@@ -1,0 +1,311 @@
+enum UserRole {
+    DENTIST
+    RECEPTIONIST
+    CUSTOMER
+}
+enum ThemePreference {
+    LIGHT
+    DARK
+}
+enum RecordStatus {
+    ACTIVE
+    INACTIVE
+    DELETED
+}
+enum ProcedureStatus {
+    NEXT
+    ONGOING
+    DONE
+}
+enum AppointmentStatus {
+    UPCOMING
+    MISSED
+    ATTENDED
+}
+enum QueueStatus {
+    WAITING
+    SERVING
+    DONE
+}
+enum AuditAction {
+    CREATE
+    UPDATE
+    DELETE
+}
+enum AuditEntityType {
+    PATIENT
+    PROCEDURE
+    APPOINTMENT
+    PAYMENT
+    USER
+}
+enum {
+    REJECT
+    ALLOW_CREDIT
+}
+
+
+
+model User {
+    id                String            @id @default(uuid()) @db.Char(36)
+    fullname          String            @db.VarChar(120)
+    email             String?           @unique @db.VarChar(255)
+    phone             String?           @unique @db.VarChar(30)
+    passwordHash      String            @unique @db.VarChar(255)
+    role              UserRole 
+    themePreference   ThemePreference   @default(LIGHT)
+
+    linkedPatientId   String?           @unique @db.Char(36)
+
+    createdAt         DateTime          @default(now())
+    updatedAt         DateTime          @updatedAt
+    deleteAt          DateTime? 
+    recordStatus      RecordStatus      @default(ACTIVE)
+
+    linkedPatient      Patient?        @relation(
+        "CustomerPatient",
+        fields: [linkedPatientId],
+        references: [id])
+
+        createdPatients     Patient[]            @relation("PatientCreatedBy")
+        createdProcedures   Procedure[]          @relation("ProcedureCreatedBy")
+        paymentsRecorded    Payment[]            @relation("PaymentRecordedBy")
+        notifications       Notification[]       @relation("NotiifcationRecipient")
+        auditLogs           AuditLog[]           @relation("AuditLogger")
+
+}
+
+
+
+model patient {
+    id                      String              @id default(uuid()) @db.char(36)
+    full_name               String              @db.VarChar(120)
+    age                     Int                
+    contact_info            String              @db.VarChar(255)
+    service_type            String              @db.VarChar(125)
+    remaining_fee           Int                 @db.Decimal(10,2)
+    next_appointment_date   DateTime            @db.Date
+    created_by_user_id      String              @db.VarChar(36)
+    record_status           RecordStatus        @default(ACTIVE)
+    created_at              DateTime            @default(now())
+    updated_at              DateTime            @updatedAt
+    deletedAt               DateTime            
+ 
+   createdBy                User                @relation (
+    "PatientCreatedBy"
+    fields: [CreatedByUserId]
+    references: [id]
+   )
+
+   linkedUser                User?              @relation("CustomerPatient")
+
+   procedures            Procedure[]
+   appointments          Appointment[]
+   queueEntries          QueueEntry[]
+   payments              Payment[]
+}
+
+
+model Procedure {
+    id                     String             @id @default(uuid())  @db.Char(36)
+
+    patientId              String              @db.VarChar(36)
+    description            String              @db.VarChar(500)
+    status                 String
+    cost                   Int                 @db.Decimal(10, 2)
+
+    targetDate              DateTime           @db.Date
+    completedDate           DateTime           @db.Date
+
+    created_by_user_id      String              @db.VarChar(36)
+
+    record_status           RecordStatus        @default(ACTIVE)
+    created_at              DateTime            @default(now())
+    updated_at              DateTime            @updatedAt
+    deletedAt               DateTime            
+
+patient                  Patient               @relation(
+    fields:[patientId],
+    references:[id]
+)
+
+createdBy              User                 @relation(
+    "ProcedureCreatedBy",
+    fields: [createdByUserId],
+    references: [id]
+)
+
+appointments    Appointment[]
+    
+}
+
+
+model Appointment {
+    id                  String                 @id @default(uuid()) @db.Char(36)
+    patient_id          String                 @db.Char(36)
+    procedure_id        String?                @db.Char(36)
+    scheduled_date      DateTime               @db.Date
+    status              AppointmentStatus
+
+
+
+    created_by_user_id      String              @db.VarChar(36)
+
+    record_status           RecordStatus        @default(ACTIVE)
+    created_at              DateTime            @default(now())
+    updated_at              DateTime            @updatedAt
+    deletedAt               DateTime            
+
+patient                  Patient               @relation(
+    fields:[patientId],
+    references:[id]
+)
+
+}
+
+
+
+model QueueEntry {
+id                       String                 @id @default(uuid())  @db.Char(36)
+patient_id               String                 @db.VarChar(36)
+queue_number             Int                   
+status                   QueueStatus
+queue_date               DateTime               @db.Date
+called_at                DateTime?            
+completed_at             DateTime?            
+
+
+    
+    created_by_user_id      String              @db.VarChar(36)
+
+    record_status           RecordStatus        @default(ACTIVE)
+    created_at              DateTime            @default(now())
+    updated_at              DateTime            @updatedAt
+    deletedAt               DateTime            
+
+patient                  Patient               @relation(
+    fields:[patientId],
+    references:[id]
+)
+notifications          Notification[]
+}
+
+
+
+model payment {
+    id                     String              @id @default(uuid()) @db.Char(36)
+    patient_id             String              @db.VarChar(36)
+    amount                 Decimal             @db.Decimal(10, 2)
+    recorded_by_user_id    String              @db.Char(36)
+    payment_date           DateTime            @db.Date
+
+
+    record_status           RecordStatus        @default(ACTIVE)
+    created_at              DateTime            @default(now())
+    updated_at              DateTime            @updatedAt
+    deletedAt               DateTime            
+
+patient                  Patient               @relation(
+    fields:[patientId],
+    references:[id]
+)
+recordedBy                User               @relation(
+    "PaymentRecordedBy"
+    fields:[recordedByUserId],
+    references: [id]
+)
+
+}
+
+
+model notification {
+    id                       String             @id @default(uuid())  @db.Char(36)
+    recipient_user_id        String             @db.Char(36)
+    message                  String             @db.Text
+    related_queue_entry_id   String?            @db.Char(36)
+    is_read                  Boolean            @default(false)
+
+
+
+
+    record_status           RecordStatus        @default(ACTIVE)
+    created_at              DateTime            @default(now())
+    updated_at              DateTime            @updatedAt
+    deletedAt               DateTime            
+
+  recipient             User         @relation(
+    "NotificationRecipient",
+    fields: [recipientUserId],
+    references: [id]
+  )
+
+  relatedQueueEntry     QueueEntry?  @relation(
+    fields: [relatedQueueEntryId],
+    references: [id]
+  )
+}
+
+
+// ============================================================
+// AUDIT LOG
+// ============================================================
+
+model AuditLog {
+  id            String          @id @default(uuid()) @db.Char(36)
+
+  actorUserId   String          @db.Char(36)
+  entityType    AuditEntityType
+  entityId      String          @db.Char(36)
+  action        AuditAction
+
+  changeSummary Json
+
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  deletedAt     DateTime?
+  recordStatus  RecordStatus    @default(ACTIVE)
+
+  actor         User            @relation(
+    "AuditActor",
+    fields: [actorUserId],
+    references: [id]
+  )
+}
+
+
+// ============================================================
+// SERVICE TYPE
+// ============================================================
+
+model ServiceType {
+  id        String       @id @default(uuid()) @db.Char(36)
+
+  name      String       @unique @db.VarChar(120)
+  isActive  Boolean      @default(true)
+  sortOrder Int
+
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  deletedAt DateTime?
+  recordStatus RecordStatus @default(ACTIVE)
+}
+
+
+// ============================================================
+// CLINIC SETTINGS
+// ============================================================
+
+model ClinicSettings {
+  id                 String            @id @default(uuid()) @db.Char(36)
+
+  clinicName         String            @db.VarChar(255)
+  timezone           String            @db.VarChar(100)
+  noShowGraceHours   Int               @default(0)
+  overpaymentPolicy  OverpaymentPolicy
+  currencyCode       String            @db.Char(3)
+
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+  deletedAt          DateTime?
+  recordStatus       RecordStatus      @default(ACTIVE)
+}
