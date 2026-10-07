@@ -1,16 +1,15 @@
-require("dotenv").config();
+const env = require("../config/env");
 const { PrismaClient } = require("@prisma/client");
 const { PrismaMariaDb } = require("@prisma/adapter-mariadb");
 
 const globalForPrisma = global;
 
 function createPrismaClient() {
-  const connectionString = process.env.TIDB_DATABASE_URL;
-  const adapter = new PrismaMariaDb(connectionString);
+  const adapter = new PrismaMariaDb(env.TIDB_DATABASE_URL);
   return new PrismaClient({
     adapter,
     log:
-      process.env.NODE_ENV === "development"
+      env.NODE_ENV === "development"
         ? ["query", "error", "warn"]
         : ["error"],
   });
@@ -18,6 +17,6 @@ function createPrismaClient() {
 
 const prisma = globalForPrisma.prisma || createPrismaClient();
 
-if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
+if (env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
 
 module.exports = prisma;
