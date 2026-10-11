@@ -1,20 +1,31 @@
-// Import the Prisma client from infrastructure.
-// This is the database implementation our application will use.
-const prisma = require("../infrastructure/database/prisma");
+const prisma = require("../Infrastructure/database/prisma");
+const userRepository = require("../Infrastructure/Repositories/user.repository");
+
+const passwordService = require("../Infrastructure/authentication/password.service");
+const tokenService = require("../Infrastructure/authentication/token.service");
+
+const LoginUser = require("../application/auth/LoginUser");
+const GetCurrentUser = require("../application/auth/GetCurrentUser");
 
 
-// Create the application's dependency container.
-//
-// As the project grows, this object will contain repositories,
-// services, and use cases with their dependencies already connected.
+const loginUser = new LoginUser({
+    userRepository,
+    passwordService,
+    tokenService,
+});
+
+const getCurrentUser = new GetCurrentUser({
+    userRepository,
+});
+
+
 const container = {
-
-    // Make Prisma available to the rest of the application
-    // through the dependency container.
     prisma,
-
+    userRepository,
+    passwordService,
+    tokenService,
+    loginUser,
+    getCurrentUser,
 };
 
-
-// Export the container.
 module.exports = container;
