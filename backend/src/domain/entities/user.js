@@ -1,3 +1,9 @@
+const {
+    UserRole,
+    RecordStatus,
+    ThemePreference,
+} = require("../enums/enum");
+
 class User {
     constructor(
         id = null,
