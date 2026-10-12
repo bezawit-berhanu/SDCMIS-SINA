@@ -1,6 +1,6 @@
-const app = require(".app");
+const app = require("./app");
 
-const env = require("./config/env");
+const env = require("./src/config/env");
 
 const server = app.listen(env.PORT, () => {
     console.log(
@@ -9,5 +9,5 @@ const server = app.listen(env.PORT, () => {
 });
 
 server.on("error", (error) => {
-    console.error("HTTP server error: error");
+    console.error("HTTP server error:", error);
 });

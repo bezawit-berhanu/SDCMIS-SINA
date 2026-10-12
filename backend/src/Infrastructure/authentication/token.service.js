@@ -15,7 +15,7 @@ const tokenService = {
             expiresIn: env.JWT_ACCESS_EXPIRES_IN,
             issuer: ISSUER,
             audience: AUDIENCE,
-            algorith: "HS256",
+            algorithm: "HS256",
         }
         );
     },
@@ -28,4 +28,4 @@ const tokenService = {
     },
 };
 
-Module.exports = tokenService;
+module.exports = tokenService;

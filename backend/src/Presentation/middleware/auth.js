@@ -1,22 +1,21 @@
-const tokenService = require("../../infrastructure/authentication/token.service");
+const tokenService = require("../../Infrastructure/authentication/token.service");
 const container = require("../../container/container");
-
 
 async function authenticate(req, res, next) {
     try {
         const authorization = req.headers.authorization;
 
-        if (!authorization || !authorization.startWith("Bearer ")) {
-            const error = new Error("Authentication is required");
+        if (!authorization || !authorization.startsWith("Bearer ")) {
+            const error = new Error("Authentication is required.");
             error.statusCode = 401;
-            error.code = "UNAUTHETNICATED";
+            error.code = "UNAUTHENTICATED";
             throw error;
         }
 
         const token = authorization.slice("Bearer ".length).trim();
 
         if (!token) {
-            const error = new Error("Authentication is reuquired.");
+            const error = new Error("Authentication is required.");
             error.statusCode = 401;
             error.code = "UNAUTHENTICATED";
             throw error;
@@ -24,15 +23,12 @@ async function authenticate(req, res, next) {
 
         const payload = tokenService.verifyAccessToken(token);
 
-
         const user = await container.getCurrentUser.execute(payload.sub);
 
         req.user = user;
 
-
         next();
-    }
-    catch (error) {
+    } catch (error) {
         if (
             error.name === "JsonWebTokenError" ||
             error.name === "TokenExpiredError" ||
@@ -47,4 +43,4 @@ async function authenticate(req, res, next) {
     }
 }
 
-module.export = authenticate;
+module.exports = authenticate;

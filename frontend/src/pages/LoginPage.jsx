@@ -16,7 +16,7 @@ export default function LoginPage() {
         e.preventDefault();
 
         if (!username.trim() || !password.trim()) {
-            setError("Please provide both username and password.");
+            setError("Please provide both email/username and password.");
             return;
         }
 
@@ -24,28 +24,30 @@ export default function LoginPage() {
         setError("");
 
         try {
-            // Attempt login via configured apiClient
-            const response = await apiClient.post("/auth/login", {
-                username: username.trim(),
+            // Attempt login via configured apiClient to /api/v1/auth/login
+            const response = await apiClient.post("/api/v1/auth/login", {
+                email: username.trim(),
                 password,
             });
 
             const token =
-                response.data?.token ||
-                response.data?.accessToken ||
-                `session_${Date.now()}`;
+                response.data?.data?.accessToken ||
+                response.data?.accessToken;
+
+            if (!token) {
+                throw new Error("No access token was returned by the server.");
+            }
+
             sessionStorage.setItem("sdcmis_access_token", token);
             navigate("/dashboard");
         } catch (err) {
-            // If backend responds with an explicit error message
-            if (err.response?.data?.message) {
-                setError(err.response.data.message);
-            } else {
-                // If API is unreachable or development mode without auth endpoint
-                const fallbackToken = `sdcmis_dev_token_${Date.now()}`;
-                sessionStorage.setItem("sdcmis_access_token", fallbackToken);
-                navigate("/dashboard");
-            }
+            const errorMessage =
+                err.response?.data?.error?.message ||
+                err.response?.data?.message ||
+                (err.response?.status === 401
+                    ? "Invalid email or password."
+                    : err.message || "Failed to sign in. Please check your credentials and server connection.");
+            setError(errorMessage);
         } finally {
             setLoading(false);
         }

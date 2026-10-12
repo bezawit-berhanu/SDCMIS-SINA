@@ -1,5 +1,3 @@
-const { ThemePreference } = require("@prisma/client");
-
 const userRole = Object.freeze({
     DENTIST: "DENTIST",
     RECEPTIONIST: "RECEPTIONIST",

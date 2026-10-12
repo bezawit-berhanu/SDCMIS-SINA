@@ -20,7 +20,7 @@ class GetCurrentUser {
         // Expose only the fields needed by the application.
         return {
             id: user.id,
-            fullName: user.fullName,
+            fullName: user.fullname || user.fullName,
             email: user.email,
             role: user.role,
         };

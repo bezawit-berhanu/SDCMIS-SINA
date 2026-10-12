@@ -1,11 +1,11 @@
-const bcrypt = require("bcrypt.js");
+const bcrypt = require("bcryptjs");
 
 const SALT_ROUNDS = 12;
 
 const passwordService = {
     async hash(plainPassword) {
         if (typeof plainPassword !== "string" || plainPassword.length === 0) {
-            throw new Errpr("A password is required!");
+            throw new Error("A password is required!");
         }
 
         if (Buffer.byteLength(plainPassword, "utf8") > 72) {

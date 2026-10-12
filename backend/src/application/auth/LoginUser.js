@@ -22,10 +22,10 @@ class LoginUser {
             password, user?.passwordHash
         );
 
-        if (!user || !passwordIsValid) {
+        if (!user || !passwordValid) {
             const error = new Error("Invalid email or password.");
             error.statusCode = 401;
-            error.code = "Invalid_CREDENTAILS";
+            error.code = "INVALID_CREDENTIALS";
             throw error;
         }
 
@@ -36,7 +36,7 @@ class LoginUser {
             tokenType: "Bearer",
             user: {
                 id: user.id,
-                fullName: user.fullName,
+                fullName: user.fullname || user.fullName,
                 email: user.email,
                 role: user.role,
             },

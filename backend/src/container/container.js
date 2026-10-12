@@ -1,4 +1,4 @@
-const prisma = require("../Infrastructure/database/prisma");
+const prisma = require("../Infrastructure/prisma");
 const userRepository = require("../Infrastructure/Repositories/user.repository");
 
 const passwordService = require("../Infrastructure/authentication/password.service");
