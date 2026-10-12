@@ -1,4 +1,4 @@
-const userRole = Object.freeze({
+const UserRole = Object.freeze({
     DENTIST: "DENTIST",
     RECEPTIONIST: "RECEPTIONIST",
     CUSTOMER: "CUSTOMER",
@@ -9,13 +9,16 @@ const RecordStatus = Object.freeze({
     INACTIVE: "INACTIVE",
     DELETED: "DELETED",
 });
+
 const ThemePreference = Object.freeze({
     LIGHT: "LIGHT",
     DARK: "DARK",
 });
 
 module.exports = {
-    userRole,
+    UserRole,
+    userRole: UserRole,
     RecordStatus,
     ThemePreference,
+    ...UserRole,
 };

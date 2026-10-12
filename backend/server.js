@@ -9,5 +9,11 @@ const server = app.listen(env.PORT, () => {
 });
 
 server.on("error", (error) => {
-    console.error("HTTP server error:", error);
+    if (error.code === "EADDRINUSE") {
+        console.error(
+            `Port ${env.PORT} is already in use (EADDRINUSE). Please ensure no previous server instance is running or set a different PORT in environment variables.`
+        );
+    } else {
+        console.error("HTTP server error:", error);
+    }
 });
