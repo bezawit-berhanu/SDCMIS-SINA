@@ -13,21 +13,6 @@ class User {
         lastLoginAt,
         createdAt,
         updatedAt) {
-        this.id = id;
-        this.email = email;
-        this.phone = phone;
-        this.passwordHash = passwordHash;
-        this.role = role;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.clinicId = clinicId;
-        this.avatarUrl = avatarUrl;
-        this.themePreference = themePreference;
-        this.status = status;
-        this.lastLoginAt = lastLoginAt;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-
         if (
             typeof fullName !== "string" ||
             fullName.trim().length < 1 ||
@@ -48,12 +33,39 @@ class User {
                 "A user must have at least an email address or phone number."
             );
         }
-        if (hasEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail))
-    ) {
+        if (hasEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
             throw new Error("Email address has an invalid format.");
         }
+        if (typeof passwordHash !== "string" || passwordHash.trim.length === 0) {
+            throw new Error("A password hash is required.");
+        }
 
+        if (!Object.values(UserRole).includes(role)) {
+            throw new Error("The specified user role is invalid.");
+        }
+        if (!Object.values(ThemePreference).includes(themePreference)) {
+            throw new Error("The specified theme preference is invalid.");
+        }
+        if (!Object.values(RecordStatus).includes(recordStatus)) {
+            throw new Error("The specified record status is invalid.");
+        }
+
+        this.id = id;
+        this.email = email;
+        this.phone = phone;
+        this.passwordHash = passwordHash;
+        this.role = role;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.clinicId = clinicId;
+        this.avatarUrl = avatarUrl;
+        this.themePreference = themePreference;
+        this.status = status;
+        this.lastLoginAt = lastLoginAt;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
     }
 }
+
 
 module.exports = User;
