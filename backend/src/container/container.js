@@ -5,6 +5,7 @@ const passwordService = require("../Infrastructure/authentication/password.servi
 const tokenService = require("../Infrastructure/authentication/token.service");
 
 const LoginUser = require("../application/auth/LoginUser");
+const RegisterUser = require("../application/auth/RegisterUser");
 const GetCurrentUser = require("../application/auth/GetCurrentUser");
 
 
@@ -12,6 +13,11 @@ const loginUser = new LoginUser({
     userRepository,
     passwordService,
     tokenService,
+});
+
+const registerUser = new RegisterUser({
+    userRepository,
+    passwordService,
 });
 
 const getCurrentUser = new GetCurrentUser({
@@ -25,6 +31,7 @@ const container = {
     passwordService,
     tokenService,
     loginUser,
+    registerUser,
     getCurrentUser,
 };
 
