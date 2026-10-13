@@ -29,6 +29,7 @@ app.use("/api", healthRoutes);
 
 // Authentication endpoints
 app.use("/api/v1/auth", authRoutes);
+app.use("/api/auth", authRoutes);
 
 // Fallback & centralized error handlers
 app.use(notFound);

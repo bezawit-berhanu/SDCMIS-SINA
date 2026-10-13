@@ -47,6 +47,10 @@ class User {
             throw new Error("Email address has an invalid format.");
         }
 
+        if (hasPhone && (!/^\+?[0-9\s\-().]{7,30}$/.test(normalizedPhone) || normalizedPhone.replace(/\D/g, "").length < 7 || normalizedPhone.replace(/\D/g, "").length > 15)) {
+            throw new Error("Phone number has an invalid format.");
+        }
+
         if (typeof passwordHash !== "string" || passwordHash.trim().length === 0) {
             throw new Error("A password hash is required.");
         }
