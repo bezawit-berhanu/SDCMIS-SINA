@@ -1,12 +1,13 @@
 import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../../features/auth/AuthContext";
 import Button from "../common/Button";
 
 export default function Header({ onToggleSidebar, isSidebarOpen }) {
     const navigate = useNavigate();
-    const token = typeof window !== "undefined" ? sessionStorage.getItem("sdcmis_access_token") : null;
+    const { user, logout } = useAuth();
 
     const handleLogout = () => {
-        sessionStorage.removeItem("sdcmis_access_token");
+        logout();
         navigate("/login");
     };
 
@@ -31,10 +32,10 @@ export default function Header({ onToggleSidebar, isSidebarOpen }) {
             <div className="header-right">
                 <div className="user-badge">
                     <span className="user-badge__dot" />
-                    <span>{token ? "Connected" : "Guest"}</span>
+                    <span>{user ? user.fullName || "Connected" : "Guest"}</span>
                 </div>
 
-                {token ? (
+                {user ? (
                     <Button variant="secondary" size="sm" onClick={handleLogout}>
                         Logout
                     </Button>

@@ -1,23 +1,87 @@
-//Manages the current user authentication state, 
-//restores the session by calling the exisiting endpoint and clear the session when the token get rejected.
-
+/* eslint-disable react-refresh/only-export-components */
 import {
-    createContext, useCallback, useContext, useEffect, useState,
+    createContext,
+    useCallback,
+    useContext,
+    useEffect,
+    useRef,
+    useState,
 } from "react";
+import apiClient from "../../services/apiclient";
+import { authStorage } from "./auth_storage";
 
-import { authStorage } from "../auth_storage";
-import { apiRequest } from "../../services/api_client";
+/**
+ * Safely parse JWT payload without external dependencies.
+ */
+function parseJwtPayload(token) {
+    if (!token || typeof token !== "string") return null;
+    try {
+        const parts = token.split(".");
+        if (parts.length < 2) return null;
+        const base64Url = parts[1];
+        const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+        const jsonPayload = decodeURIComponent(
+            atob(base64)
+                .split("")
+                .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+                .join("")
+        );
+        return JSON.parse(jsonPayload);
+    } catch {
+        return null;
+    }
+}
 
-const AuthContext = createContext(null);
+export const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-    const [user, setUser] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const [user, setUser] = useState(() => authStorage.getUser());
+    const [loading, setLoading] = useState(() => {
+        const token = authStorage.getToken();
+        if (!token) return false;
+        const payload = parseJwtPayload(token);
+        if (payload?.exp && payload.exp * 1000 <= Date.now()) {
+            authStorage.clear();
+            return false;
+        }
+        return true;
+    });
+
+    const expiryTimerRef = useRef(null);
+
+    const clearExpiryTimer = useCallback(() => {
+        if (expiryTimerRef.current) {
+            clearTimeout(expiryTimerRef.current);
+            expiryTimerRef.current = null;
+        }
+    }, []);
 
     const logout = useCallback(() => {
+        clearExpiryTimer();
         authStorage.clear();
         setUser(null);
-    }, []);
+        setLoading(false);
+    }, [clearExpiryTimer]);
+
+    const scheduleExpiryLogout = useCallback(
+        (token) => {
+            clearExpiryTimer();
+            const payload = parseJwtPayload(token);
+            if (!payload?.exp) return;
+
+            const remainingTimeMs = payload.exp * 1000 - Date.now();
+            if (remainingTimeMs <= 0) {
+                logout();
+                return;
+            }
+
+            const delay = Math.min(remainingTimeMs, 2147483647);
+            expiryTimerRef.current = setTimeout(() => {
+                logout();
+            }, delay);
+        },
+        [clearExpiryTimer, logout]
+    );
 
     const restoreSession = useCallback(async () => {
         const token = authStorage.getToken();
@@ -28,88 +92,150 @@ export function AuthProvider({ children }) {
             return;
         }
 
-        try {
-            const response = await apiRequest("/auth/me");
+        const payload = parseJwtPayload(token);
+        if (payload?.exp && payload.exp * 1000 <= Date.now()) {
+            logout();
+            setLoading(false);
+            return;
+        }
 
-            if (!response.ok) {
-                logout();
-                return;
+        const cachedUser = authStorage.getUser();
+        if (cachedUser) {
+            setUser(cachedUser);
+        }
+
+        try {
+            const response = await apiClient.get("/api/v1/auth/me");
+            const userData =
+                response.data?.data?.user ||
+                response.data?.user ||
+                response.data?.data;
+
+            if (userData) {
+                setUser(userData);
+                authStorage.save({ accessToken: token, user: userData });
             }
 
-            const result = await response.json();
-            const currentUser = result.data;
-
-            setUser(currentUser);
-
-            authStorage.save({
-                accessToken: token,
-                user: currentUser,
-            });
-        } catch {
-            setUser(null);
+            scheduleExpiryLogout(token);
+        } catch (error) {
+            if (error.response?.status === 401) {
+                logout();
+            } else if (cachedUser) {
+                scheduleExpiryLogout(token);
+            }
         } finally {
             setLoading(false);
         }
-    }, [logout]);
+    }, [logout, scheduleExpiryLogout]);
 
     useEffect(() => {
-        restoreSession();
-    }, [restoreSession]);
+        let isMounted = true;
+        const token = authStorage.getToken();
 
+        if (!token) {
+            return;
+        }
 
-    useEffect(() => {
-        const handleUnauthorized = () => logout();
+        const payload = parseJwtPayload(token);
+        if (payload?.exp && payload.exp * 1000 <= Date.now()) {
+            queueMicrotask(() => {
+                if (isMounted) {
+                    logout();
+                }
+            });
+            return;
+        }
 
-        window.addEventListener(
-            "auth:Unauthorized",
-            handleUnauthorized
-        );
+        apiClient
+            .get("/api/v1/auth/me")
+            .then((response) => {
+                if (!isMounted) return;
+                const userData =
+                    response.data?.data?.user ||
+                    response.data?.user ||
+                    response.data?.data;
+
+                if (userData) {
+                    setUser(userData);
+                    authStorage.save({ accessToken: token, user: userData });
+                }
+
+                scheduleExpiryLogout(token);
+            })
+            .catch((error) => {
+                if (!isMounted) return;
+                if (error.response?.status === 401) {
+                    logout();
+                } else {
+                    scheduleExpiryLogout(token);
+                }
+            })
+            .finally(() => {
+                if (isMounted) {
+                    setLoading(false);
+                }
+            });
 
         return () => {
-            window.removeEventListener(
-                "auth:Unauthorized",
-                handleUnauthorized
-            );
-        }
-    }, [logout]);
+            isMounted = false;
+        };
+    }, [logout, scheduleExpiryLogout]);
 
-    const login = useCallback(async (credentials) => {
-        const response = await apiRequest("/auth/login", {
-            method: "post",
-            body: JSON.stringfy(credentials),
-        });
+    useEffect(() => {
+        const handleUnauthorized = () => {
+            logout();
+        };
 
-        const result = await response.json();
+        window.addEventListener("auth:unauthorized", handleUnauthorized);
+        window.addEventListener("auth:Unauthorized", handleUnauthorized);
 
-        if (!response.ok) {
-            throw new Error(
-                result.message || "Login Failed."
-            );
-        }
+        return () => {
+            window.removeEventListener("auth:unauthorized", handleUnauthorized);
+            window.removeEventListener("auth:Unauthorized", handleUnauthorized);
+            clearExpiryTimer();
+        };
+    }, [logout, clearExpiryTimer]);
 
-        const session = result.data;
-        authStorage.save(session);
-        setUser(session.user);
+    const login = useCallback(
+        async (credentials) => {
+            const response = await apiClient.post("/api/v1/auth/login", credentials);
+            const data = response.data?.data || response.data;
+            const accessToken = data.accessToken;
+            const authenticatedUser = data.user;
 
-        return session.user;
-    }, []);
+            if (!accessToken) {
+                throw new Error("Authentication response did not return an access token.");
+            }
 
+            authStorage.save({
+                accessToken,
+                user: authenticatedUser,
+            });
 
-    return (
-        <AuthContext.Provider
-            value={{ user, loading, login, logout, restoreSession }}>
-            {children}
-        </AuthContext.Provider>
+            setUser(authenticatedUser);
+            scheduleExpiryLogout(accessToken);
+
+            return authenticatedUser;
+        },
+        [scheduleExpiryLogout]
     );
+
+    const value = {
+        user,
+        loading,
+        isAuthenticated: Boolean(user),
+        login,
+        logout,
+        restoreSession,
+    };
+
+    return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth() {
     const context = useContext(AuthContext);
-
     if (!context) {
-        throw new Error(
-            "useAuth must be used inside AuthProvider."
-        );
+        throw new Error("useAuth must be used inside AuthProvider.");
     }
     return context;
 }

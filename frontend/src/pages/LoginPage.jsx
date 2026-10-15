@@ -1,16 +1,24 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import apiClient from "../services/apiclient";
+import { useAuth } from "../features/auth/AuthContext";
 import Button from "../components/common/Button";
 import ErrorMessage from "../components/common/ErrorMessage";
 import Loading from "../components/common/Loading";
 
 export default function LoginPage() {
     const navigate = useNavigate();
+    const { login, user } = useAuth();
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+
+    // If already authenticated, redirect directly to dashboard
+    useEffect(() => {
+        if (user) {
+            navigate("/dashboard", { replace: true });
+        }
+    }, [user, navigate]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -24,21 +32,11 @@ export default function LoginPage() {
         setError("");
 
         try {
-            // Attempt login via configured apiClient to /api/v1/auth/login
-            const response = await apiClient.post("/api/v1/auth/login", {
+            await login({
                 email: username.trim(),
                 password,
             });
 
-            const token =
-                response.data?.data?.accessToken ||
-                response.data?.accessToken;
-
-            if (!token) {
-                throw new Error("No access token was returned by the server.");
-            }
-
-            sessionStorage.setItem("sdcmis_access_token", token);
             navigate("/dashboard");
         } catch (err) {
             const errorMessage =
@@ -69,7 +67,7 @@ export default function LoginPage() {
                         id="username"
                         type="text"
                         className="form-input"
-                        placeholder="Enter your username"
+                        placeholder="Enter your email or username"
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
                         disabled={loading}

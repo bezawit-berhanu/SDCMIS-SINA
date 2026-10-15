@@ -1,38 +1,19 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import apiClient from "../services/apiclient";
+import { useState } from "react";
+import { useAuth } from "../features/auth/AuthContext";
 import PageContainer from "../components/layout/PageContainer";
 import Button from "../components/common/Button";
 
 export default function DashboardPage() {
-    const navigate = useNavigate();
-    const [currentUser, setCurrentUser] = useState(null);
+    const { user: currentUser, restoreSession } = useAuth();
     const [refreshing, setRefreshing] = useState(false);
 
-    useEffect(() => {
-        const fetchCurrentUser = async () => {
-            const token = sessionStorage.getItem("sdcmis_access_token");
-            if (!token) return;
-
-            try {
-                const response = await apiClient.get("/api/v1/auth/me");
-                if (response.data?.data?.user) {
-                    setCurrentUser(response.data.data.user);
-                }
-            } catch (err) {
-                if (err.response?.status === 401) {
-                    sessionStorage.removeItem("sdcmis_access_token");
-                    navigate("/login");
-                }
-            }
-        };
-
-        fetchCurrentUser();
-    }, [navigate]);
-
-    const handleRefresh = () => {
+    const handleRefresh = async () => {
         setRefreshing(true);
-        setTimeout(() => setRefreshing(false), 600);
+        try {
+            await restoreSession();
+        } finally {
+            setTimeout(() => setRefreshing(false), 500);
+        }
     };
 
     const stats = [
