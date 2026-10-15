@@ -28,11 +28,14 @@ const authController = {
     async login(req, res, next) {
         try {
             // Extract only the expected login fields from the request body.
-            const { email, password } = req.body ?? {};
+            const { email, username, phone, identifier, password } = req.body ?? {};
 
             // Let the application use case handle login rules.
             const result = await container.loginUser.execute({
                 email,
+                username,
+                phone,
+                identifier,
                 password,
             });
 
