@@ -1,6 +1,20 @@
-const { describe, it, beforeEach, after } = require("node:test");
+const { describe, it, before, beforeEach, after } = require("node:test");
 const assert = require("node:assert");
 const http = require("node:http");
+
+const mockPrisma = {
+    user: {
+        findFirst: async () => null,
+        create: async (args) => ({ id: "mock-id", ...args.data }),
+    },
+    $disconnect: async () => {},
+};
+require.cache[require.resolve("./src/Infrastructure/prisma")] = {
+    id: require.resolve("./src/Infrastructure/prisma"),
+    filename: require.resolve("./src/Infrastructure/prisma"),
+    loaded: true,
+    exports: mockPrisma,
+};
 
 const RegisterUser = require("./src/application/auth/RegisterUser");
 const passwordService = require("./src/Infrastructure/authentication/password.service");
@@ -553,14 +567,8 @@ describe("Express API HTTP Integration Tests", () => {
     let baseUrl;
     let originalRegisterUser;
 
-    beforeEach(async () => {
+    before(async () => {
         originalRegisterUser = container.registerUser;
-        const mockRepo = createMockUserRepository();
-        container.registerUser = new RegisterUser({
-            userRepository: mockRepo,
-            passwordService,
-        });
-
         await new Promise((resolve) => {
             server = http.createServer(app);
             server.listen(0, "127.0.0.1", () => {
@@ -571,12 +579,21 @@ describe("Express API HTTP Integration Tests", () => {
         });
     });
 
-    after(() => {
-        if (server && server.listening) {
-            server.close();
-        }
+    beforeEach(() => {
+        const mockRepo = createMockUserRepository();
+        container.registerUser = new RegisterUser({
+            userRepository: mockRepo,
+            passwordService,
+        });
+    });
+
+    after(async () => {
         if (originalRegisterUser) {
             container.registerUser = originalRegisterUser;
+        }
+        if (server && server.listening) {
+            server.closeAllConnections?.();
+            await new Promise((resolve) => server.close(resolve));
         }
     });
 
@@ -603,7 +620,7 @@ describe("Express API HTTP Integration Tests", () => {
         assert.strictEqual(json.data.user.role, "CUSTOMER");
         assert.strictEqual("passwordHash" in json.data.user, false);
         assert.strictEqual("password" in json.data.user, false);
-        assert.ok(json.requestId, "Response should include requestId");
+        assert.ok(res.headers.get("x-request-id"), "Response should include X-Request-ID header");
     });
 
     it("POST /api/v1/auth/register returns 201 Created on valid registration (supporting existing API prefix)", async () => {
