@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "test": "node --test test.routes.js",
+    "test": "node --test test.routes.js && node --test test.settings.js",
     "preview": "vite preview"
   },
   "dependencies": {
