@@ -1,9 +1,10 @@
 import { Link } from "react-router-dom";
-import { useAuth } from "../../features/auth/auth-context";
+import { useAuth, getDefaultDashboardForRole } from "../../features/auth/auth-context";
 import Button from "./Button";
 
 export default function AccessDenied({ message, requiredRoles }) {
     const { user } = useAuth();
+    const authorizedDashboard = getDefaultDashboardForRole(user?.role);
 
     return (
         <div style={{ maxWidth: "600px", margin: "3rem auto", padding: "1.5rem" }}>
@@ -41,7 +42,7 @@ export default function AccessDenied({ message, requiredRoles }) {
                 )}
 
                 <div style={{ display: "flex", justifyContent: "center", gap: "0.75rem" }}>
-                    <Link to="/dashboard">
+                    <Link to={authorizedDashboard || "/dashboard"}>
                         <Button variant="primary">Return to Dashboard</Button>
                     </Link>
                     <Link to="/">

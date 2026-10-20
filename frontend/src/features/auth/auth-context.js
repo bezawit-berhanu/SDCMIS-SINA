@@ -1,2 +1,2 @@
 export { AuthContext, AuthProvider, useAuth, default } from "./AuthContext";
-export { UserRole } from "./roles";
+export { UserRole, getDefaultDashboardForRole, isRoleAuthorized } from "./roles";

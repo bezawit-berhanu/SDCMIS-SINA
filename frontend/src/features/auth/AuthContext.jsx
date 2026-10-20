@@ -35,12 +35,21 @@ function parseJwtPayload(token) {
 export const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-    const [user, setUser] = useState(() => authStorage.getUser());
+    const [user, setUser] = useState(() => {
+        const token = authStorage.getToken();
+        if (!token) return null;
+        const payload = parseJwtPayload(token);
+        if (!payload || (payload.exp && payload.exp * 1000 <= Date.now())) {
+            authStorage.clear();
+            return null;
+        }
+        return authStorage.getUser();
+    });
     const [loading, setLoading] = useState(() => {
         const token = authStorage.getToken();
         if (!token) return false;
         const payload = parseJwtPayload(token);
-        if (payload?.exp && payload.exp * 1000 <= Date.now()) {
+        if (!payload || (payload.exp && payload.exp * 1000 <= Date.now())) {
             authStorage.clear();
             return false;
         }
@@ -93,7 +102,7 @@ export function AuthProvider({ children }) {
         }
 
         const payload = parseJwtPayload(token);
-        if (payload?.exp && payload.exp * 1000 <= Date.now()) {
+        if (!payload || (payload.exp && payload.exp * 1000 <= Date.now())) {
             logout();
             setLoading(false);
             return;
@@ -137,7 +146,7 @@ export function AuthProvider({ children }) {
         }
 
         const payload = parseJwtPayload(token);
-        if (payload?.exp && payload.exp * 1000 <= Date.now()) {
+        if (!payload || (payload.exp && payload.exp * 1000 <= Date.now())) {
             queueMicrotask(() => {
                 if (isMounted) {
                     logout();
@@ -220,11 +229,20 @@ export function AuthProvider({ children }) {
         [scheduleExpiryLogout]
     );
 
+    const register = useCallback(
+        async (registrationData) => {
+            const response = await apiClient.post("/api/v1/auth/register", registrationData);
+            return response.data?.data || response.data;
+        },
+        []
+    );
+
     const value = {
         user,
         loading,
         isAuthenticated: Boolean(user),
         login,
+        register,
         logout,
         restoreSession,
     };
