@@ -1,24 +1,30 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "../features/auth/AuthContext";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useAuth, getDefaultDashboardForRole } from "../features/auth/auth-context";
 import Button from "../components/common/Button";
 import ErrorMessage from "../components/common/ErrorMessage";
 import Loading from "../components/common/Loading";
 
 export default function LoginPage() {
     const navigate = useNavigate();
+    const location = useLocation();
     const { login, user } = useAuth();
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
 
-    // If already authenticated, redirect directly to dashboard
+    const fromPath = location.state?.from?.pathname || location.state?.from;
+    const returnTarget = (fromPath && fromPath !== "/login" && fromPath !== "/register")
+        ? fromPath
+        : null;
+
+    // If already authenticated, redirect directly to intended destination or role dashboard
     useEffect(() => {
         if (user) {
-            navigate("/dashboard", { replace: true });
+            navigate(returnTarget || getDefaultDashboardForRole(user.role), { replace: true });
         }
-    }, [user, navigate]);
+    }, [user, navigate, returnTarget]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -32,12 +38,13 @@ export default function LoginPage() {
         setError("");
 
         try {
-            await login({
+            const loggedInUser = await login({
                 email: username.trim(),
                 password,
             });
 
-            navigate("/dashboard");
+            const target = returnTarget || getDefaultDashboardForRole(loggedInUser?.role);
+            navigate(target, { replace: true });
         } catch (err) {
             const errorMessage =
                 err.response?.data?.error?.message ||
@@ -102,6 +109,13 @@ export default function LoginPage() {
                     >
                         {loading ? <Loading inline size="sm" message="Signing in..." /> : "Sign In"}
                     </Button>
+                </div>
+
+                <div style={{ marginTop: "1.25rem", textAlign: "center", fontSize: "0.875rem" }}>
+                    <span style={{ color: "var(--text-muted)" }}>Don't have an account? </span>
+                    <Link to="/register" style={{ color: "var(--primary)", fontWeight: 500 }}>
+                        Create one
+                    </Link>
                 </div>
             </form>
         </div>
