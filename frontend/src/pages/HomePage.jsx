@@ -1,23 +1,25 @@
 import { Link } from "react-router-dom";
+import { useAuth, getDefaultDashboardForRole } from "../features/auth/auth-context";
 import Button from "../components/common/Button";
 
 export default function HomePage() {
-    const token = typeof window !== "undefined" ? sessionStorage.getItem("sdcmis_access_token") : null;
+    const { user } = useAuth();
+    const dashboardPath = user ? getDefaultDashboardForRole(user.role) : "/login";
 
     return (
         <div style={{ maxWidth: "1000px", margin: "0 auto", padding: "3rem 1.5rem" }}>
             <div style={{ textAlign: "center", marginBottom: "3rem" }}>
                 <h1 style={{ fontSize: "2.25rem", fontWeight: 800, marginBottom: "1rem", color: "var(--text-main)" }}>
-                    Spatial Data & Information Management System
+                    Sina Dental Customer Information Management Platform
                 </h1>
                 <p style={{ fontSize: "1.125rem", color: "var(--text-muted)", maxWidth: "600px", margin: "0 auto 2rem" }}>
-                    SDCMIS-SINA delivers streamlined records processing, fast spatial information handling, and dependable system management.
+                    SCDCIMP delivers unified clinical workflows, role-based dental administration, patient queue scheduling, and customer self-service.
                 </p>
                 <div style={{ display: "flex", justifyContent: "center", gap: "1rem", flexWrap: "wrap" }}>
-                    {token ? (
-                        <Link to="/dashboard">
+                    {user ? (
+                        <Link to={dashboardPath}>
                             <Button variant="primary" size="lg">
-                                Go to Dashboard
+                                Open Role Dashboard
                             </Button>
                         </Link>
                     ) : (
@@ -27,9 +29,9 @@ export default function HomePage() {
                                     Sign In
                                 </Button>
                             </Link>
-                            <Link to="/dashboard">
+                            <Link to="/register">
                                 <Button variant="outline" size="lg">
-                                    View Dashboard
+                                    Create Account
                                 </Button>
                             </Link>
                         </>

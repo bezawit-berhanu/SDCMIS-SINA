@@ -1,11 +1,14 @@
 import { NavLink } from "react-router-dom";
-import { useAuth } from "../../features/auth/auth-context";
+import { useAuth, UserRole } from "../../features/auth/auth-context";
 
 export default function Sidebar({ isOpen = false, onClose }) {
     const { user } = useAuth();
 
     const navItems = [
-        { path: "/dashboard", label: "Dashboard", icon: "📊" },
+        { path: "/dentist", label: "Dentist Portal", icon: "🦷", roles: [UserRole.DENTIST] },
+        { path: "/receptionist", label: "Receptionist Desk", icon: "📋", roles: [UserRole.RECEPTIONIST] },
+        { path: "/customer", label: "Customer Portal", icon: "👤", roles: [UserRole.CUSTOMER] },
+        { path: "/settings", label: "Settings", icon: "⚙️" },
         { path: "/", label: "Home Page", icon: "🏠" },
     ];
 

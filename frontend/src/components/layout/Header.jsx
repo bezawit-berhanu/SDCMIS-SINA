@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../../features/auth/AuthContext";
+import { useAuth, getDefaultDashboardForRole } from "../../features/auth/auth-context";
 import Button from "../common/Button";
 
 export default function Header({ onToggleSidebar, isSidebarOpen }) {
@@ -10,6 +10,8 @@ export default function Header({ onToggleSidebar, isSidebarOpen }) {
         logout();
         navigate("/login");
     };
+
+    const brandDestination = user ? getDefaultDashboardForRole(user.role) : "/";
 
     return (
         <header className="app-header">
@@ -24,7 +26,7 @@ export default function Header({ onToggleSidebar, isSidebarOpen }) {
                         ☰
                     </button>
                 )}
-                <Link to="/dashboard" className="header-brand">
+                <Link to={brandDestination} className="header-brand">
                     SDCMIS-SINA
                 </Link>
             </div>

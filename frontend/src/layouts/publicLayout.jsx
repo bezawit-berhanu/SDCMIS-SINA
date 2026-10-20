@@ -1,8 +1,10 @@
 import { Link, Outlet } from "react-router-dom";
+import { useAuth, getDefaultDashboardForRole } from "../features/auth/auth-context";
 import Button from "../components/common/Button";
 
 export default function PublicLayout() {
-    const token = typeof window !== "undefined" ? sessionStorage.getItem("sdcmis_access_token") : null;
+    const { user } = useAuth();
+    const dashboardPath = user ? getDefaultDashboardForRole(user.role) : "/login";
 
     return (
         <div className="public-layout">
@@ -14,18 +16,25 @@ export default function PublicLayout() {
                     <Link to="/" className="public-nav-link">
                         Home
                     </Link>
-                    {token ? (
-                        <Link to="/dashboard">
+                    {user ? (
+                        <Link to={dashboardPath}>
                             <Button variant="primary" size="sm">
                                 Open Dashboard
                             </Button>
                         </Link>
                     ) : (
-                        <Link to="/login">
-                            <Button variant="primary" size="sm">
-                                Login
-                            </Button>
-                        </Link>
+                        <div style={{ display: "flex", gap: "0.5rem" }}>
+                            <Link to="/login">
+                                <Button variant="secondary" size="sm">
+                                    Login
+                                </Button>
+                            </Link>
+                            <Link to="/register">
+                                <Button variant="primary" size="sm">
+                                    Register
+                                </Button>
+                            </Link>
+                        </div>
                     )}
                 </div>
             </nav>
