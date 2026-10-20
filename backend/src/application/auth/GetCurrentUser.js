@@ -17,12 +17,14 @@ class GetCurrentUser {
             throw error;
         }
 
-        // Expose only the fields needed by the application.
+        // Expose only the safe profile fields needed by the application.
         return {
             id: user.id,
             fullName: user.fullname || user.fullName,
             email: user.email,
+            phone: user.phone,
             role: user.role,
+            themePreference: user.themePreference,
         };
     }
 }

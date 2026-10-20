@@ -7,6 +7,7 @@ const errorHandler = require("./src/Presentation/middleware/errorHandler");
 
 const healthRoutes = require("./src/Presentation/routes/health.routes");
 const authRoutes = require("./src/Presentation/routes/auth.routes");
+const userRoutes = require("./src/Presentation/routes/user.routes");
 
 const app = express();
 
@@ -30,6 +31,10 @@ app.use("/api", healthRoutes);
 // Authentication endpoints
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/auth", authRoutes);
+
+// User personal settings endpoints
+app.use("/api/v1/users", userRoutes);
+app.use("/api/users", userRoutes);
 
 // Fallback & centralized error handlers
 app.use(notFound);

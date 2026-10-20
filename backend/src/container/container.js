@@ -8,6 +8,10 @@ const LoginUser = require("../application/auth/LoginUser");
 const RegisterUser = require("../application/auth/RegisterUser");
 const GetCurrentUser = require("../application/auth/GetCurrentUser");
 
+const UpdateUserName = require("../application/settings/UpdateUserName");
+const UpdateUserContact = require("../application/settings/UpdateUserContact");
+const ChangeUserPassword = require("../application/settings/ChangeUserPassword");
+const UpdateUserProfile = require("../application/settings/UpdateUserProfile");
 
 const loginUser = new LoginUser({
     userRepository,
@@ -24,6 +28,22 @@ const getCurrentUser = new GetCurrentUser({
     userRepository,
 });
 
+const updateUserName = new UpdateUserName({
+    userRepository,
+});
+
+const updateUserContact = new UpdateUserContact({
+    userRepository,
+});
+
+const changeUserPassword = new ChangeUserPassword({
+    userRepository,
+    passwordService,
+});
+
+const updateUserProfile = new UpdateUserProfile({
+    userRepository,
+});
 
 const container = {
     prisma,
@@ -33,6 +53,10 @@ const container = {
     loginUser,
     registerUser,
     getCurrentUser,
+    updateUserName,
+    updateUserContact,
+    changeUserPassword,
+    updateUserProfile,
 };
 
 module.exports = container;

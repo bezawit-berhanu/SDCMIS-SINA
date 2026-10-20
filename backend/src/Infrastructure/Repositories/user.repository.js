@@ -64,6 +64,51 @@ const userRepository = {
             },
         });
     },
+
+    async update(id, updateData) {
+        if (!id) return null;
+        const data = {};
+        if (updateData.fullName !== undefined || updateData.fullname !== undefined) {
+            data.fullname = (updateData.fullName || updateData.fullname).trim();
+        }
+        if (updateData.email !== undefined) {
+            data.email = updateData.email ? updateData.email.trim().toLowerCase() : null;
+        }
+        if (updateData.phone !== undefined) {
+            data.phone = updateData.phone ? updateData.phone.trim() : null;
+        }
+        if (updateData.passwordHash !== undefined) {
+            data.passwordHash = updateData.passwordHash;
+        }
+        if (updateData.themePreference !== undefined) {
+            data.themePreference = updateData.themePreference;
+        }
+
+        return prisma.user.update({
+            where: { id },
+            data,
+        });
+    },
+
+    async findAnyByEmailExcludingUser(email, excludeUserId) {
+        if (!email) return null;
+        return prisma.user.findFirst({
+            where: {
+                email: email.trim().toLowerCase(),
+                id: { not: excludeUserId },
+            },
+        });
+    },
+
+    async findAnyByPhoneExcludingUser(phone, excludeUserId) {
+        if (!phone) return null;
+        return prisma.user.findFirst({
+            where: {
+                phone: phone.trim(),
+                id: { not: excludeUserId },
+            },
+        });
+    },
 };
 
 module.exports = userRepository;
