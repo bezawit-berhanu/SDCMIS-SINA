@@ -3,7 +3,7 @@
 
 const crypto = require("crypto");
 
-//Express Middleware recieves the request, response, and next function
+//Express Middleware recieves the request, response, and next functions
 const requestId = (req, res, next) => {
 
     const id = crypto.randomUUID();
