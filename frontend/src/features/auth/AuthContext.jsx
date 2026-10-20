@@ -237,6 +237,79 @@ export function AuthProvider({ children }) {
         []
     );
 
+    // Apply active theme preference to document root whenever it updates
+    useEffect(() => {
+        if (typeof document !== "undefined") {
+            const theme = user?.themePreference ? String(user.themePreference).toLowerCase() : "light";
+            document.documentElement.setAttribute("data-theme", theme);
+        }
+    }, [user?.themePreference]);
+
+    const updateName = useCallback(
+        async (fullName) => {
+            const response = await apiClient.patch("/api/v1/users/name", { fullName });
+            const updatedUser =
+                response.data?.data?.user ||
+                response.data?.user ||
+                response.data?.data;
+
+            if (updatedUser) {
+                const currentToken = authStorage.getToken();
+                authStorage.save({ accessToken: currentToken, user: updatedUser });
+                setUser(updatedUser);
+            }
+            return updatedUser;
+        },
+        []
+    );
+
+    const updateContact = useCallback(
+        async ({ email, phone }) => {
+            const response = await apiClient.patch("/api/v1/users/contact", { email, phone });
+            const updatedUser =
+                response.data?.data?.user ||
+                response.data?.user ||
+                response.data?.data;
+
+            if (updatedUser) {
+                const currentToken = authStorage.getToken();
+                authStorage.save({ accessToken: currentToken, user: updatedUser });
+                setUser(updatedUser);
+            }
+            return updatedUser;
+        },
+        []
+    );
+
+    const changePassword = useCallback(
+        async ({ currentPassword, newPassword }) => {
+            const response = await apiClient.post("/api/v1/users/change-password", {
+                currentPassword,
+                newPassword,
+            });
+            return response.data;
+        },
+        []
+    );
+
+    const updateProfile = useCallback(
+        async (profileData) => {
+            const response = await apiClient.patch("/api/v1/users/profile", profileData);
+            const updatedUser =
+                response.data?.data?.user ||
+                response.data?.user ||
+                response.data?.data;
+
+            if (updatedUser) {
+                const currentToken = authStorage.getToken();
+                authStorage.save({ accessToken: currentToken, user: updatedUser });
+                setUser(updatedUser);
+            }
+            return updatedUser;
+        },
+        []
+    );
+
     const value = {
         user,
         loading,
@@ -245,6 +318,10 @@ export function AuthProvider({ children }) {
         register,
         logout,
         restoreSession,
+        updateName,
+        updateContact,
+        changePassword,
+        updateProfile,
     };
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
