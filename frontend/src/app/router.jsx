@@ -14,6 +14,7 @@ import DentistPage from "../pages/DentistPage.jsx";
 import ReceptionistPage from "../pages/ReceptionistPage.jsx";
 import CustomerPage from "../pages/CustomerPage.jsx";
 import SettingsPage from "../pages/SettingsPage.jsx";
+import PatientsPage from "../pages/PatientsPage.jsx";
 
 const router = createBrowserRouter([
     // Public home route
@@ -60,6 +61,14 @@ const router = createBrowserRouter([
                 element: (
                     <ProtectedRoute allowedRoles={[UserRole.DENTIST]}>
                         <DentistPage />
+                    </ProtectedRoute>
+                ),
+            },
+            {
+                path: "/patients",
+                element: (
+                    <ProtectedRoute allowedRoles={[UserRole.DENTIST, UserRole.RECEPTIONIST]}>
+                        <PatientsPage />
                     </ProtectedRoute>
                 ),
             },
