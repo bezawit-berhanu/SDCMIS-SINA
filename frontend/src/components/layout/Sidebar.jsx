@@ -5,6 +5,7 @@ export default function Sidebar({ isOpen = false, onClose }) {
     const { user } = useAuth();
 
     const navItems = [
+        { path: "/patients", label: "Patient Directory", icon: "👥", roles: [UserRole.DENTIST, UserRole.RECEPTIONIST] },
         { path: "/dentist", label: "Dentist Portal", icon: "🦷", roles: [UserRole.DENTIST] },
         { path: "/receptionist", label: "Receptionist Desk", icon: "📋", roles: [UserRole.RECEPTIONIST] },
         { path: "/customer", label: "Customer Portal", icon: "👤", roles: [UserRole.CUSTOMER] },
