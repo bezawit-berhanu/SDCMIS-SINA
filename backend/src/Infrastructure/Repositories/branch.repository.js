@@ -233,11 +233,19 @@ class BranchRepository {
 
     async findDentistById(dentistId) {
         if (!dentistId) return null;
+        const found = this.dentists.find((d) => d.id === dentistId && d.recordStatus === RecordStatus.ACTIVE);
+        if (found) {
+            return {
+                ...found,
+                name: found.fullName,
+            };
+        }
+
         try {
             if (prisma?.user?.findUnique) {
                 const d = await prisma.user.findUnique({
                     where: { id: dentistId },
-                    select: { id: true, fullname: true, email: true, phone: true, branchId: true, role: true },
+                    select: { id: true, fullname: true, email: true, phone: true, role: true },
                 });
                 if (d && d.role === UserRole.DENTIST) {
                     return {
@@ -246,7 +254,7 @@ class BranchRepository {
                         name: d.fullname,
                         email: d.email,
                         phone: d.phone,
-                        branchId: d.branchId,
+                        branchId: null,
                     };
                 }
             }
@@ -254,8 +262,7 @@ class BranchRepository {
             // Fall through
         }
 
-        const found = this.dentists.find((d) => d.id === dentistId && d.recordStatus === RecordStatus.ACTIVE);
-        return found ? { ...found, name: found.fullName } : null;
+        return null;
     }
 
     async associateDentistWithBranch(dentistId, branchId) {
