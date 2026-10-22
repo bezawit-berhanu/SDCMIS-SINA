@@ -13,6 +13,16 @@ const UpdateUserContact = require("../application/settings/UpdateUserContact");
 const ChangeUserPassword = require("../application/settings/ChangeUserPassword");
 const UpdateUserProfile = require("../application/settings/UpdateUserProfile");
 
+const patientRepository = require("../Infrastructure/Repositories/patient.repository");
+const branchRepository = require("../Infrastructure/Repositories/branch.repository");
+
+const CreatePatient = require("../application/patient/CreatePatient");
+const GetPatients = require("../application/patient/GetPatients");
+const GetPatientById = require("../application/patient/GetPatientById");
+const UpdatePatient = require("../application/patient/UpdatePatient");
+const DeletePatient = require("../application/patient/DeletePatient");
+const GetBranchesAndDentists = require("../application/branch/GetBranchesAndDentists");
+
 const loginUser = new LoginUser({
     userRepository,
     passwordService,
@@ -45,9 +55,37 @@ const updateUserProfile = new UpdateUserProfile({
     userRepository,
 });
 
+const createPatient = new CreatePatient({
+    patientRepository,
+    branchRepository,
+});
+
+const getPatients = new GetPatients({
+    patientRepository,
+});
+
+const getPatientById = new GetPatientById({
+    patientRepository,
+});
+
+const updatePatient = new UpdatePatient({
+    patientRepository,
+    branchRepository,
+});
+
+const deletePatient = new DeletePatient({
+    patientRepository,
+});
+
+const getBranchesAndDentists = new GetBranchesAndDentists({
+    branchRepository,
+});
+
 const container = {
     prisma,
     userRepository,
+    patientRepository,
+    branchRepository,
     passwordService,
     tokenService,
     loginUser,
@@ -57,6 +95,12 @@ const container = {
     updateUserContact,
     changeUserPassword,
     updateUserProfile,
+    createPatient,
+    getPatients,
+    getPatientById,
+    updatePatient,
+    deletePatient,
+    getBranchesAndDentists,
 };
 
 module.exports = container;
