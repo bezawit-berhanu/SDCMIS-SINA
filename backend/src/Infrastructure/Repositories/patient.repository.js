@@ -327,49 +327,7 @@ class PatientRepository {
             dentistId = "",
         } = filters;
 
-        // Try Prisma DB first
-        try {
-            if (prisma?.patient?.findMany) {
-                const whereClause = {
-                    record_status: status ? status : { not: "DELETED" },
-                    deletedAt: null,
-                };
-
-                if (branchId) whereClause.branchId = branchId;
-                if (dentistId) whereClause.dentistId = dentistId;
-                if (service) whereClause.service_type = { contains: service };
-
-                const dbPatients = await prisma.patient.findMany({
-                    where: whereClause,
-                    include: {
-                        procedures: { where: { record_status: "ACTIVE" } },
-                        appointments: { where: { record_status: "ACTIVE" } },
-                        payments: { where: { record_status: "ACTIVE" } },
-                        branch: true,
-                        dentist: { select: { id: true, fullname: true, email: true, phone: true, branchId: true } },
-                    },
-                    orderBy: { created_at: "desc" },
-                });
-
-                if (dbPatients && dbPatients.length > 0) {
-                    let results = dbPatients.map((p) => new Patient({
-                        ...p,
-                        name: p.full_name,
-                        contact: p.contact_info,
-                        serviceType: p.service_type,
-                        remainingFee: Number(p.remaining_fee),
-                        dentist: p.dentist ? { id: p.dentist.id, fullName: p.dentist.fullname, name: p.dentist.fullname } : null,
-                        branch: p.branch,
-                    }));
-
-                    return this._applyFilters(results, { search, outstandingBalance, procedureState, service, status, branchId, dentistId });
-                }
-            }
-        } catch (_) {
-            // Fall through to in-memory store
-        }
-
-        // In-memory querying
+        // In-memory querying with full rich relations and filtering
         const activePatients = this.patients.filter((p) => {
             if (status) {
                 return p.record_status === status && !p.deletedAt;
