@@ -70,14 +70,17 @@ model User {
   themePreference ThemePreference @default(LIGHT)
 
   linkedPatientId String?         @unique @db.Char(36)
+  branchId        String?         @db.Char(36)
 
   createdAt       DateTime        @default(now())
   updatedAt       DateTime        @updatedAt
   deletedAt       DateTime?
   recordStatus    RecordStatus    @default(ACTIVE)
 
+  branch            Branch?        @relation("BranchDentists", fields: [branchId], references: [id])
   linkedPatient     Patient?       @relation("CustomerPatient", fields: [linkedPatientId], references: [id])
   createdPatients   Patient[]      @relation("PatientCreatedBy")
+  treatedPatients   Patient[]      @relation("PatientDentist")
   createdProcedures Procedure[]    @relation("ProcedureCreatedBy")
   paymentsRecorded  Payment[]      @relation("PaymentRecordedBy")
   notifications     Notification[] @relation("NotificationRecipient")
@@ -94,12 +97,16 @@ model Patient {
   remaining_fee         Decimal       @db.Decimal(10, 2)
   next_appointment_date DateTime      @db.Date
   created_by_user_id    String        @db.Char(36)
+  dentistId             String?       @db.Char(36)
+  branchId              String?       @db.Char(36)
   record_status         RecordStatus  @default(ACTIVE)
   created_at            DateTime      @default(now())
   updated_at            DateTime      @updatedAt
   deletedAt             DateTime?
 
   createdBy   User         @relation("PatientCreatedBy", fields: [created_by_user_id], references: [id])
+  dentist     User?        @relation("PatientDentist", fields: [dentistId], references: [id])
+  branch      Branch?      @relation(fields: [branchId], references: [id])
   serviceType ServiceType? @relation(fields: [serviceTypeId], references: [id])
   linkedUser  User?        @relation("CustomerPatient")
 
@@ -107,6 +114,20 @@ model Patient {
   appointments Appointment[]
   queueEntries QueueEntry[]
   payments     Payment[]
+}
+
+model Branch {
+  id           String       @id @default(uuid()) @db.Char(36)
+  name         String       @unique @db.VarChar(120)
+  address      String?      @db.VarChar(255)
+  phone        String?      @db.VarChar(30)
+  recordStatus RecordStatus @default(ACTIVE)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  deletedAt    DateTime?
+
+  patients     Patient[]
+  dentists     User[]       @relation("BranchDentists")
 }
 
 model Procedure {
