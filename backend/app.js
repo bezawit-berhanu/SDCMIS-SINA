@@ -8,6 +8,8 @@ const errorHandler = require("./src/Presentation/middleware/errorHandler");
 const healthRoutes = require("./src/Presentation/routes/health.routes");
 const authRoutes = require("./src/Presentation/routes/auth.routes");
 const userRoutes = require("./src/Presentation/routes/user.routes");
+const patientRoutes = require("./src/Presentation/routes/patient.routes");
+const branchRoutes = require("./src/Presentation/routes/branch.routes");
 
 const app = express();
 
@@ -35,6 +37,19 @@ app.use("/api/auth", authRoutes);
 // User personal settings endpoints
 app.use("/api/v1/users", userRoutes);
 app.use("/api/users", userRoutes);
+
+// Patient management endpoints (Task 2: GET, POST, PUT, DELETE /patients)
+app.use("/api/v1/patients", patientRoutes);
+app.use("/api/patients", patientRoutes);
+app.use("/patients", patientRoutes);
+
+// Branch & Dentist management endpoints (Task 10 & 11)
+app.use("/api/v1/branches", branchRoutes);
+app.use("/api/branches", branchRoutes);
+app.use("/branches", branchRoutes);
+app.use("/api/v1/dentists", branchRoutes);
+app.use("/api/dentists", branchRoutes);
+app.use("/dentists", branchRoutes);
 
 // Fallback & centralized error handlers
 app.use(notFound);
