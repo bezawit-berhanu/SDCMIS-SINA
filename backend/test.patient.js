@@ -1,4 +1,4 @@
-const { describe, it } = require("node:test");
+const { describe, it, after } = require("node:test");
 const assert = require("node:assert");
 
 const Patient = require("./src/domain/entities/patient");
@@ -8,6 +8,14 @@ const container = require("./src/container/container");
 const { RecordStatus, ProcedureStatus, AppointmentStatus, AuditAction, AuditEntityType } = require("./src/domain/enums/enum");
 
 describe("Patient Management System - Comprehensive Verification Suite", () => {
+    after(async () => {
+        try {
+            if (container.prisma?.$disconnect) {
+                await container.prisma.$disconnect();
+            }
+        } catch (_) {}
+        setTimeout(() => process.exit(0), 100);
+    });
     // ----------------------------------------------------
     // Task 1: Check for patient entity and attributes
     // ----------------------------------------------------
