@@ -26,7 +26,9 @@ const initialSeedPatients = [
         procedures: [
             {
                 id: "proc-101",
+                procedureId: "proc-101",
                 patientId: "pat-1001",
+                name: "Braces Alignment",
                 description: "Initial Braces Alignment & Archwire Placement",
                 status: ProcedureStatus.ONGOING,
                 cost: 2500.00,
@@ -39,7 +41,9 @@ const initialSeedPatients = [
             },
             {
                 id: "proc-102",
+                procedureId: "proc-102",
                 patientId: "pat-1001",
+                name: "Bracket Tightening",
                 description: "Upper Arch Bracket Tightening & Elastic Adjustment",
                 status: ProcedureStatus.NEXT,
                 cost: 800.00,
@@ -52,7 +56,9 @@ const initialSeedPatients = [
             },
             {
                 id: "proc-100",
+                procedureId: "proc-100",
                 patientId: "pat-1001",
+                name: "Dental X-Ray",
                 description: "Panoramic Dental X-Ray & Cephalometric Scan",
                 status: ProcedureStatus.DONE,
                 cost: 600.00,
@@ -108,7 +114,9 @@ const initialSeedPatients = [
         procedures: [
             {
                 id: "proc-201",
+                procedureId: "proc-201",
                 patientId: "pat-1002",
+                name: "Endodontic Pulp Extirpation",
                 description: "Molar Endodontic Pulp Extirpation & Canal Cleaning",
                 status: ProcedureStatus.ONGOING,
                 cost: 1500.00,
@@ -121,7 +129,9 @@ const initialSeedPatients = [
             },
             {
                 id: "proc-202",
+                procedureId: "proc-202",
                 patientId: "pat-1002",
+                name: "Canal Obturation",
                 description: "Permanent Gutta-Percha Canal Obturation & Crown Prep",
                 status: ProcedureStatus.NEXT,
                 cost: 1200.00,
@@ -177,7 +187,9 @@ const initialSeedPatients = [
         procedures: [
             {
                 id: "proc-301",
+                procedureId: "proc-301",
                 patientId: "pat-1003",
+                name: "Surgical Implantation",
                 description: "Titanium Fixture Surgical Implantation",
                 status: ProcedureStatus.ONGOING,
                 cost: 5000.00,
@@ -190,7 +202,9 @@ const initialSeedPatients = [
             },
             {
                 id: "proc-302",
+                procedureId: "proc-302",
                 patientId: "pat-1003",
+                name: "Abutment Screw Placement",
                 description: "Abutment Screw Placement & Impression",
                 status: ProcedureStatus.NEXT,
                 cost: 1500.00,
@@ -246,7 +260,9 @@ const initialSeedPatients = [
         procedures: [
             {
                 id: "proc-401",
+                procedureId: "proc-401",
                 patientId: "pat-1004",
+                name: "Laser Teeth Whitening",
                 description: "Laser In-Office Teeth Whitening & Enamel Fluoride Protection",
                 status: ProcedureStatus.DONE,
                 cost: 950.00,
@@ -283,6 +299,8 @@ class PatientRepository {
             next_appointment_date: new Date(p.next_appointment_date),
             procedures: p.procedures.map((proc) => ({
                 ...proc,
+                procedureId: proc.procedureId || proc.id,
+                name: proc.name || (proc.description ? proc.description.slice(0, 120) : "Dental Procedure"),
                 targetDate: new Date(proc.targetDate),
                 completedDate: proc.completedDate ? new Date(proc.completedDate) : null,
                 createdAt: new Date(proc.createdAt),
@@ -438,13 +456,18 @@ class PatientRepository {
         const branchId = data.branchId || data.branchID || null;
         const createdByUserId = data.createdByUserId || actorUserId || "usr-receptionist";
         const initialProcedure = data.initialProcedure || data.initial_procedure || null;
+        const initialProcedureName = data.initialProcedureName || data.name || (initialProcedure ? initialProcedure.slice(0, 120) : "Clinical Procedure");
 
         const procedures = [];
         if (initialProcedure && typeof initialProcedure === "string" && initialProcedure.trim().length > 0) {
+            const procDesc = initialProcedure.trim();
+            const procName = (data.initialProcedureName || procDesc.split("&")[0] || procDesc).trim().slice(0, 120);
             procedures.push({
                 id: `proc-${Date.now()}-1`,
+                procedureId: `proc-${Date.now()}-1`,
                 patientId: id,
-                description: initialProcedure.trim(),
+                name: procName,
+                description: procDesc,
                 status: ProcedureStatus.ONGOING,
                 cost: initialFee,
                 targetDate: new Date(),
