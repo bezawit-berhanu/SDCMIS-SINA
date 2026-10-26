@@ -11,24 +11,30 @@ class PaymentRepository extends IPaymentRepository {
     }
 
     _getSeedPatients() {
-        if (this.patientRepository && Array.isArray(this.patientRepository.seedPatients)) {
-            return this.patientRepository.seedPatients;
+        if (this.patientRepository) {
+            if (Array.isArray(this.patientRepository.patients)) {
+                return this.patientRepository.patients;
+            }
+            if (Array.isArray(this.patientRepository.seedPatients)) {
+                return this.patientRepository.seedPatients;
+            }
         }
         return [];
     }
 
     _findPatientInMemory(patientId) {
         const patients = this._getSeedPatients();
-        return patients.find((p) => p.id === patientId && p.record_status !== RecordStatus.DELETED);
+        return patients.find((p) => p.id === patientId && p.record_status !== RecordStatus.DELETED && !p.deletedAt);
     }
 
     _syncPatientBalance(patientId) {
         const patient = this._findPatientInMemory(patientId);
         if (!patient) return 0;
-        const procedures = (patient.procedures || []).filter((p) => p.recordStatus !== RecordStatus.DELETED);
-        const payments = (patient.payments || []).filter((p) => p.recordStatus !== RecordStatus.DELETED);
+        const procedures = (patient.procedures || []).filter((p) => p.recordStatus !== RecordStatus.DELETED && p.record_status !== "DELETED");
+        const payments = (patient.payments || []).filter((p) => p.recordStatus !== RecordStatus.DELETED && p.record_status !== "DELETED");
         const newBalance = BalanceCalculator.calculateRemainingFee(procedures, payments);
         patient.remaining_fee = newBalance;
+        patient.remainingFee = newBalance;
         patient.balance = newBalance;
         return newBalance;
     }
@@ -52,7 +58,7 @@ class PaymentRepository extends IPaymentRepository {
         const patient = this._findPatientInMemory(patientId);
         let currentBalance = 0;
         if (patient) {
-            currentBalance = Number(patient.remaining_fee ?? patient.balance ?? 0);
+            currentBalance = Number(patient.remaining_fee ?? patient.remainingFee ?? patient.balance ?? 0);
         } else {
             // Check Prisma
             try {
@@ -77,7 +83,44 @@ class PaymentRepository extends IPaymentRepository {
             }
         }
 
-        // 1. Try Prisma
+        // In-Memory fallback when patient exists in memory
+        if (patient) {
+            if (!Array.isArray(patient.payments)) {
+                patient.payments = [];
+            }
+
+            const newId = payment.id || `pay-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+            payment.id = newId;
+            payment.paymentId = newId;
+            payment.PaymentId = newId;
+
+            const record = {
+                id: newId,
+                paymentId: newId,
+                PaymentId: newId,
+                patientId: patientId,
+                PatientId: patientId,
+                patient_id: patientId,
+                amount: payment.amount,
+                Amount: payment.amount,
+                paymentDate: payment.paymentDate,
+                PaymentDate: payment.paymentDate,
+                payment_date: payment.paymentDate,
+                recordedBy: payment.recordedBy,
+                RecordedBy: payment.recordedBy,
+                recordedByUserId: payment.recordedBy,
+                recordStatus: RecordStatus.ACTIVE,
+                createdAt: payment.createdAt || new Date(),
+                updatedAt: new Date(),
+            };
+
+            patient.payments.push(record);
+            this._syncPatientBalance(patientId);
+
+            return new Payment(record);
+        }
+
+        // Try Prisma
         try {
             if (this.prisma?.payment?.create) {
                 const created = await this.prisma.payment.create({
@@ -118,48 +161,21 @@ class PaymentRepository extends IPaymentRepository {
             }
         } catch (_) {}
 
-        // 2. In-Memory fallback
-        if (!patient) {
-            throw new Error(`Patient with ID ${patientId} not found.`);
-        }
-
-        if (!Array.isArray(patient.payments)) {
-            patient.payments = [];
-        }
-
-        const newId = payment.id || `pay-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
-        payment.id = newId;
-        payment.paymentId = newId;
-        payment.PaymentId = newId;
-
-        const record = {
-            id: newId,
-            paymentId: newId,
-            PaymentId: newId,
-            patientId: patientId,
-            PatientId: patientId,
-            patient_id: patientId,
-            amount: payment.amount,
-            Amount: payment.amount,
-            paymentDate: payment.paymentDate,
-            PaymentDate: payment.paymentDate,
-            payment_date: payment.paymentDate,
-            recordedBy: payment.recordedBy,
-            RecordedBy: payment.recordedBy,
-            recordedByUserId: payment.recordedBy,
-            recordStatus: RecordStatus.ACTIVE,
-            createdAt: payment.createdAt || new Date(),
-            updatedAt: new Date(),
-        };
-
-        patient.payments.push(record);
-        this._syncPatientBalance(patientId);
-
-        return new Payment(record);
+        throw new Error(`Patient with ID ${patientId} not found.`);
     }
 
     async findById(id) {
         if (!id) return null;
+
+        const patients = this._getSeedPatients();
+        for (const pat of patients) {
+            const match = (pat.payments || []).find((p) =>
+                (p.id === id || p.paymentId === id || p.PaymentId === id) &&
+                p.recordStatus !== RecordStatus.DELETED &&
+                p.record_status !== "DELETED"
+            );
+            if (match) return new Payment(match);
+        }
 
         try {
             if (this.prisma?.payment?.findUnique) {
@@ -181,19 +197,18 @@ class PaymentRepository extends IPaymentRepository {
             }
         } catch (_) {}
 
-        const patients = this._getSeedPatients();
-        for (const pat of patients) {
-            const match = (pat.payments || []).find((p) =>
-                (p.id === id || p.paymentId === id || p.PaymentId === id) &&
-                p.recordStatus !== RecordStatus.DELETED
-            );
-            if (match) return new Payment(match);
-        }
         return null;
     }
 
     async findByPatientId(patientId) {
         if (!patientId) return [];
+
+        const patient = this._findPatientInMemory(patientId);
+        if (patient && Array.isArray(patient.payments)) {
+            return patient.payments
+                .filter((p) => p.recordStatus !== RecordStatus.DELETED && p.record_status !== "DELETED")
+                .map((p) => new Payment(p));
+        }
 
         try {
             if (this.prisma?.payment?.findMany) {
@@ -216,12 +231,7 @@ class PaymentRepository extends IPaymentRepository {
             }
         } catch (_) {}
 
-        const patient = this._findPatientInMemory(patientId);
-        if (!patient || !Array.isArray(patient.payments)) return [];
-
-        return patient.payments
-            .filter((p) => p.recordStatus !== RecordStatus.DELETED)
-            .map((p) => new Payment(p));
+        return [];
     }
 
     async calculateTotalsByPatientId(patientId) {

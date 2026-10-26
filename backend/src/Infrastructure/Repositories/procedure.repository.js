@@ -11,24 +11,30 @@ class ProcedureRepository extends IProcedureRepository {
     }
 
     _getSeedPatients() {
-        if (this.patientRepository && Array.isArray(this.patientRepository.seedPatients)) {
-            return this.patientRepository.seedPatients;
+        if (this.patientRepository) {
+            if (Array.isArray(this.patientRepository.patients)) {
+                return this.patientRepository.patients;
+            }
+            if (Array.isArray(this.patientRepository.seedPatients)) {
+                return this.patientRepository.seedPatients;
+            }
         }
         return [];
     }
 
     _findPatientInMemory(patientId) {
         const patients = this._getSeedPatients();
-        return patients.find((p) => p.id === patientId && p.record_status !== RecordStatus.DELETED);
+        return patients.find((p) => p.id === patientId && p.record_status !== RecordStatus.DELETED && !p.deletedAt);
     }
 
     _syncPatientBalance(patientId) {
         const patient = this._findPatientInMemory(patientId);
         if (!patient) return;
-        const procedures = (patient.procedures || []).filter((p) => p.recordStatus !== RecordStatus.DELETED);
-        const payments = (patient.payments || []).filter((p) => p.recordStatus !== RecordStatus.DELETED);
+        const procedures = (patient.procedures || []).filter((p) => p.recordStatus !== RecordStatus.DELETED && p.record_status !== "DELETED");
+        const payments = (patient.payments || []).filter((p) => p.recordStatus !== RecordStatus.DELETED && p.record_status !== "DELETED");
         const newBalance = BalanceCalculator.calculateRemainingFee(procedures, payments);
         patient.remaining_fee = newBalance;
+        patient.remainingFee = newBalance;
         patient.balance = newBalance;
     }
 
@@ -50,7 +56,49 @@ class ProcedureRepository extends IProcedureRepository {
             }
         }
 
-        // 1. Try Prisma persistence if connected
+        // In-Memory persistence when patient exists in memory
+        const patient = this._findPatientInMemory(patientId);
+        if (patient) {
+            if (!Array.isArray(patient.procedures)) {
+                patient.procedures = [];
+            }
+
+            const newId = procedure.id || `proc-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+            procedure.id = newId;
+            procedure.procedureId = newId;
+            procedure.ProcedureId = newId;
+
+            const record = {
+                id: newId,
+                procedureId: newId,
+                ProcedureId: newId,
+                patientId: patientId,
+                PatientId: patientId,
+                name: procedure.name,
+                Name: procedure.name,
+                description: procedure.description,
+                Description: procedure.description,
+                cost: procedure.cost,
+                Cost: procedure.cost,
+                status: procedure.status,
+                Status: procedure.status,
+                targetDate: procedure.targetDate,
+                TargetDate: procedure.targetDate,
+                completedDate: procedure.completedDate,
+                CompletedDate: procedure.completedDate,
+                createdByUserId: procedure.createdByUserId || "usr-admin-01",
+                recordStatus: RecordStatus.ACTIVE,
+                createdAt: procedure.createdAt || new Date(),
+                updatedAt: new Date(),
+            };
+
+            patient.procedures.push(record);
+            this._syncPatientBalance(patientId);
+
+            return new Procedure(record);
+        }
+
+        // Try Prisma persistence if connected
         try {
             if (this.prisma?.procedure?.create) {
                 const created = await this.prisma.procedure.create({
@@ -82,56 +130,24 @@ class ProcedureRepository extends IProcedureRepository {
                 return new Procedure(created);
             }
         } catch (_) {
-            // Fallback to in-memory store
+            // Fallback
         }
 
-        // 2. In-Memory persistence
-        const patient = this._findPatientInMemory(patientId);
-        if (!patient) {
-            throw new Error(`Patient with ID ${patientId} not found.`);
-        }
-
-        if (!Array.isArray(patient.procedures)) {
-            patient.procedures = [];
-        }
-
-        const newId = procedure.id || `proc-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
-        procedure.id = newId;
-        procedure.procedureId = newId;
-        procedure.ProcedureId = newId;
-
-        const record = {
-            id: newId,
-            procedureId: newId,
-            ProcedureId: newId,
-            patientId: patientId,
-            PatientId: patientId,
-            name: procedure.name,
-            Name: procedure.name,
-            description: procedure.description,
-            Description: procedure.description,
-            cost: procedure.cost,
-            Cost: procedure.cost,
-            status: procedure.status,
-            Status: procedure.status,
-            targetDate: procedure.targetDate,
-            TargetDate: procedure.targetDate,
-            completedDate: procedure.completedDate,
-            CompletedDate: procedure.completedDate,
-            createdByUserId: procedure.createdByUserId || "usr-admin-01",
-            recordStatus: RecordStatus.ACTIVE,
-            createdAt: procedure.createdAt || new Date(),
-            updatedAt: new Date(),
-        };
-
-        patient.procedures.push(record);
-        this._syncPatientBalance(patientId);
-
-        return new Procedure(record);
+        throw new Error(`Patient with ID ${patientId} not found.`);
     }
 
     async findById(id) {
         if (!id) return null;
+
+        const patients = this._getSeedPatients();
+        for (const pat of patients) {
+            const match = (pat.procedures || []).find((p) =>
+                (p.id === id || p.procedureId === id) &&
+                p.recordStatus !== RecordStatus.DELETED &&
+                p.record_status !== "DELETED"
+            );
+            if (match) return new Procedure(match);
+        }
 
         try {
             if (this.prisma?.procedure?.findUnique) {
@@ -144,19 +160,18 @@ class ProcedureRepository extends IProcedureRepository {
             }
         } catch (_) {}
 
-        const patients = this._getSeedPatients();
-        for (const pat of patients) {
-            const match = (pat.procedures || []).find((p) =>
-                (p.id === id || p.procedureId === id) &&
-                p.recordStatus !== RecordStatus.DELETED
-            );
-            if (match) return new Procedure(match);
-        }
         return null;
     }
 
     async findByPatientId(patientId) {
         if (!patientId) return [];
+
+        const patient = this._findPatientInMemory(patientId);
+        if (patient && Array.isArray(patient.procedures)) {
+            return patient.procedures
+                .filter((p) => p.recordStatus !== RecordStatus.DELETED && p.record_status !== "DELETED")
+                .map((p) => new Procedure(p));
+        }
 
         try {
             if (this.prisma?.procedure?.findMany) {
@@ -171,12 +186,7 @@ class ProcedureRepository extends IProcedureRepository {
             }
         } catch (_) {}
 
-        const patient = this._findPatientInMemory(patientId);
-        if (!patient || !Array.isArray(patient.procedures)) return [];
-
-        return patient.procedures
-            .filter((p) => p.recordStatus !== RecordStatus.DELETED)
-            .map((p) => new Procedure(p));
+        return [];
     }
 
     async findNextByPatientId(patientId) {
@@ -206,37 +216,7 @@ class ProcedureRepository extends IProcedureRepository {
             }
         }
 
-        try {
-            if (this.prisma?.procedure?.update) {
-                const updatedPrisma = await this.prisma.procedure.update({
-                    where: { id },
-                    data: {
-                        name: updateData.name !== undefined ? updateData.name : undefined,
-                        description: updateData.description !== undefined ? updateData.description : undefined,
-                        cost: updateData.cost !== undefined ? updateData.cost : undefined,
-                        status: newStatus !== undefined ? newStatus : undefined,
-                        targetDate: updateData.targetDate ? new Date(updateData.targetDate) : undefined,
-                        completedDate: updateData.completedDate ? new Date(updateData.completedDate) : undefined,
-                        updated_at: new Date(),
-                    },
-                });
-
-                // Resync balance
-                const allProcs = await this.findByPatientId(existing.patientId);
-                const payments = this.prisma.payment ? await this.prisma.payment.findMany({ where: { patient_id: existing.patientId, record_status: "ACTIVE" } }) : [];
-                const newBalance = BalanceCalculator.calculateRemainingFee(allProcs, payments);
-                if (this.prisma.patient?.update) {
-                    await this.prisma.patient.update({
-                        where: { id: existing.patientId },
-                        data: { remaining_fee: newBalance },
-                    });
-                }
-
-                return new Procedure(updatedPrisma);
-            }
-        } catch (_) {}
-
-        // In-memory update
+        // 1. In-memory update if patient is in memory
         const patient = this._findPatientInMemory(existing.patientId);
         if (patient && Array.isArray(patient.procedures)) {
             const procRecord = patient.procedures.find((p) => p.id === id || p.procedureId === id);
@@ -274,6 +254,37 @@ class ProcedureRepository extends IProcedureRepository {
             }
         }
 
+        // 2. Prisma update
+        try {
+            if (this.prisma?.procedure?.update) {
+                const updatedPrisma = await this.prisma.procedure.update({
+                    where: { id },
+                    data: {
+                        name: updateData.name !== undefined ? updateData.name : undefined,
+                        description: updateData.description !== undefined ? updateData.description : undefined,
+                        cost: updateData.cost !== undefined ? updateData.cost : undefined,
+                        status: newStatus !== undefined ? newStatus : undefined,
+                        targetDate: updateData.targetDate ? new Date(updateData.targetDate) : undefined,
+                        completedDate: updateData.completedDate ? new Date(updateData.completedDate) : undefined,
+                        updated_at: new Date(),
+                    },
+                });
+
+                // Resync balance
+                const allProcs = await this.findByPatientId(existing.patientId);
+                const payments = this.prisma.payment ? await this.prisma.payment.findMany({ where: { patient_id: existing.patientId, record_status: "ACTIVE" } }) : [];
+                const newBalance = BalanceCalculator.calculateRemainingFee(allProcs, payments);
+                if (this.prisma.patient?.update) {
+                    await this.prisma.patient.update({
+                        where: { id: existing.patientId },
+                        data: { remaining_fee: newBalance },
+                    });
+                }
+
+                return new Procedure(updatedPrisma);
+            }
+        } catch (_) {}
+
         throw new Error(`Procedure with ID ${id} could not be updated.`);
     }
 
@@ -284,6 +295,20 @@ class ProcedureRepository extends IProcedureRepository {
             throw new Error(`Procedure with ID ${id} not found.`);
         }
 
+        // 1. In-memory deletion
+        const patient = this._findPatientInMemory(existing.patientId);
+        if (patient && Array.isArray(patient.procedures)) {
+            const procRecord = patient.procedures.find((p) => p.id === id || p.procedureId === id);
+            if (procRecord) {
+                procRecord.recordStatus = RecordStatus.DELETED;
+                procRecord.record_status = RecordStatus.DELETED;
+                procRecord.deletedAt = new Date();
+                this._syncPatientBalance(existing.patientId);
+                return true;
+            }
+        }
+
+        // 2. Prisma deletion
         try {
             if (this.prisma?.procedure?.update) {
                 await this.prisma.procedure.update({
@@ -294,16 +319,6 @@ class ProcedureRepository extends IProcedureRepository {
             }
         } catch (_) {}
 
-        const patient = this._findPatientInMemory(existing.patientId);
-        if (patient && Array.isArray(patient.procedures)) {
-            const procRecord = patient.procedures.find((p) => p.id === id || p.procedureId === id);
-            if (procRecord) {
-                procRecord.recordStatus = RecordStatus.DELETED;
-                procRecord.deletedAt = new Date();
-                this._syncPatientBalance(existing.patientId);
-                return true;
-            }
-        }
         return false;
     }
 }
