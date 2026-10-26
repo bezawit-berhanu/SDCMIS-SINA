@@ -196,7 +196,25 @@ describe("Procedure Model - Comprehensive Verification Suite", () => {
             }, /Invalid procedure status/);
         });
 
-        it("marks procedure completed and updates CompletedDate", () => {
+        it("transitions procedure status from NEXT to ONGOING (Task 4)", () => {
+            const proc = new Procedure({
+                name: "Dental Examination",
+                description: "Routine checkup and bitewing radiographs",
+                status: ProcedureStatus.NEXT,
+            });
+
+            assert.strictEqual(proc.isNext(), true);
+            assert.strictEqual(proc.isOngoing(), false);
+
+            proc.transitionToOngoing();
+
+            assert.strictEqual(proc.status, ProcedureStatus.ONGOING);
+            assert.strictEqual(proc.Status, ProcedureStatus.ONGOING);
+            assert.strictEqual(proc.isOngoing(), true);
+            assert.strictEqual(proc.isNext(), false);
+        });
+
+        it("marks procedure completed and updates CompletedDate (Task 5)", () => {
             const proc = new Procedure({
                 name: "Extraction",
                 description: "Simple extraction of wisdom tooth",
@@ -205,14 +223,28 @@ describe("Procedure Model - Comprehensive Verification Suite", () => {
 
             assert.strictEqual(proc.Status, ProcedureStatus.ONGOING);
             assert.strictEqual(proc.CompletedDate, null);
+            assert.strictEqual(proc.isDone(), false);
 
             const completionTime = new Date("2026-10-23T11:00:00Z");
             proc.markCompleted(completionTime);
 
             assert.strictEqual(proc.Status, ProcedureStatus.DONE);
             assert.strictEqual(proc.status, ProcedureStatus.DONE);
+            assert.strictEqual(proc.isDone(), true);
             assert.deepStrictEqual(proc.CompletedDate, completionTime);
             assert.deepStrictEqual(proc.completedDate, completionTime);
+        });
+
+        it("prevents transitioning a DONE procedure back to ONGOING", () => {
+            const proc = new Procedure({
+                name: "Extraction",
+                description: "Completed procedure",
+                status: ProcedureStatus.DONE,
+            });
+
+            assert.throws(() => {
+                proc.transitionToOngoing();
+            }, /Cannot transition a completed procedure back to ongoing/);
         });
     });
 

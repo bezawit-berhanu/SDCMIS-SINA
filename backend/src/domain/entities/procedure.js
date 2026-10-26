@@ -110,6 +110,28 @@ class Procedure {
         this.deletedAt = deletedAt ? (deletedAt instanceof Date ? deletedAt : new Date(deletedAt)) : null;
     }
 
+    isNext() {
+        return this.status === ProcedureStatus.NEXT;
+    }
+
+    isOngoing() {
+        return this.status === ProcedureStatus.ONGOING;
+    }
+
+    isDone() {
+        return this.status === ProcedureStatus.DONE;
+    }
+
+    transitionToOngoing() {
+        if (this.status === ProcedureStatus.DONE) {
+            throw new Error("Cannot transition a completed procedure back to ongoing.");
+        }
+        this.status = ProcedureStatus.ONGOING;
+        this.Status = ProcedureStatus.ONGOING;
+        this.updatedAt = new Date();
+        return this;
+    }
+
     markCompleted(completionDate = new Date()) {
         const date = completionDate instanceof Date ? completionDate : new Date(completionDate);
         if (Number.isNaN(date.getTime())) {
@@ -120,6 +142,7 @@ class Procedure {
         this.completedDate = date;
         this.CompletedDate = date;
         this.updatedAt = new Date();
+        return this;
     }
 
     toSafeObject() {
