@@ -81,11 +81,39 @@ const getBranchesAndDentists = new GetBranchesAndDentists({
     branchRepository,
 });
 
+const ProcedureRepository = require("../Infrastructure/Repositories/procedure.repository");
+const PaymentRepository = require("../Infrastructure/Repositories/payment.repository");
+
+const CreateNextProcedure = require("../application/procedure/CreateNextProcedure");
+const GetProceduresByPatient = require("../application/procedure/GetProceduresByPatient");
+const UpdateProcedure = require("../application/procedure/UpdateProcedure");
+const DeleteProcedure = require("../application/procedure/DeleteProcedure");
+const StartOngoingProcedure = require("../application/procedure/StartOngoingProcedure");
+const CompleteProcedure = require("../application/procedure/CompleteProcedure");
+
+const RecordPayment = require("../application/payment/RecordPayment");
+const GetPaymentHistory = require("../application/payment/GetPaymentHistory");
+
+const procedureRepository = new ProcedureRepository(prisma, patientRepository);
+const paymentRepository = new PaymentRepository(prisma, patientRepository);
+
+const createNextProcedure = new CreateNextProcedure(procedureRepository, patientRepository);
+const getProceduresByPatient = new GetProceduresByPatient(procedureRepository, patientRepository);
+const updateProcedure = new UpdateProcedure(procedureRepository, patientRepository);
+const deleteProcedure = new DeleteProcedure(procedureRepository, patientRepository);
+const startOngoingProcedure = new StartOngoingProcedure(procedureRepository, patientRepository);
+const completeProcedure = new CompleteProcedure(procedureRepository, patientRepository);
+
+const recordPayment = new RecordPayment(paymentRepository, patientRepository);
+const getPaymentHistory = new GetPaymentHistory(paymentRepository, patientRepository, procedureRepository);
+
 const container = {
     prisma,
     userRepository,
     patientRepository,
     branchRepository,
+    procedureRepository,
+    paymentRepository,
     passwordService,
     tokenService,
     loginUser,
@@ -101,6 +129,14 @@ const container = {
     updatePatient,
     deletePatient,
     getBranchesAndDentists,
+    createNextProcedure,
+    getProceduresByPatient,
+    updateProcedure,
+    deleteProcedure,
+    startOngoingProcedure,
+    completeProcedure,
+    recordPayment,
+    getPaymentHistory,
 };
 
-module.exports = container;
+module.exports = container;
