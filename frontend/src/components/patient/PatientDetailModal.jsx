@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { usePatientContext } from "../../features/patient/patient-context";
 import patientService from "../../services/patient.service";
+import procedureService from "../../services/procedure.service";
+import paymentService from "../../services/payment.service";
 
 export default function PatientDetailModal() {
     const {
@@ -8,49 +10,148 @@ export default function PatientDetailModal() {
         setIsDetailOpen,
         detailPatient,
         openEdit,
+        fetchPatients,
     } = usePatientContext();
 
     const [fullDetail, setFullDetail] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [actionLoading, setActionLoading] = useState(false);
+    const [feedbackMsg, setFeedbackMsg] = useState("");
+    const [feedbackType, setFeedbackType] = useState("success");
+
+    // Next Procedure Modal Form State
+    const [showNextProcForm, setShowNextProcForm] = useState(false);
+    const [nextProcForm, setNextProcForm] = useState({
+        name: "",
+        description: "",
+        cost: "",
+        targetDate: new Date(Date.now() + 7 * 86400000).toISOString().split("T")[0],
+    });
+
+    // Record Payment Modal Form State
+    const [showPaymentForm, setShowPaymentForm] = useState(false);
+    const [paymentForm, setPaymentForm] = useState({
+        amount: "",
+        paymentDate: new Date().toISOString().split("T")[0],
+        recordedBy: "Front Desk Staff",
+    });
+
+    const refreshPatientDetails = useCallback(async () => {
+        if (!detailPatient?.id) return;
+        setLoading(true);
+        try {
+            const res = await patientService.getPatientById(detailPatient.id);
+            setFullDetail(res.data || res);
+            if (fetchPatients) fetchPatients();
+        } catch (_) {
+            // Keep existing state
+        } finally {
+            setLoading(false);
+        }
+    }, [detailPatient?.id, fetchPatients]);
 
     useEffect(() => {
-        let isMounted = true;
         if (detailPatient?.id && isDetailOpen) {
-            setLoading(true);
-            patientService.getPatientById(detailPatient.id)
-                .then((res) => {
-                    if (isMounted) {
-                        setFullDetail(res.data || res);
-                    }
-                })
-                .catch(() => {
-                    if (isMounted) {
-                        // Fall back to detailPatient already in state
-                        setFullDetail({
-                            patient: detailPatient,
-                            clinicalOverview: {
-                                currentProcedure: (detailPatient.procedures || []).find((p) => p.status === "ONGOING") || null,
-                                nextProcedure: (detailPatient.procedures || []).find((p) => p.status === "NEXT") || null,
-                                procedureHistory: (detailPatient.procedures || []).filter((p) => p.status === "DONE"),
-                                paymentInformation: {
-                                    remainingFee: detailPatient.remainingFee || detailPatient.balance || 0,
-                                    balance: detailPatient.remainingFee || detailPatient.balance || 0,
-                                    payments: detailPatient.payments || [],
-                                    totalPaid: (detailPatient.payments || []).reduce((acc, p) => acc + Number(p.amount || 0), 0),
-                                },
-                                appointments: detailPatient.appointments || [],
-                                branch: detailPatient.branch,
-                                dentist: detailPatient.dentist,
-                            },
-                        });
-                    }
-                })
-                .finally(() => {
-                    if (isMounted) setLoading(false);
-                });
+            refreshPatientDetails();
         }
-        return () => { isMounted = false; };
-    }, [detailPatient, isDetailOpen]);
+    }, [detailPatient?.id, isDetailOpen, refreshPatientDetails]);
+
+    // Task 4: Next -> Ongoing transition
+    const handleStartOngoing = async (procId) => {
+        setActionLoading(true);
+        setFeedbackMsg("");
+        try {
+            await procedureService.startOngoingProcedure(procId, detailPatient?.id);
+            setFeedbackType("success");
+            setFeedbackMsg("Procedure transitioned to ONGOING status successfully.");
+            await refreshPatientDetails();
+        } catch (err) {
+            setFeedbackType("danger");
+            setFeedbackMsg(err.response?.data?.error?.message || err.message || "Failed to start ongoing procedure.");
+        } finally {
+            setActionLoading(false);
+        }
+    };
+
+    // Task 5: Ongoing -> Done transition
+    const handleCompleteProcedure = async (procId) => {
+        setActionLoading(true);
+        setFeedbackMsg("");
+        try {
+            await procedureService.completeProcedure(procId, new Date(), detailPatient?.id);
+            setFeedbackType("success");
+            setFeedbackMsg("Procedure marked as COMPLETED (DONE) successfully.");
+            await refreshPatientDetails();
+        } catch (err) {
+            setFeedbackType("danger");
+            setFeedbackMsg(err.response?.data?.error?.message || err.message || "Failed to complete procedure.");
+        } finally {
+            setActionLoading(false);
+        }
+    };
+
+    // Task 2: Schedule Next Procedure (Only one next procedure per patient)
+    const handleScheduleNextProcedure = async (e) => {
+        e.preventDefault();
+        setActionLoading(true);
+        setFeedbackMsg("");
+        try {
+            await procedureService.createNextProcedure(detailPatient?.id, {
+                name: nextProcForm.name || nextProcForm.description.slice(0, 50),
+                description: nextProcForm.description,
+                cost: Number(nextProcForm.cost) || 0,
+                targetDate: nextProcForm.targetDate,
+            });
+            setFeedbackType("success");
+            setFeedbackMsg("Next procedure scheduled successfully.");
+            setShowNextProcForm(false);
+            setNextProcForm({
+                name: "",
+                description: "",
+                cost: "",
+                targetDate: new Date(Date.now() + 7 * 86400000).toISOString().split("T")[0],
+            });
+            await refreshPatientDetails();
+        } catch (err) {
+            setFeedbackType("danger");
+            setFeedbackMsg(err.response?.data?.error?.message || err.message || "Failed to schedule next procedure.");
+        } finally {
+            setActionLoading(false);
+        }
+    };
+
+    // Task 7: Record Payment (Receptionist / Dentist Can record payment)
+    const handleRecordPayment = async (e) => {
+        e.preventDefault();
+        setActionLoading(true);
+        setFeedbackMsg("");
+        try {
+            const amt = Number(paymentForm.amount);
+            if (Number.isNaN(amt) || amt <= 0) {
+                throw new Error("Payment amount must be greater than zero.");
+            }
+            await paymentService.recordPayment({
+                patientId: detailPatient?.id,
+                amount: amt,
+                paymentDate: paymentForm.paymentDate,
+                recordedBy: paymentForm.recordedBy,
+            });
+            setFeedbackType("success");
+            setFeedbackMsg(`Payment of $${amt.toFixed(2)} recorded successfully.`);
+            setShowPaymentForm(false);
+            setPaymentForm({
+                amount: "",
+                paymentDate: new Date().toISOString().split("T")[0],
+                recordedBy: "Front Desk Staff",
+            });
+            await refreshPatientDetails();
+        } catch (err) {
+            setFeedbackType("danger");
+            setFeedbackMsg(err.response?.data?.error?.message || err.message || "Failed to record payment.");
+        } finally {
+            setActionLoading(false);
+        }
+    };
 
     if (!isDetailOpen || !detailPatient) return null;
 
@@ -115,6 +216,20 @@ export default function PatientDetailModal() {
                 </div>
 
                 <div className="modal-body detail-flow-container">
+                    {feedbackMsg && (
+                        <div style={{
+                            padding: "10px 16px",
+                            marginBottom: "16px",
+                            borderRadius: "8px",
+                            fontWeight: 500,
+                            backgroundColor: feedbackType === "success" ? "#d1fae5" : "#fee2e2",
+                            color: feedbackType === "success" ? "#065f46" : "#991b1b",
+                            border: `1px solid ${feedbackType === "success" ? "#a7f3d0" : "#fca5a5"}`
+                        }}>
+                            {feedbackMsg}
+                        </div>
+                    )}
+
                     {loading && <div className="detail-loading-banner">Refreshing clinical records...</div>}
 
                     {/* STAGE 1: PATIENT INFORMATION */}
@@ -141,14 +256,14 @@ export default function PatientDetailModal() {
                                 <span className="stat-value font-semibold text-primary">{patient.serviceType || patient.service_type || "General Dentistry"}</span>
                             </div>
                             <div className="info-stat-card">
-                                <span className="stat-label">Outstanding Balance</span>
+                                <span className="stat-label">Outstanding Balance (Remaining Fee)</span>
                                 <span className={`stat-value font-bold ${remainingBalance > 0 ? "text-danger" : "text-success"}`}>
                                     ${remainingBalance.toFixed(2)}
                                 </span>
                             </div>
                         </div>
 
-                        {/* Branch & Dentist Registration Details (Task 10) */}
+                        {/* Branch & Dentist Registration Details */}
                         <div className="facility-dentist-row">
                             <div className="facility-card">
                                 <div className="facility-title-row">
@@ -183,21 +298,48 @@ export default function PatientDetailModal() {
                         <div className="arrow-line"></div>
                     </div>
 
-                    {/* STAGE 2: CURRENT PROCEDURE */}
+                    {/* STAGE 2: CURRENT PROCEDURE (ONGOING) */}
                     <section className="clinical-stage-card stage-current-procedure" id="stage-current-procedure">
-                        <div className="stage-header">
-                            <div className="stage-number-circle active-circle">2</div>
-                            <div className="stage-header-text">
-                                <div className="stage-title-row">
-                                    <h3 className="stage-title">Current Procedure</h3>
-                                    <span className="procedure-state-pill ongoing">ONGOING</span>
+                        <div className="stage-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                                <div className="stage-number-circle active-circle">2</div>
+                                <div className="stage-header-text">
+                                    <div className="stage-title-row">
+                                        <h3 className="stage-title">Current Procedure</h3>
+                                        <span className="procedure-state-pill ongoing">ONGOING</span>
+                                    </div>
+                                    <p className="stage-subtitle">Active clinical intervention currently in progress</p>
                                 </div>
-                                <p className="stage-subtitle">Active clinical intervention currently in progress</p>
                             </div>
+                            {currentProc && (
+                                <button
+                                    type="button"
+                                    className="btn-sm"
+                                    style={{
+                                        backgroundColor: "#059669",
+                                        color: "white",
+                                        padding: "8px 14px",
+                                        borderRadius: "6px",
+                                        fontWeight: "600",
+                                        cursor: "pointer",
+                                        border: "none",
+                                        display: "inline-flex",
+                                        alignItems: "center",
+                                        gap: "6px"
+                                    }}
+                                    disabled={actionLoading}
+                                    onClick={() => handleCompleteProcedure(currentProc.id)}
+                                >
+                                    ✓ Complete Procedure (Ongoing → Done)
+                                </button>
+                            )}
                         </div>
 
                         {currentProc ? (
                             <div className="procedure-detail-box active-procedure">
+                                <div style={{ fontWeight: "700", fontSize: "1.05rem", color: "#1f2937", marginBottom: "4px" }}>
+                                    {currentProc.name || currentProc.description}
+                                </div>
                                 <div className="proc-desc-title">{currentProc.description}</div>
                                 <div className="proc-meta-tags">
                                     <span className="meta-tag">
@@ -208,6 +350,9 @@ export default function PatientDetailModal() {
                                             Target: {new Date(currentProc.targetDate).toLocaleDateString()}
                                         </span>
                                     )}
+                                    <span className="meta-tag" style={{ color: "#0284c7" }}>
+                                        Status: <strong>ONGOING</strong>
+                                    </span>
                                 </div>
                             </div>
                         ) : (
@@ -224,21 +369,147 @@ export default function PatientDetailModal() {
                         <div className="arrow-line"></div>
                     </div>
 
-                    {/* STAGE 3: NEXT PROCEDURE */}
+                    {/* STAGE 3: NEXT PROCEDURE (NEXT) */}
                     <section className="clinical-stage-card stage-next-procedure" id="stage-next-procedure">
-                        <div className="stage-header">
-                            <div className="stage-number-circle next-circle">3</div>
-                            <div className="stage-header-text">
-                                <div className="stage-title-row">
-                                    <h3 className="stage-title">Next Procedure</h3>
-                                    <span className="procedure-state-pill next">UPCOMING NEXT</span>
+                        <div className="stage-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                                <div className="stage-number-circle next-circle">3</div>
+                                <div className="stage-header-text">
+                                    <div className="stage-title-row">
+                                        <h3 className="stage-title">Next Procedure</h3>
+                                        <span className="procedure-state-pill next">UPCOMING NEXT</span>
+                                    </div>
+                                    <p className="stage-subtitle">Upcoming sequence scheduled in patient's treatment plan (1 max)</p>
                                 </div>
-                                <p className="stage-subtitle">Upcoming sequence scheduled in patient's treatment plan</p>
+                            </div>
+                            <div>
+                                {nextProc ? (
+                                    <button
+                                        type="button"
+                                        className="btn-sm"
+                                        style={{
+                                            backgroundColor: "#2563eb",
+                                            color: "white",
+                                            padding: "8px 14px",
+                                            borderRadius: "6px",
+                                            fontWeight: "600",
+                                            cursor: "pointer",
+                                            border: "none",
+                                            display: "inline-flex",
+                                            alignItems: "center",
+                                            gap: "6px"
+                                        }}
+                                        disabled={actionLoading}
+                                        onClick={() => handleStartOngoing(nextProc.id)}
+                                    >
+                                        ▶ Start Procedure (Next → Ongoing)
+                                    </button>
+                                ) : (
+                                    <button
+                                        type="button"
+                                        className="btn-sm"
+                                        style={{
+                                            backgroundColor: showNextProcForm ? "#6b7280" : "#4f46e5",
+                                            color: "white",
+                                            padding: "8px 14px",
+                                            borderRadius: "6px",
+                                            fontWeight: "600",
+                                            cursor: "pointer",
+                                            border: "none"
+                                        }}
+                                        onClick={() => setShowNextProcForm(!showNextProcForm)}
+                                    >
+                                        {showNextProcForm ? "Cancel" : "+ Schedule Next Procedure"}
+                                    </button>
+                                )}
                             </div>
                         </div>
 
+                        {/* Inline form to Schedule Next Procedure */}
+                        {showNextProcForm && !nextProc && (
+                            <form onSubmit={handleScheduleNextProcedure} style={{
+                                backgroundColor: "#f8fafc",
+                                border: "1px solid #e2e8f0",
+                                borderRadius: "8px",
+                                padding: "16px",
+                                marginBottom: "16px"
+                            }}>
+                                <h4 style={{ margin: "0 0 12px 0", fontSize: "0.95rem", fontWeight: "600", color: "#1e293b" }}>
+                                    Define & Schedule Next Clinical Procedure
+                                </h4>
+                                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginBottom: "12px" }}>
+                                    <div>
+                                        <label style={{ display: "block", fontSize: "0.8rem", fontWeight: "600", color: "#475569", marginBottom: "4px" }}>Procedure Name *</label>
+                                        <input
+                                            type="text"
+                                            required
+                                            value={nextProcForm.name}
+                                            onChange={(e) => setNextProcForm({ ...nextProcForm, name: e.target.value })}
+                                            placeholder="e.g. Composite Restoration"
+                                            style={{ width: "100%", padding: "8px", borderRadius: "6px", border: "1px solid #cbd5e1" }}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label style={{ display: "block", fontSize: "0.8rem", fontWeight: "600", color: "#475569", marginBottom: "4px" }}>Estimated Cost ($) *</label>
+                                        <input
+                                            type="number"
+                                            required
+                                            min="0"
+                                            step="0.01"
+                                            value={nextProcForm.cost}
+                                            onChange={(e) => setNextProcForm({ ...nextProcForm, cost: e.target.value })}
+                                            placeholder="e.g. 150.00"
+                                            style={{ width: "100%", padding: "8px", borderRadius: "6px", border: "1px solid #cbd5e1" }}
+                                        />
+                                    </div>
+                                </div>
+                                <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: "12px", marginBottom: "12px" }}>
+                                    <div>
+                                        <label style={{ display: "block", fontSize: "0.8rem", fontWeight: "600", color: "#475569", marginBottom: "4px" }}>Clinical Description *</label>
+                                        <input
+                                            type="text"
+                                            required
+                                            value={nextProcForm.description}
+                                            onChange={(e) => setNextProcForm({ ...nextProcForm, description: e.target.value })}
+                                            placeholder="e.g. Tooth #14 composite resin restoration"
+                                            style={{ width: "100%", padding: "8px", borderRadius: "6px", border: "1px solid #cbd5e1" }}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label style={{ display: "block", fontSize: "0.8rem", fontWeight: "600", color: "#475569", marginBottom: "4px" }}>Target Date *</label>
+                                        <input
+                                            type="date"
+                                            required
+                                            value={nextProcForm.targetDate}
+                                            onChange={(e) => setNextProcForm({ ...nextProcForm, targetDate: e.target.value })}
+                                            style={{ width: "100%", padding: "8px", borderRadius: "6px", border: "1px solid #cbd5e1" }}
+                                        />
+                                    </div>
+                                </div>
+                                <div style={{ display: "flex", justifyContent: "flex-end", gap: "8px" }}>
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowNextProcForm(false)}
+                                        style={{ padding: "8px 14px", borderRadius: "6px", border: "1px solid #cbd5e1", background: "white", cursor: "pointer" }}
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        disabled={actionLoading}
+                                        style={{ padding: "8px 16px", borderRadius: "6px", border: "none", background: "#2563eb", color: "white", fontWeight: "600", cursor: "pointer" }}
+                                    >
+                                        {actionLoading ? "Saving..." : "Save Next Procedure"}
+                                    </button>
+                                </div>
+                            </form>
+                        )}
+
                         {nextProc ? (
                             <div className="procedure-detail-box next-procedure">
+                                <div style={{ fontWeight: "700", fontSize: "1.05rem", color: "#1f2937", marginBottom: "4px" }}>
+                                    {nextProc.name || nextProc.description}
+                                </div>
                                 <div className="proc-desc-title">{nextProc.description}</div>
                                 <div className="proc-meta-tags">
                                     <span className="meta-tag">
@@ -249,12 +520,17 @@ export default function PatientDetailModal() {
                                             Scheduled Date: {new Date(nextProc.targetDate).toLocaleDateString()}
                                         </span>
                                     )}
+                                    <span className="meta-tag" style={{ color: "#6366f1" }}>
+                                        Status: <strong>NEXT</strong>
+                                    </span>
                                 </div>
                             </div>
                         ) : (
-                            <div className="stage-empty-state">
-                                No pending subsequent procedure scheduled yet.
-                            </div>
+                            !showNextProcForm && (
+                                <div className="stage-empty-state">
+                                    No pending subsequent procedure scheduled yet. (Only one next procedure permitted).
+                                </div>
+                            )
                         )}
                     </section>
 
@@ -265,7 +541,7 @@ export default function PatientDetailModal() {
                         <div className="arrow-line"></div>
                     </div>
 
-                    {/* STAGE 4: PROCEDURE HISTORY */}
+                    {/* STAGE 4: PROCEDURE HISTORY (DONE) */}
                     <section className="clinical-stage-card stage-procedure-history" id="stage-procedure-history">
                         <div className="stage-header">
                             <div className="stage-number-circle done-circle">4</div>
@@ -281,12 +557,16 @@ export default function PatientDetailModal() {
                                     <div key={item.id || idx} className="history-item-row">
                                         <div className="history-check-circle">✓</div>
                                         <div className="history-details">
+                                            <div style={{ fontWeight: "600", color: "#111827" }}>
+                                                {item.name || item.description}
+                                            </div>
                                             <div className="history-item-desc">{item.description}</div>
                                             <div className="history-item-meta">
                                                 <span>Cost: ${Number(item.cost || 0).toFixed(2)}</span>
                                                 {item.completedDate && (
                                                     <span>Completed: {new Date(item.completedDate).toLocaleDateString()}</span>
                                                 )}
+                                                <span style={{ color: "#059669", fontWeight: "600" }}>Status: DONE</span>
                                             </div>
                                         </div>
                                     </div>
@@ -306,15 +586,106 @@ export default function PatientDetailModal() {
                         <div className="arrow-line"></div>
                     </div>
 
-                    {/* STAGE 5: PAYMENT INFORMATION */}
+                    {/* STAGE 5: PAYMENT INFORMATION & HISTORY */}
                     <section className="clinical-stage-card stage-payment-info" id="stage-payment-information">
-                        <div className="stage-header">
-                            <div className="stage-number-circle payment-circle">5</div>
-                            <div className="stage-header-text">
-                                <h3 className="stage-title">Payment Information</h3>
-                                <p className="stage-subtitle">Financial accounting, billing history & ledger transactions</p>
+                        <div className="stage-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                                <div className="stage-number-circle payment-circle">5</div>
+                                <div className="stage-header-text">
+                                    <h3 className="stage-title">Payment Information & History</h3>
+                                    <p className="stage-subtitle">Financial accounting, billing history & ledger transactions</p>
+                                </div>
                             </div>
+                            <button
+                                type="button"
+                                className="btn-sm"
+                                style={{
+                                    backgroundColor: showPaymentForm ? "#6b7280" : "#059669",
+                                    color: "white",
+                                    padding: "8px 14px",
+                                    borderRadius: "6px",
+                                    fontWeight: "600",
+                                    cursor: "pointer",
+                                    border: "none"
+                                }}
+                                onClick={() => setShowPaymentForm(!showPaymentForm)}
+                            >
+                                {showPaymentForm ? "Cancel" : "+ Record Payment"}
+                            </button>
                         </div>
+
+                        {/* Inline Form to Record Payment */}
+                        {showPaymentForm && (
+                            <form onSubmit={handleRecordPayment} style={{
+                                backgroundColor: "#f0fdf4",
+                                border: "1px solid #bbf7d0",
+                                borderRadius: "8px",
+                                padding: "16px",
+                                marginBottom: "16px"
+                            }}>
+                                <h4 style={{ margin: "0 0 12px 0", fontSize: "0.95rem", fontWeight: "600", color: "#166534" }}>
+                                    Record Patient Payment (Receptionist / Dentist)
+                                </h4>
+                                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "12px", marginBottom: "12px" }}>
+                                    <div>
+                                        <label style={{ display: "block", fontSize: "0.8rem", fontWeight: "600", color: "#374151", marginBottom: "4px" }}>
+                                            Payment Amount ($) *
+                                        </label>
+                                        <input
+                                            type="number"
+                                            required
+                                            min="0.01"
+                                            step="0.01"
+                                            value={paymentForm.amount}
+                                            onChange={(e) => setPaymentForm({ ...paymentForm, amount: e.target.value })}
+                                            placeholder="e.g. 50.00"
+                                            style={{ width: "100%", padding: "8px", borderRadius: "6px", border: "1px solid #cbd5e1" }}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label style={{ display: "block", fontSize: "0.8rem", fontWeight: "600", color: "#374151", marginBottom: "4px" }}>
+                                            Due / Payment Date *
+                                        </label>
+                                        <input
+                                            type="date"
+                                            required
+                                            value={paymentForm.paymentDate}
+                                            onChange={(e) => setPaymentForm({ ...paymentForm, paymentDate: e.target.value })}
+                                            style={{ width: "100%", padding: "8px", borderRadius: "6px", border: "1px solid #cbd5e1" }}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label style={{ display: "block", fontSize: "0.8rem", fontWeight: "600", color: "#374151", marginBottom: "4px" }}>
+                                            Recorded By *
+                                        </label>
+                                        <input
+                                            type="text"
+                                            required
+                                            value={paymentForm.recordedBy}
+                                            onChange={(e) => setPaymentForm({ ...paymentForm, recordedBy: e.target.value })}
+                                            placeholder="e.g. Dr. Sara / Receptionist"
+                                            style={{ width: "100%", padding: "8px", borderRadius: "6px", border: "1px solid #cbd5e1" }}
+                                        />
+                                    </div>
+                                </div>
+                                <div style={{ display: "flex", justifyContent: "flex-end", gap: "8px" }}>
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowPaymentForm(false)}
+                                        style={{ padding: "8px 14px", borderRadius: "6px", border: "1px solid #cbd5e1", background: "white", cursor: "pointer" }}
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        disabled={actionLoading}
+                                        style={{ padding: "8px 16px", borderRadius: "6px", border: "none", background: "#059669", color: "white", fontWeight: "600", cursor: "pointer" }}
+                                    >
+                                        {actionLoading ? "Processing..." : "Confirm & Record Payment"}
+                                    </button>
+                                </div>
+                            </form>
+                        )}
 
                         <div className="payment-summary-bar">
                             <div className="payment-stat-box">
@@ -322,30 +693,39 @@ export default function PatientDetailModal() {
                                 <span className="stat-value text-success font-bold">${totalPaid.toFixed(2)}</span>
                             </div>
                             <div className="payment-stat-box">
-                                <span className="stat-label">Remaining Balance</span>
+                                <span className="stat-label">Remaining Fee (Balance)</span>
                                 <span className={`stat-value font-bold ${remainingBalance > 0 ? "text-danger" : "text-success"}`}>
                                     ${remainingBalance.toFixed(2)}
                                 </span>
                             </div>
                         </div>
 
+                        {/* Payment History Table (Task 9: Display Amount, Due Date, Recorded by) */}
                         {payments.length > 0 ? (
                             <div className="table-mini-wrapper">
                                 <table className="table-mini">
                                     <thead>
                                         <tr>
                                             <th>Receipt ID</th>
-                                            <th>Date</th>
                                             <th>Amount</th>
+                                            <th>Due / Payment Date</th>
+                                            <th>Recorded By</th>
                                             <th>Status</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {payments.map((p, idx) => (
-                                            <tr key={p.id || idx}>
-                                                <td className="font-mono">{p.id || `RCP-${idx + 1}`}</td>
-                                                <td>{new Date(p.payment_date || p.createdAt || Date.now()).toLocaleDateString()}</td>
-                                                <td className="font-semibold">${Number(p.amount).toFixed(2)}</td>
+                                            <tr key={p.id || p.paymentId || idx}>
+                                                <td className="font-mono">{p.id || p.paymentId || `RCP-${idx + 1}`}</td>
+                                                <td className="font-semibold text-success">
+                                                    ${Number(p.amount).toFixed(2)}
+                                                </td>
+                                                <td>
+                                                    {new Date(p.paymentDate || p.payment_date || p.dueDate || p.createdAt || Date.now()).toLocaleDateString()}
+                                                </td>
+                                                <td className="font-medium text-slate-700">
+                                                    {p.recordedBy || p.recorded_by || "Receptionist / Dentist"}
+                                                </td>
                                                 <td><span className="badge-mini-paid">VERIFIED</span></td>
                                             </tr>
                                         ))}
