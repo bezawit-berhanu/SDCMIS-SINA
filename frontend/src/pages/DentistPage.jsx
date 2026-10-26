@@ -23,12 +23,29 @@ export default function DentistPage() {
         { label: "Clinical Status", value: "Active", change: "All suites ready", icon: "🟢" },
     ];
 
-    const upcomingProcedures = [
+    const [procedures, setProcedures] = useState([
         { id: "PROC-101", patient: "Abebe Kebede", type: "Root Canal Therapy (Molar)", time: "09:30 AM", status: "NEXT" },
         { id: "PROC-102", patient: "Sara Tadesse", type: "Composite Filling & Polish", time: "11:00 AM", status: "ONGOING" },
-        { id: "PROC-103", patient: "Michael Haile", type: "Orthodontic Adjustment", time: "02:15 PM", status: "SCHEDULED" },
-        { id: "PROC-104", patient: "Bethlehem Alemu", type: "Full Dental Prophylaxis", time: "04:00 PM", status: "SCHEDULED" },
-    ];
+        { id: "PROC-103", patient: "Michael Haile", type: "Orthodontic Adjustment", time: "02:15 PM", status: "NEXT" },
+        { id: "PROC-104", patient: "Bethlehem Alemu", type: "Full Dental Prophylaxis", time: "04:00 PM", status: "DONE" },
+    ]);
+    const [actionMsg, setActionMsg] = useState("");
+
+    const advanceToOngoing = (procId) => {
+        setProcedures((prev) =>
+            prev.map((p) => (p.id === procId ? { ...p, status: "ONGOING" } : p))
+        );
+        setActionMsg(`Procedure ${procId} transitioned from NEXT to ONGOING.`);
+        setTimeout(() => setActionMsg(""), 3000);
+    };
+
+    const markAsDone = (procId) => {
+        setProcedures((prev) =>
+            prev.map((p) => (p.id === procId ? { ...p, status: "DONE" } : p))
+        );
+        setActionMsg(`Procedure ${procId} transitioned from ONGOING to DONE.`);
+        setTimeout(() => setActionMsg(""), 3000);
+    };
 
     return (
         <PageContainer
@@ -40,6 +57,21 @@ export default function DentistPage() {
                 </Button>
             }
         >
+            {actionMsg && (
+                <div style={{
+                    padding: "10px 16px",
+                    marginBottom: "1rem",
+                    borderRadius: "6px",
+                    backgroundColor: "#ecfdf5",
+                    color: "#065f46",
+                    border: "1px solid #a7f3d0",
+                    fontWeight: 500,
+                    fontSize: "0.875rem"
+                }}>
+                    ✓ {actionMsg}
+                </div>
+            )}
+
             <div className="grid grid-cols-4" style={{ marginBottom: "1.5rem" }}>
                 {stats.map((stat, i) => (
                     <div key={i} className="card">
@@ -65,10 +97,10 @@ export default function DentistPage() {
                 <div className="card">
                     <div className="card__header">
                         <h2 className="card__title">Today's Treatment Schedule</h2>
-                        <p className="card__subtitle">Scheduled clinical procedures and operations</p>
+                        <p className="card__subtitle">Scheduled clinical procedures and operations (Next → Ongoing → Done)</p>
                     </div>
                     <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
-                        {upcomingProcedures.map((proc) => (
+                        {procedures.map((proc) => (
                             <div
                                 key={proc.id}
                                 style={{
@@ -87,18 +119,56 @@ export default function DentistPage() {
                                         {proc.type} • {proc.time}
                                     </p>
                                 </div>
-                                <span
-                                    style={{
-                                        fontSize: "0.75rem",
-                                        fontWeight: 600,
-                                        color: proc.status === "ONGOING" ? "var(--primary)" : "var(--success)",
-                                        backgroundColor: proc.status === "ONGOING" ? "var(--primary-light)" : "var(--success-bg)",
-                                        padding: "0.25rem 0.5rem",
-                                        borderRadius: "var(--radius-sm)",
-                                    }}
-                                >
-                                    {proc.status}
-                                </span>
+                                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                                    <span
+                                        style={{
+                                            fontSize: "0.75rem",
+                                            fontWeight: 600,
+                                            color: proc.status === "ONGOING" ? "#0284c7" : proc.status === "NEXT" ? "#4f46e5" : "#059669",
+                                            backgroundColor: proc.status === "ONGOING" ? "#e0f2fe" : proc.status === "NEXT" ? "#e0e7ff" : "#d1fae5",
+                                            padding: "0.25rem 0.5rem",
+                                            borderRadius: "var(--radius-sm)",
+                                        }}
+                                    >
+                                        {proc.status}
+                                    </span>
+                                    {proc.status === "NEXT" && (
+                                        <button
+                                            type="button"
+                                            onClick={() => advanceToOngoing(proc.id)}
+                                            style={{
+                                                fontSize: "0.75rem",
+                                                fontWeight: 600,
+                                                padding: "4px 8px",
+                                                borderRadius: "4px",
+                                                border: "1px solid #2563eb",
+                                                backgroundColor: "#2563eb",
+                                                color: "white",
+                                                cursor: "pointer",
+                                            }}
+                                        >
+                                            Start (→ Ongoing)
+                                        </button>
+                                    )}
+                                    {proc.status === "ONGOING" && (
+                                        <button
+                                            type="button"
+                                            onClick={() => markAsDone(proc.id)}
+                                            style={{
+                                                fontSize: "0.75rem",
+                                                fontWeight: 600,
+                                                padding: "4px 8px",
+                                                borderRadius: "4px",
+                                                border: "1px solid #059669",
+                                                backgroundColor: "#059669",
+                                                color: "white",
+                                                cursor: "pointer",
+                                            }}
+                                        >
+                                            Complete (→ Done)
+                                        </button>
+                                    )}
+                                </div>
                             </div>
                         ))}
                     </div>
