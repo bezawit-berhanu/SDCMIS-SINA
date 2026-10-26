@@ -11,6 +11,9 @@ const userRoutes = require("./src/Presentation/routes/user.routes");
 const patientRoutes = require("./src/Presentation/routes/patient.routes");
 const branchRoutes = require("./src/Presentation/routes/branch.routes");
 
+const procedureRoutes = require("./src/Presentation/routes/procedure.routes");
+const paymentRoutes = require("./src/Presentation/routes/payment.routes");
+
 const app = express();
 
 // Standard CORS handling for local frontend integration
@@ -37,6 +40,22 @@ app.use("/api/auth", authRoutes);
 // User personal settings endpoints
 app.use("/api/v1/users", userRoutes);
 app.use("/api/users", userRoutes);
+
+// Procedure management endpoints (Tasks 1, 2, 3, 4, 5)
+app.use("/api/v1/procedures", procedureRoutes);
+app.use("/api/procedures", procedureRoutes);
+app.use("/procedures", procedureRoutes);
+app.use("/api/v1/patients/:patientId/procedures", procedureRoutes);
+app.use("/api/patients/:patientId/procedures", procedureRoutes);
+app.use("/patients/:patientId/procedures", procedureRoutes);
+
+// Payment & Billing management endpoints (Tasks 6, 7, 8, 9)
+app.use("/api/v1/payments", paymentRoutes);
+app.use("/api/payments", paymentRoutes);
+app.use("/payments", paymentRoutes);
+app.use("/api/v1/patients/:patientId/payments", paymentRoutes);
+app.use("/api/patients/:patientId/payments", paymentRoutes);
+app.use("/patients/:patientId/payments", paymentRoutes);
 
 // Patient management endpoints (Task 2: GET, POST, PUT, DELETE /patients)
 app.use("/api/v1/patients", patientRoutes);
