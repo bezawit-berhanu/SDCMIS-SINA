@@ -17,14 +17,18 @@ class CreateAppointment {
             throw err;
         }
 
-        // Verify patient existence
-        if (this.patientRepository) {
-            const patient = await this.patientRepository.findById(patientId);
-            if (!patient) {
-                const err = new Error(`Patient with ID "${patientId}" was not found.`);
-                err.statusCode = 404;
-                throw err;
-            }
+        // Verify patient existence (check in-memory patients first for fast resolution)
+        let patient = null;
+        if (this.patientRepository?.patients) {
+            patient = this.patientRepository.patients.find((p) => String(p.id) === String(patientId));
+        }
+        if (!patient && this.patientRepository) {
+            patient = await this.patientRepository.findById(patientId);
+        }
+        if (!patient) {
+            const err = new Error(`Patient with ID "${patientId}" was not found.`);
+            err.statusCode = 404;
+            throw err;
         }
 
         // Verify procedure existence if specified
