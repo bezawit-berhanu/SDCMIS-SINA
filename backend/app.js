@@ -13,6 +13,15 @@ const branchRoutes = require("./src/Presentation/routes/branch.routes");
 
 const procedureRoutes = require("./src/Presentation/routes/procedure.routes");
 const paymentRoutes = require("./src/Presentation/routes/payment.routes");
+const createAppointmentRoutes = require("./src/Presentation/routes/appointment.routes");
+const container = require("./src/container/container");
+
+const appointmentRoutes = createAppointmentRoutes(container);
+
+// Task 5: Background scheduler to periodically detect and update missed appointments
+if (process.env.NODE_ENV !== "test") {
+    container.detectAndSyncMissedAppointments.startScheduler(60000);
+}
 
 const app = express();
 
@@ -56,6 +65,14 @@ app.use("/payments", paymentRoutes);
 app.use("/api/v1/patients/:patientId/payments", paymentRoutes);
 app.use("/api/patients/:patientId/payments", paymentRoutes);
 app.use("/patients/:patientId/payments", paymentRoutes);
+
+// Appointment management endpoints (Tasks 1, 2, 3, 4, 5, 6, 7, 8, 9)
+app.use("/api/v1/appointments", appointmentRoutes);
+app.use("/api/appointments", appointmentRoutes);
+app.use("/appointments", appointmentRoutes);
+app.use("/api/v1/patients/:patientId/appointments", appointmentRoutes);
+app.use("/api/patients/:patientId/appointments", appointmentRoutes);
+app.use("/patients/:patientId/appointments", appointmentRoutes);
 
 // Patient management endpoints (Task 2: GET, POST, PUT, DELETE /patients)
 app.use("/api/v1/patients", patientRoutes);
