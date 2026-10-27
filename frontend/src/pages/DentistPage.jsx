@@ -176,10 +176,20 @@ export default function DentistPage() {
 
                 <div className="card">
                     <div className="card__header">
-                        <h2 className="card__title">Clinical Actions</h2>
-                        <p className="card__subtitle">Perform clinical workflows and update records</p>
+                        <h2 className="card__title">Clinical Actions & Appointments</h2>
+                        <p className="card__subtitle">Perform clinical workflows, visit scheduling, and recovery</p>
                     </div>
                     <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+                        <a href="/appointments" style={{ textDecoration: "none" }}>
+                            <Button variant="outline" fullWidth style={{ justifyContent: "flex-start", color: "#2563eb", borderColor: "#bfdbfe" }}>
+                                📅 View & Manage All Appointments
+                            </Button>
+                        </a>
+                        <a href="/appointments/missed" style={{ textDecoration: "none" }}>
+                            <Button variant="outline" fullWidth style={{ justifyContent: "flex-start", color: "#dc2626", borderColor: "#fecaca" }}>
+                                ⚠️ Review & Reschedule Missed Visits
+                            </Button>
+                        </a>
                         <Button variant="outline" fullWidth style={{ justifyContent: "flex-start" }}>
                             📋 View Patient Clinical History
                         </Button>
@@ -187,12 +197,68 @@ export default function DentistPage() {
                             ➕ Log Completed Procedure
                         </Button>
                         <Button variant="outline" fullWidth style={{ justifyContent: "flex-start" }}>
-                            📝 Prescribe Dental Treatment Plan
-                        </Button>
-                        <Button variant="outline" fullWidth style={{ justifyContent: "flex-start" }}>
                             🦷 Update Dental Charting & X-Rays
                         </Button>
                     </div>
+                </div>
+            </div>
+
+            {/* Task 3: Upcoming Tasks Dashboard */}
+            <div className="card" style={{ marginTop: "1.5rem" }}>
+                <div className="card__header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <div>
+                        <h2 className="card__title">Upcoming Clinical Tasks Dashboard</h2>
+                        <p className="card__subtitle">Displaying Patient, Procedure, Appointment Date, and Status</p>
+                    </div>
+                    <a href="/appointments" style={{ textDecoration: "none" }}>
+                        <Button variant="outline" size="sm">
+                            Open Full Calendar →
+                        </Button>
+                    </a>
+                </div>
+                <div style={{ overflowX: "auto" }}>
+                    <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.875rem" }}>
+                        <thead>
+                            <tr style={{ borderBottom: "1px solid var(--border)", textAlign: "left", color: "var(--text-muted)" }}>
+                                <th style={{ padding: "10px 12px" }}>Patient</th>
+                                <th style={{ padding: "10px 12px" }}>Procedure</th>
+                                <th style={{ padding: "10px 12px" }}>Appointment Date</th>
+                                <th style={{ padding: "10px 12px" }}>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style={{ padding: "12px", fontWeight: 600 }}>Abebe Kebede</td>
+                                <td style={{ padding: "12px", color: "#334155" }}>Root Canal Therapy (Molar)</td>
+                                <td style={{ padding: "12px", color: "#1d4ed8", fontWeight: 500 }}>Oct 28, 2026 • 09:30 AM</td>
+                                <td style={{ padding: "12px" }}>
+                                    <span style={{ fontSize: "0.75rem", fontWeight: 700, padding: "3px 8px", borderRadius: "9999px", backgroundColor: "#e0e7ff", color: "#3730a3" }}>
+                                        UPCOMING
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style={{ padding: "12px", fontWeight: 600 }}>Sara Tadesse</td>
+                                <td style={{ padding: "12px", color: "#334155" }}>Composite Filling & Polish</td>
+                                <td style={{ padding: "12px", color: "#1d4ed8", fontWeight: 500 }}>Oct 28, 2026 • 11:00 AM</td>
+                                <td style={{ padding: "12px" }}>
+                                    <span style={{ fontSize: "0.75rem", fontWeight: 700, padding: "3px 8px", borderRadius: "9999px", backgroundColor: "#e0f2fe", color: "#0369a1" }}>
+                                        ONGOING
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style={{ padding: "12px", fontWeight: 600 }}>Michael Haile</td>
+                                <td style={{ padding: "12px", color: "#334155" }}>Orthodontic Adjustment</td>
+                                <td style={{ padding: "12px", color: "#1d4ed8", fontWeight: 500 }}>Oct 29, 2026 • 02:15 PM</td>
+                                <td style={{ padding: "12px" }}>
+                                    <span style={{ fontSize: "0.75rem", fontWeight: 700, padding: "3px 8px", borderRadius: "9999px", backgroundColor: "#e0e7ff", color: "#3730a3" }}>
+                                        UPCOMING
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </PageContainer>
