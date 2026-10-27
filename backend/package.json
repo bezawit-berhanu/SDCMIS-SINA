@@ -12,6 +12,7 @@
     "test:payment": "node --test test.payment.js",
     "test:balance": "node --test test.balance.js",
     "test:finance": "node --test test.finance.procedure.js",
+    "test:appointment": "node --test test.appointment.js",
     "test:security": "node --test test.security.js",
     "postinstall": "prisma skills sync || exit 0"
   },
