@@ -25,6 +25,8 @@ const AppointmentStatus = Object.freeze({
     UPCOMING: "UPCOMING",
     MISSED: "MISSED",
     ATTENDED: "ATTENDED",
+    CANCELLED: "CANCELLED",
+    RESCHEDULED: "RESCHEDULED",
 });
 
 const AuditAction = Object.freeze({
