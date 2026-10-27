@@ -94,8 +94,20 @@ const CompleteProcedure = require("../application/procedure/CompleteProcedure");
 const RecordPayment = require("../application/payment/RecordPayment");
 const GetPaymentHistory = require("../application/payment/GetPaymentHistory");
 
+const AppointmentRepository = require("../Infrastructure/Repositories/appointment.repository");
+
+const CreateAppointment = require("../application/appointment/CreateAppointment");
+const GetAppointments = require("../application/appointment/GetAppointments");
+const GetAppointmentById = require("../application/appointment/GetAppointmentById");
+const UpdateAppointment = require("../application/appointment/UpdateAppointment");
+const DeleteAppointment = require("../application/appointment/DeleteAppointment");
+const CancelAppointment = require("../application/appointment/CancelAppointment");
+const RescheduleAppointment = require("../application/appointment/RescheduleAppointment");
+const DetectAndSyncMissedAppointments = require("../application/appointment/DetectAndSyncMissedAppointments");
+
 const procedureRepository = new ProcedureRepository(prisma, patientRepository);
 const paymentRepository = new PaymentRepository(prisma, patientRepository);
+const appointmentRepository = new AppointmentRepository({ prisma, patientRepository, procedureRepository });
 
 const createNextProcedure = new CreateNextProcedure(procedureRepository, patientRepository);
 const getProceduresByPatient = new GetProceduresByPatient(procedureRepository, patientRepository);
@@ -107,6 +119,15 @@ const completeProcedure = new CompleteProcedure(procedureRepository, patientRepo
 const recordPayment = new RecordPayment(paymentRepository, patientRepository);
 const getPaymentHistory = new GetPaymentHistory(paymentRepository, patientRepository, procedureRepository);
 
+const createAppointment = new CreateAppointment({ appointmentRepository, patientRepository, procedureRepository });
+const getAppointments = new GetAppointments({ appointmentRepository });
+const getAppointmentById = new GetAppointmentById({ appointmentRepository });
+const updateAppointment = new UpdateAppointment({ appointmentRepository, procedureRepository });
+const deleteAppointment = new DeleteAppointment({ appointmentRepository });
+const cancelAppointment = new CancelAppointment({ appointmentRepository });
+const rescheduleAppointment = new RescheduleAppointment({ appointmentRepository, patientRepository });
+const detectAndSyncMissedAppointments = new DetectAndSyncMissedAppointments({ appointmentRepository });
+
 const container = {
     prisma,
     userRepository,
@@ -114,6 +135,7 @@ const container = {
     branchRepository,
     procedureRepository,
     paymentRepository,
+    appointmentRepository,
     passwordService,
     tokenService,
     loginUser,
@@ -137,6 +159,14 @@ const container = {
     completeProcedure,
     recordPayment,
     getPaymentHistory,
+    createAppointment,
+    getAppointments,
+    getAppointmentById,
+    updateAppointment,
+    deleteAppointment,
+    cancelAppointment,
+    rescheduleAppointment,
+    detectAndSyncMissedAppointments,
 };
 
 module.exports = container;
