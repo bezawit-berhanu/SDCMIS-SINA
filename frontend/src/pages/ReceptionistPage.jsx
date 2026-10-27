@@ -197,9 +197,16 @@ export default function ReceptionistPage() {
                         <Button variant="outline" fullWidth style={{ justifyContent: "flex-start" }}>
                             🎟️ Issue New Queue Ticket & Check In
                         </Button>
-                        <Button variant="outline" fullWidth style={{ justifyContent: "flex-start" }}>
-                            📅 Schedule Patient Appointment
-                        </Button>
+                        <a href="/appointments" style={{ textDecoration: "none" }}>
+                            <Button variant="outline" fullWidth style={{ justifyContent: "flex-start", color: "#2563eb", borderColor: "#bfdbfe" }}>
+                                📅 Schedule & Manage Patient Appointments
+                            </Button>
+                        </a>
+                        <a href="/appointments/missed" style={{ textDecoration: "none" }}>
+                            <Button variant="outline" fullWidth style={{ justifyContent: "flex-start", color: "#dc2626", borderColor: "#fecaca" }}>
+                                ⚠️ Review Missed Appointments & Reschedule
+                            </Button>
+                        </a>
                         <Button variant="outline" fullWidth style={{ justifyContent: "flex-start" }}>
                             👤 Search or Register New Patient
                         </Button>
