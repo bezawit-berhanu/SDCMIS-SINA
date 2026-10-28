@@ -14,9 +14,13 @@ const branchRoutes = require("./src/Presentation/routes/branch.routes");
 const procedureRoutes = require("./src/Presentation/routes/procedure.routes");
 const paymentRoutes = require("./src/Presentation/routes/payment.routes");
 const createAppointmentRoutes = require("./src/Presentation/routes/appointment.routes");
+const createQueueRoutes = require("./src/Presentation/routes/queue.routes");
+const createNotificationRoutes = require("./src/Presentation/routes/notification.routes");
 const container = require("./src/container/container");
 
 const appointmentRoutes = createAppointmentRoutes(container);
+const queueRoutes = createQueueRoutes(container);
+const notificationRoutes = createNotificationRoutes(container);
 
 // Task 5: Background scheduler to periodically detect and update missed appointments
 if (process.env.NODE_ENV !== "test") {
@@ -86,6 +90,16 @@ app.use("/branches", branchRoutes);
 app.use("/api/v1/dentists", branchRoutes);
 app.use("/api/dentists", branchRoutes);
 app.use("/dentists", branchRoutes);
+
+// Queue management endpoints (Live Queue, Check-in, Call, Auto-advance, Complete)
+app.use("/api/v1/queue", queueRoutes);
+app.use("/api/queue", queueRoutes);
+app.use("/queue", queueRoutes);
+
+// Notification endpoints (Dentist & Receptionist real-time alerts)
+app.use("/api/v1/notifications", notificationRoutes);
+app.use("/api/notifications", notificationRoutes);
+app.use("/notifications", notificationRoutes);
 
 // Fallback & centralized error handlers
 app.use(notFound);
