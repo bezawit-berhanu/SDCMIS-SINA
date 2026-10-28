@@ -29,6 +29,12 @@ const AppointmentStatus = Object.freeze({
     RESCHEDULED: "RESCHEDULED",
 });
 
+const QueueStatus = Object.freeze({
+    WAITING: "WAITING",
+    SERVING: "SERVING",
+    DONE: "DONE",
+});
+
 const AuditAction = Object.freeze({
     CREATE: "CREATE",
     UPDATE: "UPDATE",
@@ -50,6 +56,8 @@ module.exports = {
     ThemePreference,
     ProcedureStatus,
     AppointmentStatus,
+    QueueStatus,
+    queueStatus: QueueStatus,
     AuditAction,
     AuditEntityType,
     ...UserRole,

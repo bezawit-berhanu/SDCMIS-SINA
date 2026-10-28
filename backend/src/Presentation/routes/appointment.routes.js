@@ -1,13 +1,11 @@
 const express = require("express");
 const AppointmentController = require("../controllers/appointment.controller");
-const authenticate = require("../middlewares/authenticate");
+const authenticate = require("../middleware/auth");
 
 function createAppointmentRoutes(container) {
     const router = express.Router();
     const controller = new AppointmentController(container);
 
-    // Optional auth middleware: use if present, or fallback gracefully in test
-    const auth = authenticate(container.tokenService, container.userRepository);
 
     // Specific endpoints before param /:id
     router.get("/upcoming", (req, res) => {
