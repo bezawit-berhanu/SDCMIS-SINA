@@ -83,6 +83,69 @@ class QueueEntry {
         return `#${String(this.queueNumber).padStart(3, "0")}`;
     }
 
+    isWaiting() {
+        return this.status === QueueStatus.WAITING;
+    }
+
+    isServing() {
+        return this.status === QueueStatus.SERVING;
+    }
+
+    isDone() {
+        return this.status === QueueStatus.DONE;
+    }
+
+    canCall() {
+        return this.status === QueueStatus.WAITING;
+    }
+
+    canComplete() {
+        return this.status === QueueStatus.SERVING || this.status === QueueStatus.WAITING;
+    }
+
+    /**
+     * Transition: WAITING -> SERVING
+     * Called by receptionist or dentist to call patient into treatment room
+     */
+    call(dentistId = null, dentistName = null) {
+        if (this.status === QueueStatus.DONE) {
+            throw new Error(`Cannot call a patient whose visit is already DONE (Queue ${this.formattedQueueNumber}).`);
+        }
+
+        this.status = QueueStatus.SERVING;
+        this.calledTime = new Date();
+        if (dentistId) {
+            this.dentistId = String(dentistId);
+        }
+        if (dentistName) {
+            this.dentistName = String(dentistName);
+        }
+        this.updatedAt = new Date();
+        return this;
+    }
+
+    /**
+     * Alias for call()
+     */
+    serve(dentistId = null, dentistName = null) {
+        return this.call(dentistId, dentistName);
+    }
+
+    /**
+     * Transition: SERVING -> DONE (or fast-tracked from WAITING)
+     * Marks visit as completed
+     */
+    complete() {
+        if (this.status === QueueStatus.DONE) {
+            throw new Error(`Queue entry ${this.formattedQueueNumber} is already completed.`);
+        }
+
+        this.status = QueueStatus.DONE;
+        this.completedTime = new Date();
+        this.updatedAt = new Date();
+        return this;
+    }
+
     toSafeObject() {
         return {
             queueEntryId: this.id,
