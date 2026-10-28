@@ -128,6 +128,29 @@ const cancelAppointment = new CancelAppointment({ appointmentRepository });
 const rescheduleAppointment = new RescheduleAppointment({ appointmentRepository, patientRepository });
 const detectAndSyncMissedAppointments = new DetectAndSyncMissedAppointments({ appointmentRepository });
 
+const QueueRepository = require("../Infrastructure/Repositories/queue.repository");
+const NotificationRepository = require("../Infrastructure/Repositories/notification.repository");
+const { realtimeGateway } = require("../Infrastructure/realtime/realtime.gateway");
+
+const CheckInPatient = require("../application/queue/CheckInPatient");
+const GetLiveQueue = require("../application/queue/GetLiveQueue");
+const CallCustomer = require("../application/queue/CallCustomer");
+const AutoAdvanceQueue = require("../application/queue/AutoAdvanceQueue");
+const CompleteVisit = require("../application/queue/CompleteVisit");
+const GetNotifications = require("../application/notification/GetNotifications");
+const MarkNotificationRead = require("../application/notification/MarkNotificationRead");
+
+const queueRepository = new QueueRepository({ prisma, patientRepository });
+const notificationRepository = new NotificationRepository({ prisma });
+
+const checkInPatient = new CheckInPatient({ queueRepository, patientRepository, realtimeGateway });
+const getLiveQueue = new GetLiveQueue({ queueRepository });
+const callCustomer = new CallCustomer({ queueRepository, notificationRepository, patientRepository, userRepository, realtimeGateway });
+const autoAdvanceQueue = new AutoAdvanceQueue({ queueRepository, callCustomer, realtimeGateway });
+const completeVisit = new CompleteVisit({ queueRepository, autoAdvanceQueue, realtimeGateway });
+const getNotifications = new GetNotifications({ notificationRepository });
+const markNotificationRead = new MarkNotificationRead({ notificationRepository });
+
 const container = {
     prisma,
     userRepository,
@@ -136,6 +159,9 @@ const container = {
     procedureRepository,
     paymentRepository,
     appointmentRepository,
+    queueRepository,
+    notificationRepository,
+    realtimeGateway,
     passwordService,
     tokenService,
     loginUser,
@@ -167,6 +193,13 @@ const container = {
     cancelAppointment,
     rescheduleAppointment,
     detectAndSyncMissedAppointments,
+    checkInPatient,
+    getLiveQueue,
+    callCustomer,
+    autoAdvanceQueue,
+    completeVisit,
+    getNotifications,
+    markNotificationRead,
 };
 
 module.exports = container;
