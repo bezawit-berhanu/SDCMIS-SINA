@@ -71,6 +71,10 @@ router.get("/", (req, res, next) => {
     patientController.getPatients(req, res, next);
 });
 
+// Customer Dashboard API (Task 1: Returns only authenticated customer's information)
+router.get("/me", patientController.getCustomerDashboard);
+router.get("/dashboard", patientController.getCustomerDashboard);
+
 // GET /patients/:id (Task 2, 3, 5: Customer A -> GET /api/patients/B -> 403 Forbidden)
 router.get("/:id", authorizePatientAccess, patientController.getPatientById);
 

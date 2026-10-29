@@ -119,6 +119,19 @@ const patientController = {
             next(error);
         }
     },
+
+    async getCustomerDashboard(req, res, next) {
+        try {
+            const user = req.user;
+            const result = await container.getCustomerDashboard.execute(user);
+            return res.status(200).json({
+                success: true,
+                data: result,
+            });
+        } catch (error) {
+            next(error);
+        }
+    },
 };
 
 module.exports = patientController;

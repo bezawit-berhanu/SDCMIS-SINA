@@ -82,6 +82,9 @@ app.use("/patients/:patientId/appointments", appointmentRoutes);
 app.use("/api/v1/patients", patientRoutes);
 app.use("/api/patients", patientRoutes);
 app.use("/patients", patientRoutes);
+app.use("/api/v1/customers", patientRoutes);
+app.use("/api/customers", patientRoutes);
+app.use("/customers", patientRoutes);
 
 // Branch & Dentist management endpoints (Task 10 & 11)
 app.use("/api/v1/branches", branchRoutes);
