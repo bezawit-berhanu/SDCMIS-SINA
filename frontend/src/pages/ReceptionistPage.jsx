@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "../features/auth/auth-context";
 import PageContainer from "../components/layout/PageContainer";
 import Button from "../components/common/Button";
+import { realtimeService } from "../services/realtime.service";
 
 export default function ReceptionistPage() {
     const { user, restoreSession } = useAuth();
@@ -17,18 +18,127 @@ export default function ReceptionistPage() {
     };
 
     const stats = [
-        { label: "Patients in Queue", value: "4", change: "2 currently waiting", icon: "👥" },
+        { label: "Patients in Queue", value: "3", change: "1 waiting, 1 serving", icon: "👥" },
         { label: "Today's Appointments", value: "16", change: "6 attended, 10 pending", icon: "📋" },
         { label: "Payments Collected", value: "$1,850", change: "5 transactions today", icon: "💳" },
-        { label: "Front Desk Status", value: "Open", change: "Queue serving smoothly", icon: "🟢" },
+        { label: "Front Desk Status", value: "Open", change: "Live Queue Active", icon: "🟢" },
     ];
 
-    const currentQueue = [
-        { ticket: "Q-01", patient: "Dawit Yohannes", service: "Routine Cleaning", arrival: "09:10 AM", status: "SERVING" },
-        { ticket: "Q-02", patient: "Hellen Bekele", service: "Emergency Toothache", arrival: "09:25 AM", status: "WAITING" },
-        { ticket: "Q-03", patient: "Amanuel Girma", service: "Consultation & Exam", arrival: "09:40 AM", status: "WAITING" },
-        { ticket: "Q-04", patient: "Selamawit Desta", service: "Crown Placement", arrival: "10:00 AM", status: "WAITING" },
-    ];
+    const [queueList, setQueueList] = useState([
+        { id: "que-003", ticket: "#003", patient: "Sara Tadesse", service: "Composite Filling", arrival: "09:30 AM", status: "SERVING", dentist: "Dr. Sara" },
+        { id: "que-004", ticket: "#004", patient: "Michael Haile", service: "Orthodontic Adjustment", arrival: "09:45 AM", status: "WAITING", dentist: "Dr. Sara" },
+        { id: "que-005", ticket: "#005", patient: "Dawit Yohannes", service: "Root Canal Therapy", arrival: "10:00 AM", status: "WAITING", dentist: "Dr. Abebe" },
+    ]);
+
+    const [feedback, setFeedback] = useState("");
+
+    // Real-time Gateway sync
+    useEffect(() => {
+        realtimeService.connect({ role: "RECEPTIONIST", userId: user?.id || "usr-receptionist-01" });
+
+        const unsubCall = realtimeService.subscribe("PATIENT_CALLED", (payload) => {
+            const ticket = payload.formattedQueueNumber || payload.ticket;
+            if (ticket) {
+                setQueueList((prev) =>
+                    prev.map((item) => (item.ticket === ticket ? { ...item, status: "SERVING" } : item))
+                );
+            }
+        });
+
+        const unsubComp = realtimeService.subscribe("VISIT_COMPLETED", (payload) => {
+            const ticket = payload.queueEntry?.formattedQueueNumber || payload.ticket;
+            if (ticket) {
+                setQueueList((prev) =>
+                    prev.map((item) => (item.ticket === ticket ? { ...item, status: "DONE" } : item))
+                );
+            }
+        });
+
+        return () => {
+            unsubCall();
+            unsubComp();
+        };
+    }, [user]);
+
+    // Task 2: Complete Visit (Receptionist / Dentist Completes Visit)
+    const handleCompleteVisit = (ticketId) => {
+        let completedItem = null;
+        setQueueList((prev) =>
+            prev.map((item) => {
+                if ((!ticketId && item.status === "SERVING") || item.id === ticketId || item.ticket === ticketId) {
+                    completedItem = item;
+                    return { ...item, status: "DONE" };
+                }
+                return item;
+            })
+        );
+
+        const label = completedItem ? completedItem.ticket : "current";
+        setFeedback(`✓ Visit completed successfully for patient ${label}. Status transitioned to DONE.`);
+
+        // Broadcast to real-time gateway so Dentist and Customer browsers receive it
+        realtimeService.emit("VISIT_COMPLETED", {
+            queueEntry: completedItem || { formattedQueueNumber: label, status: "DONE" },
+        });
+
+        setTimeout(() => setFeedback(""), 4000);
+    };
+
+    // Task 3: Auto Advance (WAITING #004 -> SERVING according to queue rules)
+    const handleAutoAdvance = () => {
+        const nextWaiting = queueList.find((q) => q.status === "WAITING");
+        if (!nextWaiting) {
+            setFeedback("Notice: No waiting patients left in queue to auto-advance.");
+            setTimeout(() => setFeedback(""), 3000);
+            return;
+        }
+
+        setQueueList((prev) =>
+            prev.map((item) =>
+                item.id === nextWaiting.id
+                    ? { ...item, status: "SERVING" }
+                    : item
+            )
+        );
+
+        const msg = `⚡ Auto Advance: System identified next waiting patient (${nextWaiting.ticket} - ${nextWaiting.patient}). Status transitioned WAITING → SERVING.`;
+        setFeedback(msg);
+
+        // Broadcast to Real-Time Gateway so Dentist receives "Patient #004 is ready."
+        realtimeService.emit("PATIENT_CALLED", {
+            queueNumber: parseInt(nextWaiting.ticket.replace("#", ""), 10) || 4,
+            formattedQueueNumber: nextWaiting.ticket,
+            ticket: nextWaiting.ticket,
+            patientName: nextWaiting.patient,
+            serviceType: nextWaiting.service,
+            notification: {
+                message: `Patient ${nextWaiting.ticket} is ready.`,
+            },
+        });
+
+        setTimeout(() => setFeedback(""), 4000);
+    };
+
+    // Call individual customer
+    const handleCallCustomer = (item) => {
+        setQueueList((prev) =>
+            prev.map((q) => (q.id === item.id ? { ...q, status: "SERVING" } : q))
+        );
+
+        setFeedback(`📢 Patient ${item.ticket} (${item.patient}) called to ${item.dentist || "Operatory"}. Status: SERVING.`);
+
+        realtimeService.emit("PATIENT_CALLED", {
+            formattedQueueNumber: item.ticket,
+            ticket: item.ticket,
+            patientName: item.patient,
+            serviceType: item.service,
+            notification: {
+                message: `Patient ${item.ticket} is ready.`,
+            },
+        });
+
+        setTimeout(() => setFeedback(""), 4000);
+    };
 
     const [showPaymentModal, setShowPaymentModal] = useState(false);
     const [paymentForm, setPaymentForm] = useState({
@@ -123,14 +233,35 @@ export default function ReceptionistPage() {
 
             <div className="grid grid-cols-2" style={{ marginBottom: "1.5rem" }}>
                 <div className="card">
-                    <div className="card__header">
-                        <h2 className="card__title">Active Reception Queue</h2>
-                        <p className="card__subtitle">Patients currently checked-in and awaiting service</p>
+                    <div className="card__header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <div>
+                            <h2 className="card__title">Active Reception Queue</h2>
+                            <p className="card__subtitle">Real-time patient flow and front-desk dispatch</p>
+                        </div>
+                        <div style={{ display: "flex", gap: "8px" }}>
+                            <Button
+                                variant="primary"
+                                size="sm"
+                                onClick={handleAutoAdvance}
+                                title="System identifies next waiting patient (WAITING → SERVING)"
+                                style={{ backgroundColor: "#2563eb" }}
+                            >
+                                ⚡ Auto Advance
+                            </Button>
+                            <Button
+                                variant="secondary"
+                                size="sm"
+                                onClick={() => handleCompleteVisit()}
+                                title="Receptionist / Dentist completes visit"
+                            >
+                                ✓ Complete Visit
+                            </Button>
+                        </div>
                     </div>
                     <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
-                        {currentQueue.map((item) => (
+                        {queueList.map((item) => (
                             <div
-                                key={item.ticket}
+                                key={item.id}
                                 style={{
                                     display: "flex",
                                     justifyContent: "space-between",
@@ -138,7 +269,7 @@ export default function ReceptionistPage() {
                                     padding: "0.75rem",
                                     backgroundColor: "var(--bg-page)",
                                     borderRadius: "var(--radius-md)",
-                                    border: "1px solid var(--border)",
+                                    border: item.status === "SERVING" ? "2px solid #2563eb" : "1px solid var(--border)",
                                 }}
                             >
                                 <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
@@ -146,8 +277,8 @@ export default function ReceptionistPage() {
                                         style={{
                                             fontWeight: 700,
                                             fontSize: "0.875rem",
-                                            backgroundColor: "var(--primary-light)",
-                                            color: "var(--primary)",
+                                            backgroundColor: item.status === "SERVING" ? "#dbeafe" : item.status === "DONE" ? "#dcfce7" : "#fef3c7",
+                                            color: item.status === "SERVING" ? "#1e40af" : item.status === "DONE" ? "#166534" : "#92400e",
                                             padding: "0.25rem 0.5rem",
                                             borderRadius: "var(--radius-sm)",
                                         }}
@@ -157,22 +288,61 @@ export default function ReceptionistPage() {
                                     <div>
                                         <p style={{ fontSize: "0.875rem", fontWeight: 600 }}>{item.patient}</p>
                                         <p style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>
-                                            {item.service} • Arrived {item.arrival}
+                                            {item.service} • {item.dentist || "General Clinic"} • Arrived {item.arrival}
                                         </p>
                                     </div>
                                 </div>
-                                <span
-                                    style={{
-                                        fontSize: "0.75rem",
-                                        fontWeight: 600,
-                                        color: item.status === "SERVING" ? "var(--primary)" : "var(--secondary)",
-                                        backgroundColor: item.status === "SERVING" ? "var(--primary-light)" : "var(--secondary-light)",
-                                        padding: "0.25rem 0.5rem",
-                                        borderRadius: "var(--radius-sm)",
-                                    }}
-                                >
-                                    {item.status}
-                                </span>
+                                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                                    <span
+                                        style={{
+                                            fontSize: "0.75rem",
+                                            fontWeight: 700,
+                                            color: item.status === "SERVING" ? "#1d4ed8" : item.status === "DONE" ? "#15803d" : "#b45309",
+                                            backgroundColor: item.status === "SERVING" ? "#eff6ff" : item.status === "DONE" ? "#f0fdf4" : "#fffbeb",
+                                            padding: "0.25rem 0.5rem",
+                                            borderRadius: "var(--radius-sm)",
+                                            border: `1px solid ${item.status === "SERVING" ? "#bfdbfe" : item.status === "DONE" ? "#bbf7d0" : "#fde68a"}`,
+                                        }}
+                                    >
+                                        {item.status}
+                                    </span>
+                                    {item.status === "WAITING" && (
+                                        <button
+                                            type="button"
+                                            onClick={() => handleCallCustomer(item)}
+                                            style={{
+                                                fontSize: "0.75rem",
+                                                fontWeight: 600,
+                                                padding: "4px 8px",
+                                                borderRadius: "4px",
+                                                border: "1px solid #2563eb",
+                                                backgroundColor: "#2563eb",
+                                                color: "white",
+                                                cursor: "pointer",
+                                            }}
+                                        >
+                                            Call
+                                        </button>
+                                    )}
+                                    {item.status === "SERVING" && (
+                                        <button
+                                            type="button"
+                                            onClick={() => handleCompleteVisit(item.id)}
+                                            style={{
+                                                fontSize: "0.75rem",
+                                                fontWeight: 600,
+                                                padding: "4px 8px",
+                                                borderRadius: "4px",
+                                                border: "1px solid #059669",
+                                                backgroundColor: "#059669",
+                                                color: "white",
+                                                cursor: "pointer",
+                                            }}
+                                        >
+                                            Complete Visit
+                                        </button>
+                                    )}
+                                </div>
                             </div>
                         ))}
                     </div>
