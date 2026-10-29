@@ -49,6 +49,14 @@ const AuditEntityType = Object.freeze({
     USER: "USER",
 });
 
+const NotificationType = Object.freeze({
+    PATIENT_READY: "PATIENT_READY",
+    QUEUE_CALLED: "QUEUE_CALLED",
+    VISIT_COMPLETED: "VISIT_COMPLETED",
+    APPOINTMENT_REMINDER: "APPOINTMENT_REMINDER",
+    SYSTEM: "SYSTEM",
+});
+
 module.exports = {
     UserRole,
     userRole: UserRole,
@@ -60,5 +68,7 @@ module.exports = {
     queueStatus: QueueStatus,
     AuditAction,
     AuditEntityType,
+    NotificationType,
+    notificationType: NotificationType,
     ...UserRole,
 };
