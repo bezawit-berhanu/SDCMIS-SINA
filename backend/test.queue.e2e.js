@@ -156,4 +156,44 @@ test("Live Queue & Receptionist Sprint - Comprehensive E2E Verification", async 
         assert.ok(autoAdvanceBroadcast);
         assert.equal(autoAdvanceBroadcast.queueEntry.queueNumber, 4);
     });
+
+    await t.test("7) Real-Time Sync Pipeline: Receptionist -> API -> Realtime Gateway -> Dentist & Customer browsers", async () => {
+        // Step A: Setup simulated Dentist Browser and Customer Browser listeners on Realtime Gateway
+        let dentistReceived = null;
+        let customerReceived = null;
+
+        const dentistBrowserListener = (payload) => {
+            dentistReceived = payload;
+        };
+
+        const customerBrowserListener = (payload) => {
+            customerReceived = payload;
+        };
+
+        realtimeGateway.on("PATIENT_CALLED", dentistBrowserListener);
+        realtimeGateway.on("QUEUE_UPDATED", customerBrowserListener);
+
+        // Step B: Receptionist triggers CALL via container use-case (simulating API call)
+        const callResult = await callCustomer.execute({
+            queueEntryId: "que-005",
+            dentistId: "usr-dentist-01",
+            dentistName: "Dr. Sara",
+        });
+
+        assert.equal(callResult.success, true);
+        assert.equal(callResult.queueEntry.status, QueueStatus.SERVING);
+
+        // Step C: Verify Dentist Browser received the instant notification without manual refresh
+        assert.ok(dentistReceived, "Dentist browser must receive real-time PATIENT_CALLED event");
+        assert.equal(dentistReceived.message, "Patient #005 is ready.");
+        assert.equal(dentistReceived.queueEntry.formattedQueueNumber, "#005");
+
+        // Step D: Verify Customer Browser received real-time queue update
+        assert.ok(customerReceived, "Customer browser must receive real-time QUEUE_UPDATED broadcast");
+        assert.ok(Array.isArray(customerReceived.queue));
+
+        // Cleanup
+        realtimeGateway.off("PATIENT_CALLED", dentistBrowserListener);
+        realtimeGateway.off("QUEUE_UPDATED", customerBrowserListener);
+    });
 });
