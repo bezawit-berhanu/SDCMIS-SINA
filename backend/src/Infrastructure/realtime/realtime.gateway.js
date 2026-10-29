@@ -190,6 +190,29 @@ class RealtimeGateway extends EventEmitter {
         });
     }
 
+    broadcastQueueStatusChanged(queueEntry, previousStatus = "WAITING") {
+        const payload = {
+            queueEntryId: queueEntry.id,
+            patientId: queueEntry.patientId,
+            patientName: queueEntry.patientName,
+            queueNumber: queueEntry.queueNumber,
+            formattedQueueNumber: queueEntry.formattedQueueNumber,
+            previousStatus,
+            newStatus: queueEntry.status,
+            status: queueEntry.status,
+            dentist: queueEntry.dentistName || null,
+            message: `Patient ${queueEntry.formattedQueueNumber} status changed from ${previousStatus} to ${queueEntry.status}.`,
+            timestamp: new Date().toISOString(),
+        };
+
+        // Emit targeted customer notification if linked
+        if (queueEntry.patientId) {
+            this.sendToUser(queueEntry.patientId, "QUEUE_STATUS_CHANGED", payload);
+        }
+
+        return this.broadcast("QUEUE_STATUS_CHANGED", payload);
+    }
+
     broadcastVisitCompleted(queueEntry, nextWaiting = null) {
         return this.broadcast("VISIT_COMPLETED", {
             completedQueueEntry: queueEntry,

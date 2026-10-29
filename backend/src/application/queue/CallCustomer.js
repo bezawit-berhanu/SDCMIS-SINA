@@ -97,6 +97,7 @@ class CallCustomer {
         if (this.realtimeGateway) {
             try {
                 this.realtimeGateway.broadcastPatientCalled(updatedEntry, notification);
+                this.realtimeGateway.broadcastQueueStatusChanged(updatedEntry, QueueStatus.WAITING);
                 const fullList = await this.queueRepository.findTodayQueue();
                 this.realtimeGateway.broadcastQueueUpdated(fullList);
             } catch (_) {}
