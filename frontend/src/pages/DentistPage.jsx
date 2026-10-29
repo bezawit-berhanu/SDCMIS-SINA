@@ -116,6 +116,61 @@ export default function DentistPage() {
         setTimeout(() => setActionMsg(""), 3000);
     };
 
+    // Task 2: Complete Visit (Dentist Completes Current Visit)
+    const handleDentistCompleteVisit = () => {
+        if (!currentServing || currentServing.status === "DONE") {
+            setActionMsg("Notice: No active patient in chair to complete.");
+            setTimeout(() => setActionMsg(""), 3000);
+            return;
+        }
+
+        const ticket = currentServing.ticket;
+        const patientName = currentServing.patient;
+
+        setCurrentServing((prev) => ({ ...prev, status: "DONE" }));
+        setActionMsg(`✓ Visit completed for ${patientName} (${ticket}). Status transitioned to DONE.`);
+
+        // Broadcast to Real-Time Gateway so Receptionist and Customer screens update immediately
+        realtimeService.emit("VISIT_COMPLETED", {
+            ticket,
+            formattedQueueNumber: ticket,
+            patientName,
+            status: "DONE",
+            dentist: user?.fullName || "Dr. Sara",
+        });
+
+        setTimeout(() => setActionMsg(""), 4000);
+    };
+
+    // Task 3: Auto Advance (Dentist advances to next waiting patient e.g. WAITING #004 -> SERVING)
+    const handleDentistAutoAdvance = () => {
+        const nextTicket = "#004";
+        const nextPatient = "Michael Haile";
+        const nextService = "Orthodontic Adjustment";
+
+        setCurrentServing({
+            ticket: nextTicket,
+            patient: nextPatient,
+            service: nextService,
+            status: "SERVING",
+        });
+
+        setActionMsg(`⚡ Auto Advance: System identified next waiting patient (${nextTicket} - ${nextPatient}). Status now SERVING.`);
+
+        // Broadcast to Real-Time Gateway so Receptionist & Customer receive update
+        realtimeService.emit("PATIENT_CALLED", {
+            ticket: nextTicket,
+            formattedQueueNumber: nextTicket,
+            patientName: nextPatient,
+            serviceType: nextService,
+            notification: {
+                message: `Patient ${nextTicket} is ready.`,
+            },
+        });
+
+        setTimeout(() => setActionMsg(""), 4000);
+    };
+
     return (
         <PageContainer
             title={user ? `Dentist Clinic Portal — Dr. ${user.fullName}` : "Dentist Clinic Portal"}
@@ -201,6 +256,76 @@ export default function DentistPage() {
                         </p>
                     </div>
                 ))}
+            </div>
+
+            {/* Chairside Operatory Queue Management (Task 2: Complete Visit, Task 3: Auto Advance) */}
+            <div className="card" style={{ marginBottom: "1.5rem", borderLeft: "4px solid #2563eb" }}>
+                <div className="card__header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <div>
+                        <h2 className="card__title">Chairside Operatory — Active Patient Visit</h2>
+                        <p className="card__subtitle">Complete active patient visit and auto-advance queue</p>
+                    </div>
+                    <div style={{ display: "flex", gap: "8px" }}>
+                        <Button
+                            variant="secondary"
+                            size="sm"
+                            onClick={handleDentistAutoAdvance}
+                            title="Auto Advance to next waiting patient (WAITING #004 -> SERVING)"
+                        >
+                            ⚡ Auto Advance Next Patient
+                        </Button>
+                        <Button
+                            variant="primary"
+                            size="sm"
+                            onClick={handleDentistCompleteVisit}
+                            disabled={currentServing?.status === "DONE"}
+                            style={{ backgroundColor: currentServing?.status === "DONE" ? "#9ca3af" : "#059669" }}
+                        >
+                            ✓ Complete Visit
+                        </Button>
+                    </div>
+                </div>
+                <div style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    padding: "1rem",
+                    backgroundColor: "var(--bg-page)",
+                    borderRadius: "var(--radius-md)",
+                    border: "1px solid var(--border)",
+                }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                        <span style={{
+                            fontSize: "1.25rem",
+                            fontWeight: 800,
+                            padding: "6px 12px",
+                            borderRadius: "6px",
+                            backgroundColor: currentServing?.status === "SERVING" ? "#dbeafe" : "#dcfce7",
+                            color: currentServing?.status === "SERVING" ? "#1e40af" : "#166534",
+                        }}>
+                            {currentServing?.ticket || "#---"}
+                        </span>
+                        <div>
+                            <p style={{ fontWeight: 700, fontSize: "1rem", margin: 0 }}>
+                                {currentServing?.patient || "No active patient"}
+                            </p>
+                            <p style={{ fontSize: "0.8125rem", color: "var(--text-muted)", margin: "2px 0 0 0" }}>
+                                {currentServing?.service} • In Operatory 1
+                            </p>
+                        </div>
+                    </div>
+                    <span style={{
+                        fontWeight: 700,
+                        fontSize: "0.8125rem",
+                        padding: "4px 10px",
+                        borderRadius: "9999px",
+                        backgroundColor: currentServing?.status === "SERVING" ? "#eff6ff" : "#f0fdf4",
+                        color: currentServing?.status === "SERVING" ? "#1d4ed8" : "#15803d",
+                        border: `1px solid ${currentServing?.status === "SERVING" ? "#bfdbfe" : "#bbf7d0"}`,
+                    }}>
+                        {currentServing?.status || "WAITING"}
+                    </span>
+                </div>
             </div>
 
             <div className="grid grid-cols-2">
