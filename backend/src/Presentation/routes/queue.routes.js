@@ -41,6 +41,9 @@ function createQueueRoutes(container) {
         next();
     };
 
+    // Customer position endpoint (Task 4: Your Queue Number: #007, Position: 2, Status: WAITING)
+    router.get("/my-position", controller.getMyQueuePosition);
+
     // Specific endpoints
     router.post("/check-in", requireStaff, controller.checkIn);
     router.post("/auto-advance", requireStaff, controller.autoAdvance);
