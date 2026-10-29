@@ -21,3 +21,4 @@ class MarkAllNotificationsRead {
 }
 
 module.exports = MarkAllNotificationsRead;
+

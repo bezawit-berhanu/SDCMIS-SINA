@@ -55,3 +55,4 @@ class CustomerAccessPolicy {
 }
 
 module.exports = CustomerAccessPolicy;
+

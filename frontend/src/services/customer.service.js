@@ -1,5 +1,5 @@
-import { apiClient } from "../lib/api-client";
-import { realtimeService } from "./realtime.service";
+import { apiClient } from "../lib/api-client.js";
+import { realtimeService } from "./realtime.service.js";
 
 /**
  * Customer Service

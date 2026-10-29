@@ -1,6 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth, getDefaultDashboardForRole } from "../../features/auth/auth-context";
 import Button from "../common/Button";
+import DentistNotificationDropdown from "../notification/DentistNotificationDropdown";
 
 export default function Header({ onToggleSidebar, isSidebarOpen }) {
     const navigate = useNavigate();
@@ -31,7 +32,12 @@ export default function Header({ onToggleSidebar, isSidebarOpen }) {
                 </Link>
             </div>
 
-            <div className="header-right">
+            <div className="header-right" style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                {/* Task 8: Dentist Notification Icon & Dropdown in App Header */}
+                {user?.role === "DENTIST" && (
+                    <DentistNotificationDropdown userId={user.id} />
+                )}
+
                 <div className="user-badge">
                     <span className="user-badge__dot" />
                     <span>{user ? user.fullName || "Connected" : "Guest"}</span>

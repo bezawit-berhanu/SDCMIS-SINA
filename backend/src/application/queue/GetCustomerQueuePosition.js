@@ -77,3 +77,4 @@ class GetCustomerQueuePosition {
 }
 
 module.exports = GetCustomerQueuePosition;
+

@@ -21,3 +21,4 @@ class GetUnreadNotifications {
 }
 
 module.exports = GetUnreadNotifications;
+

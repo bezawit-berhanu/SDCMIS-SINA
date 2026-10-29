@@ -149,3 +149,4 @@ export default function CustomerQueueWidget({ initialQueue = null, patientId = n
         </div>
     );
 }
+

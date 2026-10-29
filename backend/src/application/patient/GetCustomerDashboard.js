@@ -59,9 +59,26 @@ class GetCustomerDashboard {
         }
 
         const safePatient = typeof patient.toSafeObject === "function" ? patient.toSafeObject() : patient;
-        const procedures = safePatient.procedures || [];
-        const appointments = safePatient.appointments || [];
-        const payments = safePatient.payments || [];
+        let procedures = safePatient.procedures || [];
+        let appointments = safePatient.appointments || [];
+        let payments = safePatient.payments || [];
+
+        // Check repositories if not populated on patient
+        if (procedures.length === 0 && this.procedureRepository && typeof this.procedureRepository.findByPatientId === "function") {
+            try {
+                procedures = await this.procedureRepository.findByPatientId(patientId);
+            } catch (_) {}
+        }
+        if (payments.length === 0 && this.paymentRepository && typeof this.paymentRepository.findByPatientId === "function") {
+            try {
+                payments = await this.paymentRepository.findByPatientId(patientId);
+            } catch (_) {}
+        }
+        if (appointments.length === 0 && this.appointmentRepository && typeof this.appointmentRepository.findByPatientId === "function") {
+            try {
+                appointments = await this.appointmentRepository.findByPatientId(patientId);
+            } catch (_) {}
+        }
 
         // 1. My Information
         const myInformation = {
