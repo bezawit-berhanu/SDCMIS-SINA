@@ -29,19 +29,31 @@ function createQueueRoutes(container) {
     // Mount SSE live stream endpoint
     router.use(createQueueStreamRoutes(container));
 
+    // Role guard for queue management actions (Staff only: RECEPTIONIST or DENTIST)
+    const requireStaff = (req, res, next) => {
+        if (req.user && req.user.role === "CUSTOMER") {
+            return res.status(403).json({
+                success: false,
+                code: "FORBIDDEN",
+                message: "You do not have permission to manage the clinical queue.",
+            });
+        }
+        next();
+    };
+
     // Specific endpoints
-    router.post("/check-in", controller.checkIn);
-    router.post("/auto-advance", controller.autoAdvance);
-    router.post("/call", controller.callCustomer);
-    router.post("/complete", controller.completeVisit);
+    router.post("/check-in", requireStaff, controller.checkIn);
+    router.post("/auto-advance", requireStaff, controller.autoAdvance);
+    router.post("/call", requireStaff, controller.callCustomer);
+    router.post("/complete", requireStaff, controller.completeVisit);
 
     // RESTful endpoints with ID
-    router.post("/:id/call", controller.callCustomer);
-    router.post("/:id/complete", controller.completeVisit);
+    router.post("/:id/call", requireStaff, controller.callCustomer);
+    router.post("/:id/complete", requireStaff, controller.completeVisit);
 
     // Base endpoints
     router.get("/", controller.getQueue);
-    router.post("/", controller.checkIn);
+    router.post("/", requireStaff, controller.checkIn);
 
     return router;
 }
