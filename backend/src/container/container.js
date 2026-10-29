@@ -156,6 +156,7 @@ const getUnreadNotifications = new GetUnreadNotifications({ notificationReposito
 const markAllNotificationsRead = new MarkAllNotificationsRead({ notificationRepository });
 
 const GetCustomerDashboard = require("../application/patient/GetCustomerDashboard");
+const GetCustomerQueuePosition = require("../application/queue/GetCustomerQueuePosition");
 
 const getCustomerDashboard = new GetCustomerDashboard({
     patientRepository,
@@ -164,6 +165,8 @@ const getCustomerDashboard = new GetCustomerDashboard({
     paymentRepository,
     appointmentRepository,
 });
+
+const getCustomerQueuePosition = new GetCustomerQueuePosition({ queueRepository });
 
 const container = {
     prisma,
@@ -217,6 +220,7 @@ const container = {
     getUnreadNotifications,
     markAllNotificationsRead,
     getCustomerDashboard,
+    getCustomerQueuePosition,
 };
 
 module.exports = container;
