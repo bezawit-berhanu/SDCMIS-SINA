@@ -8,7 +8,9 @@ class QueueController {
         this.completeVisit = this.completeVisit.bind(this);
         this.autoAdvance = this.autoAdvance.bind(this);
         this.getNotifications = this.getNotifications.bind(this);
+        this.getUnreadNotifications = this.getUnreadNotifications.bind(this);
         this.markNotificationRead = this.markNotificationRead.bind(this);
+        this.markAllNotificationsRead = this.markAllNotificationsRead.bind(this);
     }
 
     async getQueue(req, res) {
@@ -131,6 +133,23 @@ class QueueController {
         }
     }
 
+    async getUnreadNotifications(req, res) {
+        try {
+            const targetUserId = req.query.userId || req.user?.id || "usr-dentist-01";
+            const result = await this.container.getUnreadNotifications.execute(targetUserId);
+            return res.status(200).json({
+                success: true,
+                data: result.notifications,
+                unreadCount: result.unreadCount,
+            });
+        } catch (error) {
+            return res.status(error.statusCode || 500).json({
+                success: false,
+                message: error.message || "Failed to retrieve unread notifications.",
+            });
+        }
+    }
+
     async markNotificationRead(req, res) {
         try {
             const notificationId = req.params.id;
@@ -147,6 +166,23 @@ class QueueController {
             return res.status(error.statusCode || 400).json({
                 success: false,
                 message: error.message || "Failed to update notification.",
+            });
+        }
+    }
+
+    async markAllNotificationsRead(req, res) {
+        try {
+            const targetUserId = req.body.userId || req.query.userId || req.user?.id || "usr-dentist-01";
+            const result = await this.container.markAllNotificationsRead.execute(targetUserId);
+            return res.status(200).json({
+                success: true,
+                updatedCount: result.updatedCount,
+                message: result.message,
+            });
+        } catch (error) {
+            return res.status(error.statusCode || 400).json({
+                success: false,
+                message: error.message || "Failed to mark all notifications as read.",
             });
         }
     }
