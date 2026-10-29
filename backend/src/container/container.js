@@ -139,6 +139,8 @@ const AutoAdvanceQueue = require("../application/queue/AutoAdvanceQueue");
 const CompleteVisit = require("../application/queue/CompleteVisit");
 const GetNotifications = require("../application/notification/GetNotifications");
 const MarkNotificationRead = require("../application/notification/MarkNotificationRead");
+const GetUnreadNotifications = require("../application/notification/GetUnreadNotifications");
+const MarkAllNotificationsRead = require("../application/notification/MarkAllNotificationsRead");
 
 const queueRepository = new QueueRepository({ prisma, patientRepository });
 const notificationRepository = new NotificationRepository({ prisma });
@@ -150,6 +152,8 @@ const autoAdvanceQueue = new AutoAdvanceQueue({ queueRepository, callCustomer, r
 const completeVisit = new CompleteVisit({ queueRepository, autoAdvanceQueue, realtimeGateway });
 const getNotifications = new GetNotifications({ notificationRepository });
 const markNotificationRead = new MarkNotificationRead({ notificationRepository });
+const getUnreadNotifications = new GetUnreadNotifications({ notificationRepository });
+const markAllNotificationsRead = new MarkAllNotificationsRead({ notificationRepository });
 
 const container = {
     prisma,
@@ -200,6 +204,8 @@ const container = {
     completeVisit,
     getNotifications,
     markNotificationRead,
+    getUnreadNotifications,
+    markAllNotificationsRead,
 };
 
 module.exports = container;
