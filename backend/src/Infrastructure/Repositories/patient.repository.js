@@ -451,7 +451,9 @@ class PatientRepository {
         const contact = (data.contact || data.contact_info || data.contactInfo || "").trim();
         const age = Number(data.age);
         const serviceType = (data.service || data.serviceType || data.service_type || "").trim();
-        const initialFee = data.initialFee !== undefined && data.initialFee !== null ? Number(data.initialFee) : (data.remainingFee || 0);
+        const initialFee = data.initialFee !== undefined && data.initialFee !== null
+            ? Number(data.initialFee)
+            : Number(data.remainingFee !== undefined ? data.remainingFee : data.remaining_fee || 0);
         const dentistId = data.dentistId || data.dentistid || null;
         const branchId = data.branchId || data.branchID || null;
         const createdByUserId = data.createdByUserId || actorUserId || "usr-receptionist";
