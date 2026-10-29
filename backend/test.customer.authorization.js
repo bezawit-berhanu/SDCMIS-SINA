@@ -135,7 +135,8 @@ test("Task 3: Data Authorization — Customer A -> GET /api/patients/B -> 403 Fo
 
         assert.equal(res.status, 200);
         assert.equal(res.body.success, true);
-        assert.ok(res.body.data.name.includes("Alice"));
+        const patientName = res.body.data?.patient?.name || res.body.data?.name || "";
+        assert.ok(patientName.includes("Alice"));
     });
 
     await t.test("Customer A -> GET /api/patients/B -> ❌ 403 Forbidden", async () => {

@@ -1,4 +1,3 @@
-
 class GetCurrentUser {
     constructor({ userRepository }) {
         // The repository is responsible for retrieving the latest user record.
@@ -25,6 +24,7 @@ class GetCurrentUser {
             phone: user.phone,
             role: user.role,
             themePreference: user.themePreference,
+            linkedPatientId: user.linkedPatientId || null,
         };
     }
 }
