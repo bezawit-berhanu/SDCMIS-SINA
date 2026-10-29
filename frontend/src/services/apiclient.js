@@ -1,7 +1,7 @@
 import axios from "axios";
-import { authStorage } from "../features/auth/auth_storage";
+import { authStorage } from "../features/auth/auth_storage.js";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
+const API_BASE_URL = (typeof import.meta !== "undefined" && import.meta.env?.VITE_API_BASE_URL) || "";
 
 const apiClient = axios.create({
     baseURL: API_BASE_URL,
