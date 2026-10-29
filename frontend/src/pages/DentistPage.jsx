@@ -1,11 +1,20 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "../features/auth/auth-context";
 import PageContainer from "../components/layout/PageContainer";
 import Button from "../components/common/Button";
+import { realtimeService } from "../services/realtime.service";
 
 export default function DentistPage() {
     const { user, restoreSession } = useAuth();
     const [refreshing, setRefreshing] = useState(false);
+    const [liveAlert, setLiveAlert] = useState(null);
+    const [notifications, setNotifications] = useState([]);
+    const [currentServing, setCurrentServing] = useState({
+        ticket: "#002",
+        patient: "Hana Bekele",
+        service: "Composite Restoration",
+        status: "SERVING"
+    });
 
     const handleRefresh = async () => {
         setRefreshing(true);
@@ -30,6 +39,66 @@ export default function DentistPage() {
         { id: "PROC-104", patient: "Bethlehem Alemu", type: "Full Dental Prophylaxis", time: "04:00 PM", status: "DONE" },
     ]);
     const [actionMsg, setActionMsg] = useState("");
+
+    // Real-time synchronization: Dentist receives live notifications without manual refresh
+    useEffect(() => {
+        realtimeService.connect({
+            role: "DENTIST",
+            userId: user?.id || "usr-dentist-01",
+        });
+
+        const unsubscribeCall = realtimeService.subscribe("PATIENT_CALLED", (payload) => {
+            const ticket = payload.formattedQueueNumber || payload.ticket || `#${String(payload.queueNumber || 3).padStart(3, "0")}`;
+            const patientName = payload.patientName || payload.patient || "Patient";
+            const alertMsg = payload.notification?.message || `Patient ${ticket} is ready.`;
+
+            setLiveAlert({
+                message: alertMsg,
+                ticket,
+                patientName,
+                time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+            });
+
+            setCurrentServing({
+                ticket,
+                patient: patientName,
+                service: payload.serviceType || "Clinical Consultation",
+                status: "SERVING",
+            });
+
+            setNotifications((prev) => [
+                {
+                    id: payload.notification?.id || `notif-${Date.now()}`,
+                    message: alertMsg,
+                    time: "Just now",
+                    isRead: false,
+                },
+                ...prev,
+            ]);
+        });
+
+        const unsubscribeNotif = realtimeService.subscribe("NOTIFICATION_CREATED", (payload) => {
+            const alertMsg = payload.message || "New patient alert received.";
+            setLiveAlert({
+                message: alertMsg,
+                time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+            });
+            setNotifications((prev) => [
+                {
+                    id: payload.id || `notif-${Date.now()}`,
+                    message: alertMsg,
+                    time: "Just now",
+                    isRead: false,
+                },
+                ...prev,
+            ]);
+        });
+
+        return () => {
+            unsubscribeCall();
+            unsubscribeNotif();
+        };
+    }, [user]);
 
     const advanceToOngoing = (procId) => {
         setProcedures((prev) =>
@@ -57,6 +126,47 @@ export default function DentistPage() {
                 </Button>
             }
         >
+            {/* Real-Time Live Notification Alert (Appears dynamically without refresh) */}
+            {liveAlert && (
+                <div
+                    role="alert"
+                    data-testid="dentist-live-alert"
+                    style={{
+                        padding: "14px 18px",
+                        marginBottom: "1.25rem",
+                        borderRadius: "8px",
+                        backgroundColor: "#eff6ff",
+                        color: "#1e40af",
+                        border: "2px solid #3b82f6",
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        boxShadow: "0 4px 12px rgba(59, 130, 246, 0.15)",
+                        animation: "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+                    }}
+                >
+                    <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                        <span style={{ fontSize: "1.5rem" }}>🔔</span>
+                        <div>
+                            <p style={{ fontWeight: 700, fontSize: "0.95rem", margin: 0 }}>
+                                Live Reception Alert: {liveAlert.message}
+                            </p>
+                            <p style={{ fontSize: "0.75rem", color: "#60a5fa", margin: 0, marginTop: "2px" }}>
+                                Received at {liveAlert.time} • Automatic live synchronization active
+                            </p>
+                        </div>
+                    </div>
+                    <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => setLiveAlert(null)}
+                        style={{ borderColor: "#bfdbfe" }}
+                    >
+                        Dismiss
+                    </Button>
+                </div>
+            )}
+
             {actionMsg && (
                 <div style={{
                     padding: "10px 16px",
