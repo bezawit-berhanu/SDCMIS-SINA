@@ -1,71 +1,78 @@
 const crypto = require("node:crypto");
 const INotificationRepository = require("../../domain/repositories/notification.repository.interface");
+const Notification = require("../../domain/entities/notification.entity");
+const { NotificationType } = require("../../domain/enums/enum");
 
 class NotificationRepository extends INotificationRepository {
     constructor({ prisma } = {}) {
         super();
         this.prisma = prisma;
 
-        // Seed notifications
-        this.notifications = [
-            {
-                id: "notif-001",
-                recipientUserId: "usr-dentist-01",
-                message: "Patient #002 (Hana Bekele) is ready in Operatory 1.",
-                relatedQueueEntryId: "que-002",
-                isRead: true,
-                createdAt: new Date(Date.now() - 40 * 60000),
-                updatedAt: new Date(Date.now() - 35 * 60000),
-            },
-        ];
+        // Seed initial notification
+        const initialNotif = new Notification({
+            notificationId: "notif-001",
+            userId: "usr-dentist-01",
+            message: "Patient #002 (Hana Bekele) is ready in Operatory 1.",
+            relatedQueueEntryId: "que-002",
+            isRead: true,
+            type: NotificationType.PATIENT_READY,
+            createdAt: new Date(Date.now() - 40 * 60000),
+        });
+
+        this.notifications = [initialNotif];
     }
 
     async create(notificationData) {
-        const id = notificationData.id || `notif-${crypto.randomUUID()}`;
-        const record = {
-            id,
-            recipientUserId: String(notificationData.recipientUserId),
-            message: String(notificationData.message),
-            relatedQueueEntryId: notificationData.relatedQueueEntryId ? String(notificationData.relatedQueueEntryId) : null,
-            isRead: false,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-        };
+        const notif = notificationData instanceof Notification
+            ? notificationData
+            : new Notification({
+                notificationId: notificationData.notificationId || notificationData.NotificationId || notificationData.id,
+                userId: notificationData.userId || notificationData.UserId || notificationData.recipientUserId,
+                message: notificationData.message || notificationData.Message,
+                type: notificationData.type || notificationData.Type || NotificationType.PATIENT_READY,
+                isRead: notificationData.isRead || notificationData.IsRead || false,
+                relatedQueueEntryId: notificationData.relatedQueueEntryId,
+                createdAt: notificationData.createdAt || notificationData.CreatedAt || new Date(),
+            });
 
-        // Try Prisma
+        // Try Prisma if available
         try {
             if (this.prisma?.notification?.create) {
                 await this.prisma.notification.create({
                     data: {
-                        id: record.id,
-                        recipient_user_id: record.recipientUserId,
-                        message: record.message,
-                        related_queue_entry_id: record.relatedQueueEntryId,
-                        is_read: record.isRead,
-                        created_at: record.createdAt,
-                        updated_at: record.updatedAt,
+                        id: notif.notificationId,
+                        recipient_user_id: notif.userId,
+                        message: notif.message,
+                        related_queue_entry_id: notif.relatedQueueEntryId,
+                        is_read: notif.isRead,
+                        created_at: notif.createdAt,
+                        updated_at: new Date(),
                     },
                 });
             }
         } catch (_) {}
 
-        this.notifications.unshift(record);
-        return { ...record };
+        this.notifications.unshift(notif);
+        return notif.toJSON();
     }
 
     async findById(id) {
-        const item = this.notifications.find((n) => n.id === id);
-        return item ? { ...item } : null;
+        const item = this.notifications.find((n) => n.notificationId === id || n.id === id);
+        return item ? item.toJSON() : null;
     }
 
     async findByRecipientId(recipientUserId, options = {}) {
         let results = this.notifications.filter(
-            (n) => n.recipientUserId === recipientUserId || recipientUserId === "all"
+            (n) => n.userId === recipientUserId || recipientUserId === "all" || n.recipientUserId === recipientUserId
         );
         if (options.unreadOnly) {
             results = results.filter((n) => !n.isRead);
         }
-        return results.map((n) => ({ ...n }));
+        if (options.type) {
+            const searchType = String(options.type).toUpperCase();
+            results = results.filter((n) => n.type === searchType);
+        }
+        return results.map((n) => (typeof n.toJSON === "function" ? n.toJSON() : { ...n }));
     }
 
     async findUnreadByRecipientId(recipientUserId) {
@@ -73,31 +80,52 @@ class NotificationRepository extends INotificationRepository {
     }
 
     async markAsRead(id) {
-        const item = this.notifications.find((n) => n.id === id);
+        const item = this.notifications.find((n) => n.notificationId === id || n.id === id);
         if (!item) return null;
-        item.isRead = true;
-        item.updatedAt = new Date();
+
+        if (typeof item.markAsRead === "function") {
+            item.markAsRead();
+        } else {
+            item.isRead = true;
+        }
 
         try {
             if (this.prisma?.notification?.update) {
                 await this.prisma.notification.update({
                     where: { id },
-                    data: { is_read: true, updated_at: item.updatedAt },
+                    data: { is_read: true, updated_at: new Date() },
                 });
             }
         } catch (_) {}
 
-        return { ...item };
+        return typeof item.toJSON === "function" ? item.toJSON() : { ...item };
     }
 
     async markAllAsReadForUser(recipientUserId) {
+        let updatedCount = 0;
         this.notifications.forEach((n) => {
-            if (n.recipientUserId === recipientUserId || recipientUserId === "all") {
-                n.isRead = true;
-                n.updatedAt = new Date();
+            if (n.userId === recipientUserId || n.recipientUserId === recipientUserId || recipientUserId === "all") {
+                if (!n.isRead) {
+                    if (typeof n.markAsRead === "function") {
+                        n.markAsRead();
+                    } else {
+                        n.isRead = true;
+                    }
+                    updatedCount++;
+                }
             }
         });
-        return true;
+
+        try {
+            if (this.prisma?.notification?.updateMany) {
+                await this.prisma.notification.updateMany({
+                    where: recipientUserId === "all" ? {} : { recipient_user_id: recipientUserId },
+                    data: { is_read: true, updated_at: new Date() },
+                });
+            }
+        } catch (_) {}
+
+        return { success: true, updatedCount };
     }
 }
 
