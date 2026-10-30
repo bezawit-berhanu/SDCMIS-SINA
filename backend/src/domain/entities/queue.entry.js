@@ -131,6 +131,18 @@ class QueueEntry {
         return this.call(dentistId, dentistName);
     }
 
+    markCalled(dentistId = null, dentistName = null, calledTime = null) {
+        this.call(dentistId, dentistName);
+        if (calledTime) this.calledTime = calledTime;
+        return this;
+    }
+
+    markCompleted(completedTime = null) {
+        this.complete();
+        if (completedTime) this.completedTime = completedTime;
+        return this;
+    }
+
     /**
      * Transition: SERVING -> DONE (or fast-tracked from WAITING)
      * Marks visit as completed
