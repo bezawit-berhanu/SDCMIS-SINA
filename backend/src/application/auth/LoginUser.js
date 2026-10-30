@@ -52,7 +52,7 @@ class LoginUser {
         }
 
         // Reject inactive or soft-deleted accounts
-        const isInactive = user.recordStatus !== RecordStatus.ACTIVE || user.deletedAt !== null;
+        const isInactive = user.recordStatus !== RecordStatus.ACTIVE || Boolean(user.deletedAt);
         if (isInactive) {
             const error = new Error("Account is inactive or disabled.");
             error.statusCode = 401;

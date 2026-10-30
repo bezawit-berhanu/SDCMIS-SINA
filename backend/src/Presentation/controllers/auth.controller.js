@@ -1,4 +1,3 @@
-
 const container = require("../../container/container");
 
 const authController = {
@@ -58,6 +57,18 @@ const authController = {
                 data: {
                     user: req.user,
                 },
+            });
+        } catch (error) {
+            next(error);
+        }
+    },
+
+    async logout(req, res, next) {
+        try {
+            res.clearCookie("refreshToken");
+            return res.status(200).json({
+                success: true,
+                message: "Logged out successfully.",
             });
         } catch (error) {
             next(error);

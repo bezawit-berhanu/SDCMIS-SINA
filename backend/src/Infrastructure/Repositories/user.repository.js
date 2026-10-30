@@ -107,6 +107,7 @@ const userRepository = {
             linkedPatientId: userData.linkedPatientId || null,
             branchId: userData.branchId || null,
             recordStatus: userData.recordStatus || "ACTIVE",
+            deletedAt: null,
             createdAt: new Date(),
             updatedAt: new Date(),
         };
