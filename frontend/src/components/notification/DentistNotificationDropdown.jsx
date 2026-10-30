@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
 import { realtimeService } from "../../services/realtime.service.js";
 import { apiClient } from "../../lib/api-client.js";
 
@@ -321,6 +322,28 @@ export default function DentistNotificationDropdown({ userId = "usr-dentist-01" 
                                 );
                             })
                         )}
+                    </div>
+
+                    <div
+                        style={{
+                            padding: "8px 12px",
+                            backgroundColor: "#f8fafc",
+                            borderTop: "1px solid #e2e8f0",
+                            textAlign: "center",
+                        }}
+                    >
+                        <Link
+                            to="/dentist/notifications"
+                            onClick={() => setIsOpen(false)}
+                            style={{
+                                fontSize: "0.8125rem",
+                                color: "#2563eb",
+                                textDecoration: "none",
+                                fontWeight: 600,
+                            }}
+                        >
+                            View all notifications →
+                        </Link>
                     </div>
                 </div>
             )}

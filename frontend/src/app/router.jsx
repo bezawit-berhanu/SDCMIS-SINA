@@ -11,6 +11,7 @@ import HomePage from "../pages/HomePage.jsx";
 import LoginPage from "../pages/LoginPage.jsx";
 import RegisterPage from "../pages/RegisterPage.jsx";
 import DentistPage from "../pages/DentistPage.jsx";
+import DentistNotificationsPage from "../pages/DentistNotificationsPage.jsx";
 import ReceptionistPage from "../pages/ReceptionistPage.jsx";
 import CustomerPage from "../pages/CustomerPage.jsx";
 import SettingsPage from "../pages/SettingsPage.jsx";
@@ -63,6 +64,14 @@ const router = createBrowserRouter([
                 element: (
                     <ProtectedRoute allowedRoles={[UserRole.DENTIST]}>
                         <DentistPage />
+                    </ProtectedRoute>
+                ),
+            },
+            {
+                path: "/dentist/notifications",
+                element: (
+                    <ProtectedRoute allowedRoles={[UserRole.DENTIST]}>
+                        <DentistNotificationsPage />
                     </ProtectedRoute>
                 ),
             },
