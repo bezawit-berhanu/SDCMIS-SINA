@@ -130,6 +130,7 @@ class RealtimeGateway extends EventEmitter {
         };
 
         this.emit("event", message);
+        this.emit(type, payload);
         this.emit(`user:${userId}`, message);
 
         for (const client of this.clients) {
@@ -153,6 +154,8 @@ class RealtimeGateway extends EventEmitter {
         };
 
         this.emit("event", message);
+        this.emit(type, payload);
+        this.emit(`role:${role}`, message);
 
         for (const client of this.clients) {
             if (client.role === role || client.role === "RECEPTIONIST") {

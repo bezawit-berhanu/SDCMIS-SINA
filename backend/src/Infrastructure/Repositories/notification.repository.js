@@ -79,6 +79,10 @@ class NotificationRepository extends INotificationRepository {
         return this.findByRecipientId(recipientUserId, { unreadOnly: true });
     }
 
+    async findUnreadByUserId(userId) {
+        return this.findUnreadByRecipientId(userId);
+    }
+
     async markAsRead(id) {
         const item = this.notifications.find((n) => n.notificationId === id || n.id === id);
         if (!item) return null;
