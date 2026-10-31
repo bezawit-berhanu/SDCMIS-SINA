@@ -1,24 +1,36 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth, getDefaultDashboardForRole } from "../features/auth/auth-context";
+import { useAuth, getDefaultDashboardForRole, UserRole } from "../features/auth/auth-context";
 import Button from "../components/common/Button";
 import ErrorMessage from "../components/common/ErrorMessage";
 import Loading from "../components/common/Loading";
 
+/**
+ * SCR-02: Sina Dental Clinic Registration Page
+ * Features classified Patient vs Staff registration (differentiating Dentist vs Receptionist)
+ * Displays exclusively the title 'Sina Dental Clinic' and registration options.
+ */
 export default function RegisterPage() {
     const navigate = useNavigate();
     const { register, user } = useAuth();
+
+    // Classification: 'PATIENT' | 'STAFF'
+    const [accountCategory, setAccountCategory] = useState("PATIENT");
+    // For staff: 'DENTIST' | 'RECEPTIONIST'
+    const [staffRole, setStaffRole] = useState(UserRole.DENTIST);
 
     const [fullName, setFullName] = useState("");
     const [email, setEmail] = useState("");
     const [phone, setPhone] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
+    const [staffCode, setStaffCode] = useState("");
+    const [specialty, setSpecialty] = useState("");
+
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const [successMessage, setSuccessMessage] = useState("");
 
-    // If already authenticated, redirect directly to appropriate dashboard
     useEffect(() => {
         if (user) {
             navigate(getDefaultDashboardForRole(user.role), { replace: true });
@@ -62,18 +74,23 @@ export default function RegisterPage() {
         setError("");
         setSuccessMessage("");
 
+        const chosenRole = accountCategory === "STAFF" ? staffRole : UserRole.CUSTOMER;
+
         try {
             await register({
                 fullName: fullName.trim(),
                 email: email.trim() || undefined,
                 phone: phone.trim() || undefined,
                 password,
+                role: chosenRole,
+                staffCode: accountCategory === "STAFF" ? staffCode.trim() : undefined,
+                specialty: accountCategory === "STAFF" && staffRole === UserRole.DENTIST ? specialty.trim() : undefined,
             });
 
-            setSuccessMessage("Account created successfully! You can now log in.");
+            setSuccessMessage(`Account created successfully as ${chosenRole === UserRole.CUSTOMER ? "Patient" : chosenRole}! Redirecting to Sign In...`);
             setTimeout(() => {
                 navigate("/login", { replace: true });
-            }, 1800);
+            }, 1600);
         } catch (err) {
             const serverMsg =
                 err.response?.data?.error?.message ||
@@ -88,29 +105,133 @@ export default function RegisterPage() {
 
     return (
         <div>
-            <h1 className="auth-title">Create an Account</h1>
-            <p className="auth-subtitle">Join Sina Dental Customer Information Management</p>
+            <h1 style={{ fontSize: "1.75rem", fontWeight: 800, color: "var(--text-main)", textAlign: "center", marginBottom: "1.5rem", letterSpacing: "-0.01em" }}>
+                Sina Dental Clinic
+            </h1>
+
+            {/* Account Category Classification Tabs: Patient vs Staff */}
+            <div
+                style={{
+                    display: "grid",
+                    gridTemplateColumns: "1fr 1fr",
+                    gap: "0.5rem",
+                    backgroundColor: "var(--bg-page)",
+                    padding: "4px",
+                    borderRadius: "8px",
+                    marginBottom: "1.25rem",
+                    border: "1px solid var(--border)",
+                }}
+            >
+                <button
+                    type="button"
+                    onClick={() => setAccountCategory("PATIENT")}
+                    style={{
+                        padding: "0.6rem 0.75rem",
+                        borderRadius: "6px",
+                        border: "none",
+                        fontWeight: 700,
+                        fontSize: "0.875rem",
+                        cursor: "pointer",
+                        transition: "all 0.15s ease",
+                        backgroundColor: accountCategory === "PATIENT" ? "var(--primary)" : "transparent",
+                        color: accountCategory === "PATIENT" ? "#ffffff" : "var(--text-muted)",
+                    }}
+                >
+                    Patient Registration
+                </button>
+                <button
+                    type="button"
+                    onClick={() => setAccountCategory("STAFF")}
+                    style={{
+                        padding: "0.6rem 0.75rem",
+                        borderRadius: "6px",
+                        border: "none",
+                        fontWeight: 700,
+                        fontSize: "0.875rem",
+                        cursor: "pointer",
+                        transition: "all 0.15s ease",
+                        backgroundColor: accountCategory === "STAFF" ? "var(--primary)" : "transparent",
+                        color: accountCategory === "STAFF" ? "#ffffff" : "var(--text-muted)",
+                    }}
+                >
+                    Staff Registration
+                </button>
+            </div>
+
+            {/* Staff Role Differentiation: Dentist vs Receptionist */}
+            {accountCategory === "STAFF" && (
+                <div
+                    style={{
+                        padding: "0.85rem",
+                        backgroundColor: "var(--primary-light)",
+                        borderRadius: "8px",
+                        marginBottom: "1.25rem",
+                        border: "1px solid var(--border)",
+                    }}
+                >
+                    <label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 700, color: "var(--primary)", marginBottom: "0.5rem" }}>
+                        Select Staff Role:
+                    </label>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.5rem" }}>
+                        <button
+                            type="button"
+                            onClick={() => setStaffRole(UserRole.DENTIST)}
+                            style={{
+                                padding: "0.5rem",
+                                borderRadius: "6px",
+                                border: "1px solid",
+                                borderColor: staffRole === UserRole.DENTIST ? "var(--primary)" : "var(--border)",
+                                backgroundColor: staffRole === UserRole.DENTIST ? "#ffffff" : "transparent",
+                                color: staffRole === UserRole.DENTIST ? "var(--primary)" : "var(--text-muted)",
+                                fontWeight: 700,
+                                fontSize: "0.85rem",
+                                cursor: "pointer",
+                            }}
+                        >
+                            🩺 Dentist (Dr.)
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setStaffRole(UserRole.RECEPTIONIST)}
+                            style={{
+                                padding: "0.5rem",
+                                borderRadius: "6px",
+                                border: "1px solid",
+                                borderColor: staffRole === UserRole.RECEPTIONIST ? "var(--primary)" : "var(--border)",
+                                backgroundColor: staffRole === UserRole.RECEPTIONIST ? "#ffffff" : "transparent",
+                                color: staffRole === UserRole.RECEPTIONIST ? "var(--primary)" : "var(--text-muted)",
+                                fontWeight: 700,
+                                fontSize: "0.85rem",
+                                cursor: "pointer",
+                            }}
+                        >
+                            🛎️ Receptionist
+                        </button>
+                    </div>
+                </div>
+            )}
 
             <ErrorMessage message={error} onDismiss={() => setError("")} />
 
             {successMessage && (
                 <div
                     style={{
-                        backgroundColor: "var(--success-bg)",
-                        color: "var(--success)",
+                        backgroundColor: "var(--primary-light)",
+                        color: "var(--primary)",
                         border: "1px solid var(--border)",
                         borderRadius: "var(--radius-md)",
                         padding: "0.75rem 1rem",
                         fontSize: "0.875rem",
                         marginBottom: "1rem",
                         textAlign: "center",
+                        fontWeight: 600,
                     }}
                 >
                     {successMessage}
                 </div>
             )}
 
-            <form onSubmit={handleSubmit} style={{ marginTop: "1.25rem" }}>
+            <form onSubmit={handleSubmit}>
                 <div className="form-group">
                     <label className="form-label" htmlFor="fullName">
                         Full Name *
@@ -119,7 +240,11 @@ export default function RegisterPage() {
                         id="fullName"
                         type="text"
                         className="form-input"
-                        placeholder="Dr. / Mr. / Ms. Full Name"
+                        placeholder={
+                            accountCategory === "STAFF"
+                                ? (staffRole === UserRole.DENTIST ? "e.g. Dr. Bethel Haile" : "e.g. Selam Yohannes")
+                                : "e.g. Yonas Bekele"
+                        }
                         value={fullName}
                         onChange={(e) => setFullName(e.target.value)}
                         disabled={loading}
@@ -136,7 +261,7 @@ export default function RegisterPage() {
                         id="email"
                         type="email"
                         className="form-input"
-                        placeholder="you@example.com"
+                        placeholder="name@sinadental.com"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         disabled={loading}
@@ -152,14 +277,31 @@ export default function RegisterPage() {
                         id="phone"
                         type="tel"
                         className="form-input"
-                        placeholder="+1 555 123 4567"
+                        placeholder="+251 91 123 4567"
                         value={phone}
                         onChange={(e) => setPhone(e.target.value)}
                         disabled={loading}
                         autoComplete="tel"
                     />
-                    <span className="form-help">Enter at least an email or phone number.</span>
                 </div>
+
+                {/* Additional context for Staff Dentist */}
+                {accountCategory === "STAFF" && staffRole === UserRole.DENTIST && (
+                    <div className="form-group">
+                        <label className="form-label" htmlFor="specialty">
+                            Dental Specialization (Optional)
+                        </label>
+                        <input
+                            id="specialty"
+                            type="text"
+                            className="form-input"
+                            placeholder="e.g. Orthodontics, General Dentistry"
+                            value={specialty}
+                            onChange={(e) => setSpecialty(e.target.value)}
+                            disabled={loading}
+                        />
+                    </div>
+                )}
 
                 <div className="form-group">
                     <label className="form-label" htmlFor="password">
@@ -169,16 +311,13 @@ export default function RegisterPage() {
                         id="password"
                         type="password"
                         className="form-input"
-                        placeholder="••••••••"
+                        placeholder="At least 8 characters (A-Z, a-z, 0-9, symbol)"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         disabled={loading}
                         required
                         autoComplete="new-password"
                     />
-                    <span className="form-help">
-                        Min. 8 characters with uppercase, lowercase, number, and symbol.
-                    </span>
                 </div>
 
                 <div className="form-group">
@@ -189,7 +328,7 @@ export default function RegisterPage() {
                         id="confirmPassword"
                         type="password"
                         className="form-input"
-                        placeholder="••••••••"
+                        placeholder="Re-enter password"
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
                         disabled={loading}
@@ -199,19 +338,20 @@ export default function RegisterPage() {
                 </div>
 
                 <div style={{ marginTop: "1.5rem" }}>
-                    <Button
-                        type="submit"
-                        variant="primary"
-                        fullWidth
-                        disabled={loading}
-                    >
-                        {loading ? <Loading inline size="sm" message="Creating account..." /> : "Register"}
+                    <Button type="submit" variant="primary" fullWidth disabled={loading}>
+                        {loading ? (
+                            <Loading inline size="sm" message="Creating account..." />
+                        ) : accountCategory === "STAFF" ? (
+                            `Register as Staff ${staffRole === UserRole.DENTIST ? "Dentist" : "Receptionist"}`
+                        ) : (
+                            "Sign Up as Patient"
+                        )}
                     </Button>
                 </div>
 
                 <div style={{ marginTop: "1.25rem", textAlign: "center", fontSize: "0.875rem" }}>
                     <span style={{ color: "var(--text-muted)" }}>Already have an account? </span>
-                    <Link to="/login" style={{ color: "var(--primary)", fontWeight: 500 }}>
+                    <Link to="/login" style={{ color: "var(--primary)", fontWeight: 600 }}>
                         Sign In
                     </Link>
                 </div>
