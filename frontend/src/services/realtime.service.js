@@ -1,11 +1,14 @@
+import signalRService from "./signalr.service.js";
+
 /**
  * Real-time Sync Service for SDCMIS-SINA Frontend
- * Connects to Backend Real-time Gateway via WebSocket with automatic SSE fallback.
+ * Connects to Backend Real-time Gateway via SignalR Hub with automatic WebSocket & SSE fallback.
  * Dispatches live queue updates, dentist notifications, and patient status changes.
  */
 
 class RealtimeService {
     constructor() {
+        this.signalR = signalRService;
         this.ws = null;
         this.eventSource = null;
         this.listeners = new Map();
@@ -66,6 +69,16 @@ class RealtimeService {
 
         this.status = "CONNECTING";
         this.emit("STATUS_CHANGED", { status: this.status });
+
+        // Initialize SignalR Hub connection in parallel
+        try {
+            this.signalR.start({ role, userId, port }).catch(() => {});
+            this.signalR.on("PATIENT_CALLED", (data) => this.emit("PATIENT_CALLED", data));
+            this.signalR.on("VISIT_COMPLETED", (data) => this.emit("VISIT_COMPLETED", data));
+            this.signalR.on("QUEUE_UPDATED", (data) => this.emit("QUEUE_UPDATED", data));
+            this.signalR.on("NOTIFICATION_CREATED", (data) => this.emit("NOTIFICATION_CREATED", data));
+            this.signalR.on("QUEUE_STATUS_CHANGED", (data) => this.emit("QUEUE_STATUS_CHANGED", data));
+        } catch (_) {}
 
         // Determine host and protocol
         const isSecure = typeof window !== "undefined" && window.location?.protocol === "https:";
