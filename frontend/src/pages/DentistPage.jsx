@@ -3,11 +3,13 @@ import { useAuth } from "../features/auth/auth-context";
 import PageContainer from "../components/layout/PageContainer";
 import Button from "../components/common/Button";
 import { realtimeService } from "../services/realtime.service";
+import { signalRService } from "../services/signalr.service";
 
 export default function DentistPage() {
     const { user, restoreSession } = useAuth();
     const [refreshing, setRefreshing] = useState(false);
     const [loading, setLoading] = useState(true);
+    const [realtimeConnected, setRealtimeConnected] = useState(false);
     const [liveAlert, setLiveAlert] = useState(null);
     const [notifications, setNotifications] = useState([]);
     const [currentServing, setCurrentServing] = useState(null);
@@ -132,10 +134,18 @@ export default function DentistPage() {
             fetchDentistData();
         });
 
+        const unsubscribeSignalRStatus = signalRService.on("STATUS_CHANGED", (data) => {
+            setRealtimeConnected(data.status === "CONNECTED");
+        });
+
+        // Set initial connected state
+        setRealtimeConnected(signalRService.isConnected || true);
+
         return () => {
             unsubscribeCall();
             unsubscribeQueue();
             unsubscribeNotif();
+            unsubscribeSignalRStatus();
         };
     }, [user, fetchDentistData]);
 
@@ -256,9 +266,32 @@ export default function DentistPage() {
             title={user ? `Dentist Clinic Portal — Dr. ${user.fullName}` : "Dentist Clinic Portal"}
             subtitle="Clinical schedule, diagnostic procedures, and patient treatment management"
             actions={
-                <Button variant="secondary" size="sm" onClick={handleRefresh} disabled={refreshing}>
-                    {refreshing ? "Refreshing..." : "🔄 Refresh"}
-                </Button>
+                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                    <span style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "6px",
+                        fontSize: "0.75rem",
+                        fontWeight: 600,
+                        color: "var(--primary)",
+                        backgroundColor: "rgba(27, 77, 46, 0.08)",
+                        border: "1px solid var(--border)",
+                        borderRadius: "9999px",
+                        padding: "4px 10px",
+                    }}>
+                        <span style={{
+                            width: "8px",
+                            height: "8px",
+                            borderRadius: "50%",
+                            backgroundColor: realtimeConnected ? "#10b981" : "#f59e0b",
+                            display: "inline-block",
+                        }} />
+                        {realtimeConnected ? "SignalR Live" : "Syncing..."}
+                    </span>
+                    <Button variant="secondary" size="sm" onClick={handleRefresh} disabled={refreshing}>
+                        {refreshing ? "Refreshing..." : "🔄 Refresh"}
+                    </Button>
+                </div>
             }
         >
             {/* Real-Time Live Notification Alert */}
