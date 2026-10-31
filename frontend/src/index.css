@@ -100,21 +100,39 @@ a:hover {
 .button--primary {
   background-color: var(--primary);
   color: #ffffff;
+  border-color: var(--primary);
+  box-shadow: 0 1px 3px rgba(27, 77, 46, 0.2);
 }
 
 .button--primary:hover:not(:disabled) {
   background-color: var(--primary-hover);
+  border-color: var(--primary-hover);
+}
+
+.button--primary:active:not(:disabled) {
+  background-color: var(--primary-active);
+}
+
+.button--success {
+  background-color: #1b4d2e;
+  color: #ffffff;
+  border-color: #1b4d2e;
+}
+
+.button--success:hover:not(:disabled) {
+  background-color: #143b22;
+  border-color: #143b22;
 }
 
 .button--secondary {
-  background-color: var(--secondary-light);
-  color: var(--secondary);
+  background-color: var(--primary-light);
+  color: var(--primary);
   border-color: var(--border);
 }
 
 .button--secondary:hover:not(:disabled) {
-  background-color: #e2e8f0;
-  color: var(--secondary-hover);
+  background-color: #dbebe0;
+  color: var(--primary-hover);
 }
 
 .button--outline {
