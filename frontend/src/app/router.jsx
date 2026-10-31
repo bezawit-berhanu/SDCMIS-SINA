@@ -19,6 +19,7 @@ import PatientsPage from "../pages/PatientsPage.jsx";
 import AppointmentsPage from "../pages/AppointmentsPage.jsx";
 import MissedAppointmentsPage from "../pages/MissedAppointmentsPage.jsx";
 import HelpPage from "../pages/HelpPage.jsx";
+import CustomerFeesPage from "../pages/CustomerFeesPage.jsx";
 
 const router = createBrowserRouter([
     // Public home route
@@ -109,6 +110,14 @@ const router = createBrowserRouter([
                 element: (
                     <ProtectedRoute allowedRoles={[UserRole.RECEPTIONIST]}>
                         <ReceptionistPage />
+                    </ProtectedRoute>
+                ),
+            },
+            {
+                path: "/receptionist/customers",
+                element: (
+                    <ProtectedRoute allowedRoles={[UserRole.RECEPTIONIST]}>
+                        <CustomerFeesPage />
                     </ProtectedRoute>
                 ),
             },
