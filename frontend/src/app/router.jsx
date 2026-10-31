@@ -20,6 +20,8 @@ import AppointmentsPage from "../pages/AppointmentsPage.jsx";
 import MissedAppointmentsPage from "../pages/MissedAppointmentsPage.jsx";
 import HelpPage from "../pages/HelpPage.jsx";
 import CustomerFeesPage from "../pages/CustomerFeesPage.jsx";
+import PatientDetailPage from "../pages/PatientDetailPage.jsx";
+import UpcomingTasksPage from "../pages/UpcomingTasksPage.jsx";
 
 const router = createBrowserRouter([
     // Public home route
@@ -82,10 +84,26 @@ const router = createBrowserRouter([
                 ),
             },
             {
+                path: "/dentist/tasks",
+                element: (
+                    <ProtectedRoute allowedRoles={[UserRole.DENTIST]}>
+                        <UpcomingTasksPage />
+                    </ProtectedRoute>
+                ),
+            },
+            {
                 path: "/patients",
                 element: (
                     <ProtectedRoute allowedRoles={[UserRole.DENTIST, UserRole.RECEPTIONIST]}>
                         <PatientsPage />
+                    </ProtectedRoute>
+                ),
+            },
+            {
+                path: "/patients/:id",
+                element: (
+                    <ProtectedRoute allowedRoles={[UserRole.DENTIST, UserRole.RECEPTIONIST]}>
+                        <PatientDetailPage />
                     </ProtectedRoute>
                 ),
             },
