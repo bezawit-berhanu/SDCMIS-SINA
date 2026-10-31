@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import { usePatientContext } from "../../features/patient/patient-context";
 
 export default function PatientTable() {
@@ -44,7 +45,9 @@ export default function PatientTable() {
                                             {(patient.name || patient.fullName || "P")[0].toUpperCase()}
                                         </div>
                                         <div>
-                                            <span className="font-semibold text-primary">{patient.name || patient.fullName}</span>
+                                            <Link to={`/patients/${patient.id}`} style={{ textDecoration: "none" }}>
+                                                <span className="font-semibold text-primary">{patient.name || patient.fullName}</span>
+                                            </Link>
                                             <div className="text-xs text-muted">Reg: {new Date(patient.createdDate || patient.createdAt).toLocaleDateString()}</div>
                                         </div>
                                     </div>
@@ -84,14 +87,15 @@ export default function PatientTable() {
                                 </td>
                                 <td className="actions-cell">
                                     <div className="action-button-group">
-                                        <button
-                                            type="button"
-                                            className="btn-action btn-view"
-                                            title="View Clinical Details"
-                                            onClick={() => openDetail(patient)}
-                                        >
-                                            View
-                                        </button>
+                                        <Link to={`/patients/${patient.id}`}>
+                                            <button
+                                                type="button"
+                                                className="btn-action btn-view"
+                                                title="View Clinical Details (SCR-06)"
+                                            >
+                                                View
+                                            </button>
+                                        </Link>
                                         <button
                                             type="button"
                                             className="btn-action btn-edit"
