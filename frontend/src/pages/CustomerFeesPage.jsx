@@ -17,93 +17,25 @@ export default function CustomerFeesPage() {
     const [selectedCustomerForPayment, setSelectedCustomerForPayment] = useState(null);
     const [feedback, setFeedback] = useState("");
 
-    // Initial mock/api dataset
+    // Fetch live customer dataset from API
     useEffect(() => {
         let isMounted = true;
         const fetchCustomers = async () => {
             try {
+                setLoading(true);
                 const res = await apiClient.get("/api/v1/patients");
-                if (isMounted && res.data?.data && Array.isArray(res.data.data)) {
-                    setCustomers(res.data.data);
-                } else if (isMounted) {
-                    // Fallback to comprehensive mock data
-                    setCustomers([
-                        {
-                            id: "pat-001",
-                            name: "Abebe Bikila",
-                            phone: "+251911223344",
-                            totalCost: 4500.0,
-                            totalPaid: 3000.0,
-                            remainingFee: 1500.0,
-                            lastVisit: "2026-10-24",
-                            serviceType: "Orthodontics",
-                        },
-                        {
-                            id: "pat-002",
-                            name: "Hana Bekele",
-                            phone: "+251922334455",
-                            totalCost: 1200.0,
-                            totalPaid: 1200.0,
-                            remainingFee: 0.0,
-                            lastVisit: "2026-10-31",
-                            serviceType: "General",
-                        },
-                        {
-                            id: "pat-003",
-                            name: "Dawit Wolde",
-                            phone: "+251933445566",
-                            totalCost: 3800.0,
-                            totalPaid: 1000.0,
-                            remainingFee: 2800.0,
-                            lastVisit: "2026-10-28",
-                            serviceType: "Cosmetics",
-                        },
-                        {
-                            id: "pat-004",
-                            name: "Tigist Assefa",
-                            phone: "+251944556677",
-                            totalCost: 800.0,
-                            totalPaid: 800.0,
-                            remainingFee: 0.0,
-                            lastVisit: "2026-10-15",
-                            serviceType: "Periodontics",
-                        },
-                    ]);
+                if (isMounted) {
+                    if (res.data?.data && Array.isArray(res.data.data)) {
+                        setCustomers(res.data.data);
+                    } else if (Array.isArray(res.data?.patients)) {
+                        setCustomers(res.data.patients);
+                    } else {
+                        setCustomers([]);
+                    }
                 }
             } catch (_) {
                 if (isMounted) {
-                    setCustomers([
-                        {
-                            id: "pat-001",
-                            name: "Abebe Bikila",
-                            phone: "+251911223344",
-                            totalCost: 4500.0,
-                            totalPaid: 3000.0,
-                            remainingFee: 1500.0,
-                            lastVisit: "2026-10-24",
-                            serviceType: "Orthodontics",
-                        },
-                        {
-                            id: "pat-002",
-                            name: "Hana Bekele",
-                            phone: "+251922334455",
-                            totalCost: 1200.0,
-                            totalPaid: 1200.0,
-                            remainingFee: 0.0,
-                            lastVisit: "2026-10-31",
-                            serviceType: "General",
-                        },
-                        {
-                            id: "pat-003",
-                            name: "Dawit Wolde",
-                            phone: "+251933445566",
-                            totalCost: 3800.0,
-                            totalPaid: 1000.0,
-                            remainingFee: 2800.0,
-                            lastVisit: "2026-10-28",
-                            serviceType: "Cosmetics",
-                        },
-                    ]);
+                    setCustomers([]);
                 }
             } finally {
                 if (isMounted) setLoading(false);
@@ -149,7 +81,7 @@ export default function CustomerFeesPage() {
             })
         );
         setSelectedCustomerForPayment(null);
-        setFeedback(`Payment of ${Number(paymentData.amount).toFixed(2)} ETB successfully recorded.`);
+        setFeedback(`✓ Payment of ${Number(paymentData.amount).toFixed(2)} ETB successfully recorded.`);
         setTimeout(() => setFeedback(""), 4000);
     };
 
@@ -161,7 +93,7 @@ export default function CustomerFeesPage() {
         <div style={{ maxWidth: "1100px", margin: "0 auto", padding: "1.5rem" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem", flexWrap: "wrap", gap: "1rem" }}>
                 <div>
-                    <h1 style={{ fontSize: "1.75rem", fontWeight: "800", color: "var(--text-main)", marginBottom: "0.25rem" }}>
+                    <h1 style={{ fontSize: "1.75rem", fontWeight: "800", color: "var(--primary)", marginBottom: "0.25rem" }}>
                         Customers & Fee Balances (SCR-11)
                     </h1>
                     <p style={{ color: "var(--text-muted)", fontSize: "0.95rem" }}>
@@ -172,15 +104,16 @@ export default function CustomerFeesPage() {
                 <div
                     style={{
                         padding: "0.75rem 1.25rem",
-                        backgroundColor: "#fef3c7",
+                        backgroundColor: "var(--bg-surface)",
                         borderRadius: "8px",
-                        border: "1px solid #fde68a",
+                        border: "1px solid var(--border)",
+                        boxShadow: "var(--shadow-sm)",
                     }}
                 >
-                    <span style={{ fontSize: "0.8rem", color: "#92400e", fontWeight: "600", display: "block" }}>
+                    <span style={{ fontSize: "0.8rem", color: "var(--text-muted)", fontWeight: "600", display: "block" }}>
                         TOTAL CLINIC OUTSTANDING
                     </span>
-                    <strong style={{ fontSize: "1.25rem", color: "#b45309" }}>
+                    <strong style={{ fontSize: "1.25rem", color: totalOutstandingClinicWide > 0 ? "#b91c1c" : "var(--primary)" }}>
                         {totalOutstandingClinicWide.toFixed(2)} ETB
                     </strong>
                 </div>
@@ -191,14 +124,15 @@ export default function CustomerFeesPage() {
                     role="alert"
                     style={{
                         padding: "0.75rem 1rem",
-                        backgroundColor: "#dcfce7",
-                        color: "#166534",
+                        backgroundColor: "rgba(27, 77, 46, 0.08)",
+                        color: "var(--primary)",
+                        border: "1px solid var(--border)",
                         borderRadius: "8px",
                         marginBottom: "1.25rem",
                         fontWeight: "600",
                     }}
                 >
-                    ✓ {feedback}
+                    {feedback}
                 </div>
             )}
 
@@ -221,7 +155,8 @@ export default function CustomerFeesPage() {
                         flex: "1 1 300px",
                         padding: "0.65rem 1rem",
                         borderRadius: "8px",
-                        border: "1px solid var(--border-color, #cbd5e1)",
+                        border: "1px solid var(--border)",
+                        backgroundColor: "var(--bg-card)",
                         fontSize: "0.95rem",
                     }}
                 />
@@ -240,9 +175,9 @@ export default function CustomerFeesPage() {
                                 padding: "0.5rem 0.85rem",
                                 borderRadius: "6px",
                                 border: "1px solid",
-                                borderColor: balanceFilter === btn.id ? "var(--primary-color, #0284c7)" : "#cbd5e1",
-                                backgroundColor: balanceFilter === btn.id ? "var(--primary-color, #0284c7)" : "#ffffff",
-                                color: balanceFilter === btn.id ? "#ffffff" : "#475569",
+                                borderColor: balanceFilter === btn.id ? "var(--primary)" : "var(--border)",
+                                backgroundColor: balanceFilter === btn.id ? "var(--primary)" : "var(--bg-card)",
+                                color: balanceFilter === btn.id ? "#ffffff" : "var(--text-main)",
                                 fontWeight: "600",
                                 fontSize: "0.85rem",
                                 cursor: "pointer",
@@ -255,46 +190,48 @@ export default function CustomerFeesPage() {
             </div>
 
             {/* Customers Table */}
-            <div className="card" style={{ padding: 0, overflowX: "auto" }}>
+            <div className="card" style={{ padding: 0, overflowX: "auto", backgroundColor: "var(--bg-surface)", border: "1px solid var(--border)" }}>
                 {loading ? (
-                    <div style={{ padding: "3rem", textAlign: "center", color: "#64748b" }}>
+                    <div style={{ padding: "3rem", textAlign: "center", color: "var(--text-muted)" }}>
                         Loading customer records...
                     </div>
                 ) : filteredCustomers.length === 0 ? (
-                    <div style={{ padding: "3rem", textAlign: "center", color: "#64748b" }}>
-                        No customer fee records match your search or filter.
+                    <div style={{ padding: "3rem", textAlign: "center", color: "var(--text-muted)" }}>
+                        <span style={{ fontSize: "2rem", display: "block", marginBottom: "0.5rem" }}>💳</span>
+                        <p style={{ fontWeight: 600, fontSize: "1rem", margin: 0 }}>No customer fee records match your search or filter</p>
+                        <p style={{ fontSize: "0.85rem", margin: "4px 0 0 0" }}>Patient balance ledger is clean or empty</p>
                     </div>
                 ) : (
                     <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", fontSize: "0.9rem" }}>
                         <thead>
-                            <tr style={{ backgroundColor: "#f8fafc", borderBottom: "1px solid #e2e8f0" }}>
-                                <th style={{ padding: "0.75rem 1rem", color: "#475569", fontWeight: "700" }}>Patient ID</th>
-                                <th style={{ padding: "0.75rem 1rem", color: "#475569", fontWeight: "700" }}>Name</th>
-                                <th style={{ padding: "0.75rem 1rem", color: "#475569", fontWeight: "700" }}>Contact</th>
-                                <th style={{ padding: "0.75rem 1rem", color: "#475569", fontWeight: "700" }}>Total Cost</th>
-                                <th style={{ padding: "0.75rem 1rem", color: "#475569", fontWeight: "700" }}>Total Paid</th>
-                                <th style={{ padding: "0.75rem 1rem", color: "#475569", fontWeight: "700" }}>Remaining Fee</th>
-                                <th style={{ padding: "0.75rem 1rem", color: "#475569", fontWeight: "700", textAlign: "right" }}>Action</th>
+                            <tr style={{ backgroundColor: "var(--bg-page)", borderBottom: "1px solid var(--border)" }}>
+                                <th style={{ padding: "0.75rem 1rem", color: "var(--text-muted)", fontWeight: "700" }}>Patient ID</th>
+                                <th style={{ padding: "0.75rem 1rem", color: "var(--text-muted)", fontWeight: "700" }}>Name</th>
+                                <th style={{ padding: "0.75rem 1rem", color: "var(--text-muted)", fontWeight: "700" }}>Contact</th>
+                                <th style={{ padding: "0.75rem 1rem", color: "var(--text-muted)", fontWeight: "700" }}>Total Cost</th>
+                                <th style={{ padding: "0.75rem 1rem", color: "var(--text-muted)", fontWeight: "700" }}>Total Paid</th>
+                                <th style={{ padding: "0.75rem 1rem", color: "var(--text-muted)", fontWeight: "700" }}>Remaining Fee</th>
+                                <th style={{ padding: "0.75rem 1rem", color: "var(--text-muted)", fontWeight: "700", textAlign: "right" }}>Action</th>
                             </tr>
                         </thead>
                         <tbody>
                             {filteredCustomers.map((cust) => {
                                 const fee = Number(cust.remainingFee || 0);
                                 return (
-                                    <tr key={cust.id} style={{ borderBottom: "1px solid #f1f5f9" }}>
-                                        <td style={{ padding: "0.75rem 1rem", fontFamily: "monospace", color: "#64748b" }}>
+                                    <tr key={cust.id} style={{ borderBottom: "1px solid var(--border)" }}>
+                                        <td style={{ padding: "0.75rem 1rem", fontFamily: "monospace", color: "var(--text-muted)" }}>
                                             {cust.id}
                                         </td>
-                                        <td style={{ padding: "0.75rem 1rem", fontWeight: "600", color: "#1e293b" }}>
+                                        <td style={{ padding: "0.75rem 1rem", fontWeight: "600", color: "var(--text-main)" }}>
                                             {cust.name}
                                         </td>
-                                        <td style={{ padding: "0.75rem 1rem", color: "#64748b" }}>
+                                        <td style={{ padding: "0.75rem 1rem", color: "var(--text-muted)" }}>
                                             {cust.phone}
                                         </td>
-                                        <td style={{ padding: "0.75rem 1rem", color: "#334155" }}>
+                                        <td style={{ padding: "0.75rem 1rem", color: "var(--text-main)" }}>
                                             {Number(cust.totalCost || 0).toFixed(2)} ETB
                                         </td>
-                                        <td style={{ padding: "0.75rem 1rem", color: "#166534", fontWeight: "600" }}>
+                                        <td style={{ padding: "0.75rem 1rem", color: "var(--primary)", fontWeight: "600" }}>
                                             {Number(cust.totalPaid || 0).toFixed(2)} ETB
                                         </td>
                                         <td style={{ padding: "0.75rem 1rem" }}>
@@ -305,8 +242,9 @@ export default function CustomerFeesPage() {
                                                     borderRadius: "4px",
                                                     fontWeight: "700",
                                                     fontSize: "0.85rem",
-                                                    backgroundColor: fee > 0 ? "#fee2e2" : "#dcfce7",
-                                                    color: fee > 0 ? "#991b1b" : "#166534",
+                                                    backgroundColor: fee > 0 ? "rgba(220, 38, 38, 0.1)" : "rgba(27, 77, 46, 0.1)",
+                                                    color: fee > 0 ? "#991b1b" : "var(--primary)",
+                                                    border: "1px solid var(--border)"
                                                 }}
                                             >
                                                 {fee.toFixed(2)} ETB
@@ -340,4 +278,3 @@ export default function CustomerFeesPage() {
         </div>
     );
 }
-
