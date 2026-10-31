@@ -60,12 +60,13 @@ export default function LoginPage() {
 
     return (
         <div>
-            <h1 className="auth-title">Welcome Back</h1>
-            <p className="auth-subtitle">Sign in to your SDCMIS-SINA account</p>
+            <h1 style={{ fontSize: "1.75rem", fontWeight: 800, color: "var(--text-main)", textAlign: "center", marginBottom: "1.5rem", letterSpacing: "-0.01em" }}>
+                Sina Dental Clinic
+            </h1>
 
             <ErrorMessage message={error} onDismiss={() => setError("")} />
 
-            <form onSubmit={handleSubmit} style={{ marginTop: "1.25rem" }}>
+            <form onSubmit={handleSubmit} style={{ marginTop: "1rem" }}>
                 <div className="form-group">
                     <label className="form-label" htmlFor="username">
                         Username / Email
