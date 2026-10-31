@@ -94,26 +94,6 @@ export default class ErrorBoundary extends Component {
                             The application encountered an unexpected error while rendering this view. Your session and data remain safe.
                         </p>
 
-                        {this.state.error && (
-                            <details
-                                style={{
-                                    textAlign: "left",
-                                    marginBottom: "1.5rem",
-                                    padding: "0.75rem 1rem",
-                                    backgroundColor: "#f1f5f9",
-                                    borderRadius: "8px",
-                                    fontSize: "0.85rem",
-                                    color: "#334155",
-                                    wordBreak: "break-word",
-                                }}
-                            >
-                                <summary style={{ cursor: "pointer", fontWeight: "600" }}>Technical Details</summary>
-                                <p style={{ marginTop: "0.5rem", fontFamily: "monospace" }}>
-                                    {this.state.error.toString()}
-                                </p>
-                            </details>
-                        )}
-
                         <div style={{ display: "flex", gap: "1rem", justifyContent: "center" }}>
                             <Button variant="primary" onClick={this.handleReset}>
                                 Return to Safety (Home)
@@ -130,3 +110,4 @@ export default class ErrorBoundary extends Component {
         return this.props.children;
     }
 }
+
