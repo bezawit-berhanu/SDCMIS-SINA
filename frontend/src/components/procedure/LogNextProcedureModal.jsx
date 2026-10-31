@@ -244,3 +244,4 @@ export default function LogNextProcedureModal({ patient, onClose, onSaved }) {
         </div>
     );
 }
+

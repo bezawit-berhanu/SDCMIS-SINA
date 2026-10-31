@@ -258,3 +258,4 @@ export default function RecordPaymentModal({ patient, onClose, onSuccess }) {
         </div>
     );
 }
+

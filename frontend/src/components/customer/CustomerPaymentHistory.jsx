@@ -69,3 +69,4 @@ export default function CustomerPaymentHistory({ payments = [], remainingFee = 0
         </div>
     );
 }
+

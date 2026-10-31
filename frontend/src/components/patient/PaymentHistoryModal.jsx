@@ -146,3 +146,4 @@ export default function PaymentHistoryModal({ patient, onClose }) {
         </div>
     );
 }
+

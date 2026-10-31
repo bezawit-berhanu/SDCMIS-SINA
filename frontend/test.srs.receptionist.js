@@ -107,3 +107,4 @@ test("SDCIMP SRS Verification Suite: Receptionist Module (SCR-10, SCR-11, SCR-12
         assert.equal(total, 5);
     });
 });
+

@@ -197,3 +197,4 @@ export default function CompleteProcedureModal({ patient, onClose, onCompleted }
         </div>
     );
 }
+

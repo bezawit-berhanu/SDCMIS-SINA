@@ -225,3 +225,4 @@ export default function OnboardingTour({ role = "DENTIST", onComplete }) {
         </div>
     );
 }
+

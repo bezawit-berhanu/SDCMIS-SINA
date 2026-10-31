@@ -136,3 +136,4 @@ export default function StartProcedureModal({ patient, onClose, onStarted }) {
         </div>
     );
 }
+

@@ -241,3 +241,4 @@ export default function AddToQueueModal({ onClose, onQueueAdded }) {
         </div>
     );
 }
+
