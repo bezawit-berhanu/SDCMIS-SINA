@@ -18,72 +18,37 @@ export default function UpcomingTasksPage() {
         let isMounted = true;
         const fetchTasks = async () => {
             try {
+                setLoading(true);
                 const res = await apiClient.get("/api/v1/dentist/tasks");
-                if (isMounted && res.data?.data && Array.isArray(res.data.data)) {
-                    setTasks(res.data.data);
-                } else if (isMounted) {
-                    setTasks([
-                        {
-                            id: "task-01",
-                            patientId: "pat-001",
-                            patientName: "Abebe Bikila",
-                            serviceType: "Orthodontics",
-                            procedureName: "Bracket Adjustment & Archwire Replacement",
-                            scheduledDate: "2026-11-05",
-                            scheduledTime: "10:00 AM",
-                            estCost: 800.0,
-                            priority: "NORMAL",
-                        },
-                        {
-                            id: "task-02",
-                            patientId: "pat-003",
-                            patientName: "Dawit Wolde",
-                            serviceType: "Cosmetics",
-                            procedureName: "Porcelain Veneer Placement - Upper Incisors",
-                            scheduledDate: "2026-11-06",
-                            scheduledTime: "02:30 PM",
-                            estCost: 2800.0,
-                            priority: "HIGH",
-                        },
-                        {
-                            id: "task-03",
-                            patientId: "pat-004",
-                            patientName: "Tigist Assefa",
-                            serviceType: "Periodontics",
-                            procedureName: "Follow-up Deep Pocket Probing & Fluoride",
-                            scheduledDate: "2026-11-08",
-                            scheduledTime: "11:15 AM",
-                            estCost: 500.0,
-                            priority: "NORMAL",
-                        },
-                    ]);
+                if (isMounted) {
+                    if (res.data?.data && Array.isArray(res.data.data)) {
+                        setTasks(res.data.data);
+                    } else if (Array.isArray(res.data?.tasks)) {
+                        setTasks(res.data.tasks);
+                    } else {
+                        // Also try fetching appointments if dedicated tasks endpoint is empty
+                        const apptRes = await apiClient.get("/api/v1/appointments");
+                        if (apptRes.data?.data && Array.isArray(apptRes.data.data)) {
+                            const formatted = apptRes.data.data.map((a) => ({
+                                id: a.id,
+                                patientId: a.patientId,
+                                patientName: a.patientName || "Patient",
+                                serviceType: a.serviceType || "Clinical Consultation",
+                                procedureName: a.reason || a.procedure || "Dental Procedure",
+                                scheduledDate: a.date || a.scheduledAt || "Scheduled",
+                                scheduledTime: a.time || a.scheduledTime || "",
+                                estCost: a.cost || 0,
+                                priority: "NORMAL",
+                            }));
+                            setTasks(formatted);
+                        } else {
+                            setTasks([]);
+                        }
+                    }
                 }
             } catch (_) {
                 if (isMounted) {
-                    setTasks([
-                        {
-                            id: "task-01",
-                            patientId: "pat-001",
-                            patientName: "Abebe Bikila",
-                            serviceType: "Orthodontics",
-                            procedureName: "Bracket Adjustment & Archwire Replacement",
-                            scheduledDate: "2026-11-05",
-                            scheduledTime: "10:00 AM",
-                            estCost: 800.0,
-                            priority: "NORMAL",
-                        },
-                        {
-                            id: "task-02",
-                            patientId: "pat-003",
-                            patientName: "Dawit Wolde",
-                            serviceType: "Cosmetics",
-                            procedureName: "Porcelain Veneer Placement",
-                            scheduledDate: "2026-11-06",
-                            scheduledTime: "02:30 PM",
-                            estCost: 2800.0,
-                            priority: "HIGH",
-                        },
-                    ]);
+                    setTasks([]);
                 }
             } finally {
                 if (isMounted) setLoading(false);
@@ -91,139 +56,143 @@ export default function UpcomingTasksPage() {
         };
 
         fetchTasks();
-        return () => { isMounted = false; };
+        return () => {
+            isMounted = false;
+        };
     }, []);
 
+    // Filter by Service Type and Search Query
     const filteredTasks = tasks.filter((t) => {
-        const matchesService = filterService === "ALL" || t.serviceType === filterService;
-        const matchesQuery =
-            t.patientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            t.procedureName.toLowerCase().includes(searchQuery.toLowerCase());
-        return matchesService && matchesQuery;
+        const matchesService = filterService === "ALL" || t.serviceType?.toLowerCase() === filterService.toLowerCase();
+        const q = searchQuery.toLowerCase();
+        const matchesSearch =
+            !searchQuery ||
+            t.patientName?.toLowerCase().includes(q) ||
+            t.procedureName?.toLowerCase().includes(q) ||
+            t.patientId?.toLowerCase().includes(q);
+        return matchesService && matchesSearch;
     });
 
     return (
-        <div style={{ maxWidth: "1000px", margin: "0 auto", padding: "1.5rem" }}>
+        <div style={{ maxWidth: "1100px", margin: "0 auto", padding: "1.5rem" }}>
+            {/* Header */}
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem", flexWrap: "wrap", gap: "1rem" }}>
                 <div>
-                    <h1 style={{ fontSize: "1.75rem", fontWeight: "800", color: "var(--text-main)", marginBottom: "0.25rem" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.25rem" }}>
+                        <Link to="/dentist" style={{ color: "var(--text-muted)", textDecoration: "none", fontSize: "0.9rem" }}>
+                            ← Dentist Dashboard
+                        </Link>
+                        <span style={{ color: "var(--border)" }}>/</span>
+                        <span style={{ fontWeight: 700, color: "var(--primary)", fontSize: "0.9rem" }}>Upcoming Tasks</span>
+                    </div>
+                    <h1 style={{ fontSize: "1.75rem", fontWeight: 800, color: "var(--primary)", margin: 0 }}>
                         Upcoming Clinical Tasks (SCR-08)
                     </h1>
-                    <p style={{ color: "var(--text-muted)", fontSize: "0.95rem" }}>
-                        Chronological forward-looking worklist of planned patient procedures per FR-DEN-11.
+                    <p style={{ color: "var(--text-muted)", margin: "0.25rem 0 0", fontSize: "0.9rem" }}>
+                        Forward-looking worklist of patients with scheduled treatments (FR-DEN-11)
                     </p>
                 </div>
-
-                <Link to="/dentist">
-                    <Button variant="secondary" size="sm">
-                        ← Back to Dentist Dashboard
-                    </Button>
-                </Link>
             </div>
 
             {/* Filter and Search Bar */}
-            <div style={{ display: "flex", gap: "1rem", marginBottom: "1.5rem", flexWrap: "wrap" }}>
+            <div className="card" style={{ padding: "1rem", marginBottom: "1.5rem", display: "flex", gap: "1rem", flexWrap: "wrap", alignItems: "center", backgroundColor: "var(--bg-surface)", border: "1px solid var(--border)" }}>
                 <input
-                    type="search"
-                    placeholder="Search tasks by patient or procedure name..."
+                    type="text"
+                    placeholder="Search by patient name, procedure, or ID..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     style={{
-                        flex: "1 1 260px",
-                        padding: "0.65rem 1rem",
-                        borderRadius: "8px",
-                        border: "1px solid var(--border-color, #cbd5e1)",
-                        fontSize: "0.95rem",
+                        flex: 1,
+                        minWidth: "240px",
+                        padding: "0.5rem 0.75rem",
+                        borderRadius: "6px",
+                        border: "1px solid var(--border)",
+                        fontSize: "0.9rem",
+                        backgroundColor: "var(--bg-card)",
                     }}
                 />
-
                 <select
                     value={filterService}
                     onChange={(e) => setFilterService(e.target.value)}
                     style={{
-                        padding: "0.65rem 1rem",
-                        borderRadius: "8px",
-                        border: "1px solid var(--border-color, #cbd5e1)",
-                        backgroundColor: "#ffffff",
-                        fontSize: "0.95rem",
+                        padding: "0.5rem 0.75rem",
+                        borderRadius: "6px",
+                        border: "1px solid var(--border)",
+                        fontSize: "0.9rem",
+                        backgroundColor: "var(--bg-card)",
                     }}
                 >
-                    <option value="ALL">All Service Types</option>
+                    <option value="ALL">All Services</option>
                     <option value="Orthodontics">Orthodontics</option>
                     <option value="Cosmetics">Cosmetics</option>
                     <option value="Periodontics">Periodontics</option>
-                    <option value="General">General</option>
+                    <option value="Endodontics">Endodontics</option>
                 </select>
             </div>
 
-            {/* Tasks Cards List */}
-            {loading ? (
-                <div style={{ padding: "3rem", textAlign: "center", color: "#64748b" }}>Loading upcoming tasks...</div>
-            ) : filteredTasks.length === 0 ? (
-                <div className="card" style={{ padding: "3rem", textAlign: "center", color: "#64748b" }}>
-                    <h3>Nothing scheduled — nice work!</h3>
-                    <p style={{ marginTop: "0.5rem" }}>No upcoming tasks match your criteria per SCR-08 empty state.</p>
-                </div>
-            ) : (
-                <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-                    {filteredTasks.map((task) => (
-                        <div
-                            key={task.id}
-                            className="card"
-                            style={{
-                                padding: "1.25rem 1.5rem",
-                                display: "flex",
-                                justifyContent: "space-between",
-                                alignItems: "center",
-                                flexWrap: "wrap",
-                                gap: "1rem",
-                                borderLeft: task.priority === "HIGH" ? "4px solid #ef4444" : "4px solid #0284c7",
-                            }}
-                        >
-                            <div style={{ flex: "1 1 300px" }}>
-                                <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "0.25rem" }}>
-                                    <h3 style={{ margin: 0, fontSize: "1.1rem", fontWeight: "700", color: "#1e293b" }}>
-                                        {task.patientName}
-                                    </h3>
-                                    <span
-                                        style={{
+            {/* Tasks Table */}
+            <div className="card" style={{ padding: 0, overflow: "hidden", backgroundColor: "var(--bg-surface)", border: "1px solid var(--border)" }}>
+                {loading ? (
+                    <div style={{ padding: "3rem", textAlign: "center", color: "var(--text-muted)" }}>Loading upcoming tasks...</div>
+                ) : filteredTasks.length === 0 ? (
+                    <div style={{ padding: "3rem", textAlign: "center", color: "var(--text-muted)" }}>
+                        <span style={{ fontSize: "2rem", display: "block", marginBottom: "0.5rem" }}>📋</span>
+                        <p style={{ fontWeight: 600, fontSize: "1rem", margin: 0 }}>No upcoming tasks scheduled</p>
+                        <p style={{ fontSize: "0.85rem", margin: "0.25rem 0 0" }}>Patients with planned procedures will appear here</p>
+                    </div>
+                ) : (
+                    <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.9rem" }}>
+                        <thead>
+                            <tr style={{ backgroundColor: "var(--bg-page)", borderBottom: "1px solid var(--border)", textAlign: "left" }}>
+                                <th style={{ padding: "0.75rem 1rem", color: "var(--text-muted)" }}>Scheduled</th>
+                                <th style={{ padding: "0.75rem 1rem", color: "var(--text-muted)" }}>Patient</th>
+                                <th style={{ padding: "0.75rem 1rem", color: "var(--text-muted)" }}>Service</th>
+                                <th style={{ padding: "0.75rem 1rem", color: "var(--text-muted)" }}>Procedure</th>
+                                <th style={{ padding: "0.75rem 1rem", color: "var(--text-muted)" }}>Est. Cost</th>
+                                <th style={{ padding: "0.75rem 1rem", textAlign: "right", color: "var(--text-muted)" }}>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {filteredTasks.map((task) => (
+                                <tr key={task.id} style={{ borderBottom: "1px solid var(--border)" }}>
+                                    <td style={{ padding: "0.75rem 1rem" }}>
+                                        <div style={{ fontWeight: 700, color: "var(--primary)" }}>{task.scheduledDate}</div>
+                                        <div style={{ fontSize: "0.8rem", color: "var(--text-muted)" }}>{task.scheduledTime}</div>
+                                    </td>
+                                    <td style={{ padding: "0.75rem 1rem" }}>
+                                        <div style={{ fontWeight: 600, color: "var(--text-main)" }}>{task.patientName}</div>
+                                        <div style={{ fontSize: "0.75rem", fontFamily: "monospace", color: "var(--text-muted)" }}>{task.patientId}</div>
+                                    </td>
+                                    <td style={{ padding: "0.75rem 1rem" }}>
+                                        <span style={{
                                             fontSize: "0.75rem",
-                                            fontWeight: "700",
-                                            padding: "0.15rem 0.5rem",
+                                            fontWeight: 700,
+                                            padding: "0.2rem 0.5rem",
                                             borderRadius: "9999px",
-                                            backgroundColor: "#e0f2fe",
-                                            color: "#0369a1",
-                                        }}
-                                    >
-                                        {task.serviceType}
-                                    </span>
-                                </div>
-                                <p style={{ margin: "0 0 0.5rem", color: "#475569", fontWeight: "600", fontSize: "0.95rem" }}>
-                                    Planned: {task.procedureName}
-                                </p>
-                                <span style={{ fontSize: "0.85rem", color: "#64748b" }}>
-                                    Est. Fee: <strong>{Number(task.estCost || 0).toFixed(2)} ETB</strong> • Patient ID: {task.patientId}
-                                </span>
-                            </div>
-
-                            <div style={{ textAlign: "right", display: "flex", flexDirection: "column", gap: "0.5rem", alignItems: "flex-end" }}>
-                                <div>
-                                    <span style={{ fontSize: "0.8rem", color: "#64748b", display: "block" }}>Scheduled</span>
-                                    <strong style={{ fontSize: "1rem", color: "#0284c7" }}>
-                                        📅 {task.scheduledDate} at {task.scheduledTime}
-                                    </strong>
-                                </div>
-                                <Link to={`/patients/${task.patientId}`}>
-                                    <Button variant="outline" size="sm">
-                                        View Patient Detail (SCR-06) →
-                                    </Button>
-                                </Link>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            )}
+                                            backgroundColor: "rgba(27, 77, 46, 0.1)",
+                                            color: "var(--primary)",
+                                            border: "1px solid var(--border)",
+                                        }}>
+                                            {task.serviceType}
+                                        </span>
+                                    </td>
+                                    <td style={{ padding: "0.75rem 1rem", color: "var(--text-main)" }}>{task.procedureName}</td>
+                                    <td style={{ padding: "0.75rem 1rem", fontWeight: 600, color: "var(--primary)" }}>
+                                        {Number(task.estCost || 0).toFixed(2)} ETB
+                                    </td>
+                                    <td style={{ padding: "0.75rem 1rem", textAlign: "right" }}>
+                                        <Link to={`/patients/${task.patientId}`}>
+                                            <Button variant="outline" size="sm">
+                                                Open Record →
+                                            </Button>
+                                        </Link>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                )}
+            </div>
         </div>
     );
 }
-
