@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { realtimeService } from "../../services/realtime.service.js";
+import { signalRService } from "../../services/signalr.service.js";
 import { apiClient } from "../../lib/api-client.js";
 
 /**
@@ -61,10 +62,28 @@ export default function DentistNotificationDropdown({ userId = "usr-dentist-01" 
             setNotifications((prev) => [newNotif, ...prev]);
         });
 
+        const unsubSignalR = signalRService.on("NOTIFICATION_CREATED", (payload) => {
+            const id = payload.NotificationId || payload.id || `sig-notif-${Date.now()}`;
+            const newNotif = {
+                id,
+                NotificationId: id,
+                message: payload.Message || payload.message || "New clinic alert via SignalR.",
+                type: payload.Type || payload.type || "PATIENT_READY",
+                createdAt: new Date().toISOString(),
+                isRead: false,
+                time: "Just now",
+            };
+            setNotifications((prev) => {
+                if (prev.some((n) => (n.id || n.NotificationId) === id)) return prev;
+                return [newNotif, ...prev];
+            });
+        });
+
         return () => {
             isMounted = false;
             unsubCall();
             unsubNotif();
+            unsubSignalR();
         };
     }, [userId]);
 
