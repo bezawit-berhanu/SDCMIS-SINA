@@ -13,26 +13,7 @@ import { apiClient } from "../../lib/api-client.js";
  */
 export default function DentistNotificationDropdown({ userId = "usr-dentist-01" }) {
     const [isOpen, setIsOpen] = useState(false);
-    const [notifications, setNotifications] = useState([
-        {
-            id: "notif-init-01",
-            NotificationId: "notif-init-01",
-            message: "Patient #003 is ready.",
-            type: "PATIENT_READY",
-            createdAt: new Date().toISOString(),
-            isRead: false,
-            time: "Just now",
-        },
-        {
-            id: "notif-init-02",
-            NotificationId: "notif-init-02",
-            message: "Patient #002 (Hana Bekele) completed composite filling.",
-            type: "VISIT_COMPLETED",
-            createdAt: new Date(Date.now() - 25 * 60000).toISOString(),
-            isRead: true,
-            time: "25m ago",
-        },
-    ]);
+    const [notifications, setNotifications] = useState([]);
     const dropdownRef = useRef(null);
 
     // Fetch initial notifications from API
@@ -196,21 +177,21 @@ export default function DentistNotificationDropdown({ userId = "usr-dentist-01" 
                     <div
                         style={{
                             padding: "12px 16px",
-                            borderBottom: "1px solid #f1f5f9",
+                            borderBottom: "1px solid var(--border)",
                             display: "flex",
                             justifyContent: "space-between",
                             alignItems: "center",
-                            backgroundColor: "#f8fafc",
+                            backgroundColor: "var(--bg-surface)",
                             borderTopLeftRadius: "8px",
                             borderTopRightRadius: "8px",
                         }}
                     >
                         <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                            <span style={{ fontWeight: 700, fontSize: "0.9375rem", color: "#1e293b" }}>
+                            <span style={{ fontWeight: 700, fontSize: "0.9375rem", color: "var(--primary)" }}>
                                 Dentist Notifications
                             </span>
                             {unreadCount > 0 && (
-                                <span style={{ fontSize: "0.75rem", color: "#2563eb", fontWeight: 700 }}>
+                                <span style={{ fontSize: "0.75rem", color: "var(--primary-hover)", fontWeight: 700 }}>
                                     ({unreadCount} new)
                                 </span>
                             )}
@@ -223,7 +204,7 @@ export default function DentistNotificationDropdown({ userId = "usr-dentist-01" 
                                 style={{
                                     border: "none",
                                     background: "none",
-                                    color: "#2563eb",
+                                    color: "var(--primary)",
                                     fontSize: "0.75rem",
                                     fontWeight: 600,
                                     cursor: "pointer",

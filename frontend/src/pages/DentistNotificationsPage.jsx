@@ -4,63 +4,31 @@ import { useAuth } from "../features/auth/auth-context";
 import PageContainer from "../components/layout/PageContainer";
 import Button from "../components/common/Button";
 import { realtimeService } from "../services/realtime.service";
+import { signalRService } from "../services/signalr.service";
 import { apiClient } from "../lib/api-client";
 
 export default function DentistNotificationsPage() {
     const { user } = useAuth();
-    const [notifications, setNotifications] = useState([
-        {
-            id: "notif-001",
-            userId: user?.id || "usr-dentist-01",
-            message: "Patient #003 (Sara Tadesse) is ready for examination in Operatory 1.",
-            createdAt: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
-            isRead: false,
-            type: "PATIENT_READY",
-            ticket: "#003",
-        },
-        {
-            id: "notif-002",
-            userId: user?.id || "usr-dentist-01",
-            message: "Patient #002 (Hana Bekele) composite restoration procedure ongoing.",
-            createdAt: new Date(Date.now() - 35 * 60 * 1000).toISOString(),
-            isRead: true,
-            type: "PROCEDURE_UPDATE",
-            ticket: "#002",
-        },
-        {
-            id: "notif-003",
-            userId: user?.id || "usr-dentist-01",
-            message: "Patient #001 (Abebe Kebede) completed visit and checked out at reception.",
-            createdAt: new Date(Date.now() - 90 * 60 * 1000).toISOString(),
-            isRead: true,
-            type: "VISIT_COMPLETED",
-            ticket: "#001",
-        },
-        {
-            id: "notif-004",
-            userId: user?.id || "usr-dentist-01",
-            message: "Daily schedule update: 3 afternoon appointments confirmed.",
-            createdAt: new Date(Date.now() - 180 * 60 * 1000).toISOString(),
-            isRead: true,
-            type: "SYSTEM_ALERT",
-        },
-    ]);
-
+    const [notifications, setNotifications] = useState([]);
     const [filter, setFilter] = useState("ALL"); // ALL | UNREAD | PATIENT_READY | SYSTEM
     const [actionMsg, setActionMsg] = useState("");
     const [loading, setLoading] = useState(false);
 
-    // Fetch initial notifications from API if available
+    // Fetch initial notifications strictly from live backend API
     useEffect(() => {
         let isMounted = true;
         const fetchNotifications = async () => {
             try {
+                setLoading(true);
                 const response = await apiClient.get("/api/v1/notifications");
-                if (isMounted && response?.data && Array.isArray(response.data.notifications)) {
-                    setNotifications(response.data.notifications);
+                if (isMounted && response?.data) {
+                    const list = response.data.notifications || response.data.data || (Array.isArray(response.data) ? response.data : []);
+                    setNotifications(list);
                 }
             } catch (_) {
-                // Keep default state in offline or mockup mode
+                // In offline or empty state, start with zero notifications
+            } finally {
+                if (isMounted) setLoading(false);
             }
         };
         fetchNotifications();
@@ -69,7 +37,7 @@ export default function DentistNotificationsPage() {
         };
     }, []);
 
-    // Subscribe to live real-time notifications
+    // Subscribe to live real-time notifications via SignalR and realtimeService
     useEffect(() => {
         realtimeService.connect({
             role: "DENTIST",
@@ -77,8 +45,8 @@ export default function DentistNotificationsPage() {
         });
 
         const unsubscribeCall = realtimeService.subscribe("PATIENT_CALLED", (payload) => {
-            const ticket = payload.formattedQueueNumber || payload.ticket || `#${String(payload.queueNumber || 3).padStart(3, "0")}`;
-            const message = payload.notification?.message || `Patient ${ticket} is ready.`;
+            const ticket = payload.formattedQueueNumber || payload.ticket || `#${String(payload.queueNumber || 1).padStart(3, "0")}`;
+            const message = payload.notification?.message || `Patient ${ticket} is ready for treatment.`;
 
             const newNotif = {
                 id: payload.notification?.id || `notif-${Date.now()}`,
@@ -110,9 +78,25 @@ export default function DentistNotificationsPage() {
             setTimeout(() => setActionMsg(""), 4000);
         });
 
+        const unsubscribeSignalRNotif = signalRService.on("NOTIFICATION_CREATED", (payload) => {
+            const newNotif = {
+                id: payload.id || `notif-sig-${Date.now()}`,
+                userId: payload.userId || user?.id || "usr-dentist-01",
+                message: payload.message || "Live SignalR alert received.",
+                createdAt: payload.createdAt || new Date().toISOString(),
+                isRead: false,
+                type: payload.type || "SIGNALR_ALERT",
+            };
+            setNotifications((prev) => {
+                if (prev.some((n) => n.id === newNotif.id)) return prev;
+                return [newNotif, ...prev];
+            });
+        });
+
         return () => {
             unsubscribeCall();
             unsubscribeNotif();
+            unsubscribeSignalRNotif();
         };
     }, [user]);
 
@@ -144,7 +128,7 @@ export default function DentistNotificationsPage() {
     const filteredNotifications = notifications.filter((n) => {
         if (filter === "UNREAD") return !n.isRead;
         if (filter === "PATIENT_READY") return n.type === "PATIENT_READY";
-        if (filter === "SYSTEM") return n.type === "SYSTEM_ALERT";
+        if (filter === "SYSTEM") return n.type === "SYSTEM_ALERT" || n.type === "SIGNALR_ALERT";
         return true;
     });
 
@@ -157,6 +141,7 @@ export default function DentistNotificationsPage() {
             case "VISIT_COMPLETED":
                 return "✅";
             case "SYSTEM_ALERT":
+            case "SIGNALR_ALERT":
                 return "📢";
             default:
                 return "🔔";
@@ -192,14 +177,13 @@ export default function DentistNotificationsPage() {
                         padding: "12px 18px",
                         marginBottom: "1.25rem",
                         borderRadius: "8px",
-                        backgroundColor: "#ecfdf5",
-                        color: "#065f46",
-                        border: "1px solid #a7f3d0",
+                        backgroundColor: "rgba(27, 77, 46, 0.08)",
+                        color: "var(--primary)",
+                        border: "1px solid var(--border)",
                         display: "flex",
                         alignItems: "center",
                         gap: "10px",
                         fontWeight: 600,
-                        boxShadow: "0 2px 8px rgba(16, 185, 129, 0.1)",
                     }}
                 >
                     <span>⚡</span>
@@ -209,11 +193,11 @@ export default function DentistNotificationsPage() {
 
             {/* Notification Summary Stats */}
             <div className="grid grid-cols-4" style={{ marginBottom: "1.5rem" }}>
-                <div className="card">
+                <div className="card" style={{ backgroundColor: "var(--bg-surface)", border: "1px solid var(--border)" }}>
                     <p style={{ fontSize: "0.8125rem", color: "var(--text-muted)", fontWeight: 500 }}>
                         Total Notifications
                     </p>
-                    <p style={{ fontSize: "1.5rem", fontWeight: 700, marginTop: "0.25rem", color: "var(--text-main)" }}>
+                    <p style={{ fontSize: "1.5rem", fontWeight: 700, marginTop: "0.25rem", color: "var(--primary)" }}>
                         {notifications.length}
                     </p>
                     <p style={{ fontSize: "0.75rem", color: "var(--text-light)", marginTop: "0.5rem" }}>
@@ -221,7 +205,7 @@ export default function DentistNotificationsPage() {
                     </p>
                 </div>
 
-                <div className="card" style={{ borderLeft: "4px solid #ef4444" }}>
+                <div className="card" style={{ backgroundColor: "var(--bg-surface)", borderLeft: "4px solid #ef4444", borderTop: "1px solid var(--border)", borderRight: "1px solid var(--border)", borderBottom: "1px solid var(--border)" }}>
                     <p style={{ fontSize: "0.8125rem", color: "var(--text-muted)", fontWeight: 500 }}>
                         Unread Alerts
                     </p>
@@ -233,27 +217,27 @@ export default function DentistNotificationsPage() {
                     </p>
                 </div>
 
-                <div className="card" style={{ borderLeft: "4px solid #3b82f6" }}>
+                <div className="card" style={{ backgroundColor: "var(--bg-surface)", borderLeft: "4px solid var(--primary)", borderTop: "1px solid var(--border)", borderRight: "1px solid var(--border)", borderBottom: "1px solid var(--border)" }}>
                     <p style={{ fontSize: "0.8125rem", color: "var(--text-muted)", fontWeight: 500 }}>
                         Patients Ready
                     </p>
-                    <p style={{ fontSize: "1.5rem", fontWeight: 700, marginTop: "0.25rem", color: "#2563eb" }}>
+                    <p style={{ fontSize: "1.5rem", fontWeight: 700, marginTop: "0.25rem", color: "var(--primary)" }}>
                         {patientReadyCount}
                     </p>
-                    <p style={{ fontSize: "0.75rem", color: "#1d4ed8", marginTop: "0.5rem" }}>
+                    <p style={{ fontSize: "0.75rem", color: "var(--primary-hover)", marginTop: "0.5rem" }}>
                         Called by reception
                     </p>
                 </div>
 
-                <div className="card" style={{ borderLeft: "4px solid #10b981" }}>
+                <div className="card" style={{ backgroundColor: "var(--bg-surface)", borderLeft: "4px solid var(--accent)", borderTop: "1px solid var(--border)", borderRight: "1px solid var(--border)", borderBottom: "1px solid var(--border)" }}>
                     <p style={{ fontSize: "0.8125rem", color: "var(--text-muted)", fontWeight: 500 }}>
                         Sync Mode
                     </p>
-                    <p style={{ fontSize: "1.25rem", fontWeight: 700, marginTop: "0.25rem", color: "#059669" }}>
-                        Live Real-Time
+                    <p style={{ fontSize: "1.25rem", fontWeight: 700, marginTop: "0.25rem", color: "var(--primary)" }}>
+                        SignalR Active
                     </p>
-                    <p style={{ fontSize: "0.75rem", color: "#047857", marginTop: "0.5rem" }}>
-                        WebSocket / SSE active
+                    <p style={{ fontSize: "0.75rem", color: "var(--text-muted)", marginTop: "0.5rem" }}>
+                        Bidirectional WebSocket
                     </p>
                 </div>
             </div>
@@ -282,7 +266,7 @@ export default function DentistNotificationsPage() {
                             padding: "6px 14px",
                             borderRadius: "6px",
                             border: "none",
-                            backgroundColor: filter === tab.key ? "#2563eb" : "transparent",
+                            backgroundColor: filter === tab.key ? "var(--primary)" : "transparent",
                             color: filter === tab.key ? "#ffffff" : "var(--text-muted)",
                             fontWeight: filter === tab.key ? 600 : 500,
                             cursor: "pointer",
@@ -296,7 +280,7 @@ export default function DentistNotificationsPage() {
             </div>
 
             {/* Notifications List */}
-            <div className="card" style={{ padding: 0, overflow: "hidden" }}>
+            <div className="card" style={{ padding: 0, overflow: "hidden", backgroundColor: "var(--bg-surface)", border: "1px solid var(--border)" }}>
                 {filteredNotifications.length === 0 ? (
                     <div style={{ padding: "3rem", textAlign: "center", color: "var(--text-muted)" }}>
                         <span style={{ fontSize: "2rem", display: "block", marginBottom: "0.5rem" }}>📭</span>
@@ -316,7 +300,7 @@ export default function DentistNotificationsPage() {
                                     alignItems: "center",
                                     padding: "1rem 1.25rem",
                                     borderBottom: idx < filteredNotifications.length - 1 ? "1px solid var(--border)" : "none",
-                                    backgroundColor: n.isRead ? "transparent" : "rgba(37, 99, 235, 0.04)",
+                                    backgroundColor: n.isRead ? "transparent" : "rgba(27, 77, 46, 0.04)",
                                     transition: "background-color 0.2s ease",
                                 }}
                             >
@@ -342,8 +326,8 @@ export default function DentistNotificationsPage() {
                                                         padding: "2px 6px",
                                                         fontSize: "0.6875rem",
                                                         fontWeight: 700,
-                                                        backgroundColor: "#dbeafe",
-                                                        color: "#1d4ed8",
+                                                        backgroundColor: "rgba(27, 77, 46, 0.12)",
+                                                        color: "var(--primary)",
                                                         borderRadius: "4px",
                                                     }}
                                                 >
@@ -351,45 +335,19 @@ export default function DentistNotificationsPage() {
                                                 </span>
                                             )}
                                         </div>
-                                        <div style={{ display: "flex", gap: "12px", marginTop: "4px", fontSize: "0.75rem", color: "var(--text-light)" }}>
-                                            <span>
-                                                {new Date(n.createdAt).toLocaleDateString([], { month: "short", day: "numeric" })} at{" "}
-                                                {new Date(n.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                                            </span>
-                                            {n.ticket && (
-                                                <span style={{ fontWeight: 600, color: "#2563eb" }}>
-                                                    Ticket {n.ticket}
-                                                </span>
-                                            )}
-                                        </div>
+                                        <p style={{ margin: "4px 0 0 0", fontSize: "0.75rem", color: "var(--text-light)" }}>
+                                            {n.createdAt ? new Date(n.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "Recently"}
+                                        </p>
                                     </div>
                                 </div>
-
-                                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                                    {n.ticket && (
-                                        <Link to="/dentist">
-                                            <Button variant="secondary" size="sm">
-                                                View Operatory
-                                            </Button>
-                                        </Link>
-                                    )}
-                                    <button
-                                        type="button"
+                                <div style={{ display: "flex", gap: "8px" }}>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
                                         onClick={() => toggleReadStatus(n.id)}
-                                        style={{
-                                            border: "none",
-                                            background: "none",
-                                            cursor: "pointer",
-                                            color: n.isRead ? "var(--text-muted)" : "#2563eb",
-                                            fontSize: "0.8125rem",
-                                            fontWeight: 600,
-                                            padding: "4px 8px",
-                                            borderRadius: "4px",
-                                        }}
-                                        title={n.isRead ? "Mark as unread" : "Mark as read"}
                                     >
                                         {n.isRead ? "Mark Unread" : "Mark Read"}
-                                    </button>
+                                    </Button>
                                 </div>
                             </div>
                         ))}
