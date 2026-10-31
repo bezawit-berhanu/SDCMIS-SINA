@@ -76,3 +76,4 @@ Configure `.env.production` following `.env.production.example`:
 - Handled by `backend/src/Infrastructure/logging/logger.js`.
 - Outputs standardized JSON with ISO timestamps, log level tags, request tracking IDs, and error traces.
 - Supports streaming into ELK, Datadog, or Grafana Loki.
+
