@@ -19,10 +19,10 @@ export default function ReceptionistPage() {
     };
 
     const stats = [
-        { label: "Patients in Queue", value: "3", change: "1 waiting, 1 serving", icon: "👥" },
-        { label: "Today's Appointments", value: "16", change: "6 attended, 10 pending", icon: "📋" },
-        { label: "Payments Collected", value: "$1,850", change: "5 transactions today", icon: "💳" },
-        { label: "Front Desk Status", value: "Open", change: "Live Queue Active", icon: "🟢" },
+        { label: "Scheduled This Month", value: "24", change: "Per FR-REC-01 monthly metric", icon: "📅" },
+        { label: "No-Shows Last Month", value: "2", change: "Missed appointments rate: 8%", icon: "⚠️" },
+        { label: "Came This Month", value: "18", change: "Attended visits to date", icon: "✅" },
+        { label: "Live Queue Lobby", value: "3", change: "1 serving, 2 waiting", icon: "👥" },
     ];
 
     const [queueList, setQueueList] = useState([
