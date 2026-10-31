@@ -671,3 +671,48 @@ a:hover {
     align-items: flex-start;
   }
 }
+
+/* NFR-USE-03: WCAG 2.1 AA Focus Rings and Accessible Status Badges */
+:focus-visible {
+  outline: 2px solid var(--border-focus, #2563eb);
+  outline-offset: 2px;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--border-focus, #2563eb);
+  outline-offset: 2px;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-weight: 700;
+  font-size: 0.8125rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 9999px;
+  line-height: 1.2;
+}
+
+.status-badge--waiting {
+  background-color: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fde68a;
+}
+
+.status-badge--serving {
+  background-color: #e0f2fe;
+  color: #0369a1;
+  border: 1px solid #bae6fd;
+}
+
+.status-badge--done {
+  background-color: #dcfce7;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+}
+
