@@ -3,6 +3,7 @@ import { useAuth } from "../features/auth/auth-context";
 import PageContainer from "../components/layout/PageContainer";
 import Button from "../components/common/Button";
 import { realtimeService } from "../services/realtime.service";
+import AddToQueueModal from "../components/queue/AddToQueueModal";
 
 export default function ReceptionistPage() {
     const { user, restoreSession } = useAuth();
@@ -31,6 +32,22 @@ export default function ReceptionistPage() {
     ]);
 
     const [feedback, setFeedback] = useState("");
+    const [showAddQueueModal, setShowAddQueueModal] = useState(false);
+
+    const handleQueueAdded = (newEntry) => {
+        const item = {
+            id: newEntry.id || `que-${Date.now()}`,
+            ticket: newEntry.formattedQueueNumber || `#${String(newEntry.queueNumber || 1).padStart(3, "0")}`,
+            patient: newEntry.patientName,
+            service: newEntry.serviceType || "General",
+            arrival: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+            status: "WAITING",
+            dentist: "Dr. Bethel",
+        };
+        setQueueList((prev) => [...prev, item]);
+        setFeedback(`Checked in ${item.patient} with Ticket ${item.ticket}.`);
+        setTimeout(() => setFeedback(""), 4000);
+    };
 
     // Real-time Gateway sync
     useEffect(() => {
@@ -189,9 +206,14 @@ export default function ReceptionistPage() {
             title={user ? `Reception Desk — ${user.fullName}` : "Reception Desk Portal"}
             subtitle="Patient check-in, queue management, appointment scheduling, and fee collection"
             actions={
-                <Button variant="secondary" size="sm" onClick={handleRefresh} disabled={refreshing}>
-                    {refreshing ? "Refreshing..." : "🔄 Refresh"}
-                </Button>
+                <div style={{ display: "flex", gap: "0.5rem" }}>
+                    <Button variant="primary" size="sm" onClick={() => setShowAddQueueModal(true)}>
+                        + Check In (SCR-15)
+                    </Button>
+                    <Button variant="secondary" size="sm" onClick={handleRefresh} disabled={refreshing}>
+                        {refreshing ? "Refreshing..." : "🔄 Refresh"}
+                    </Button>
+                </div>
             }
         >
             {feedback && (
@@ -502,6 +524,13 @@ export default function ReceptionistPage() {
                     </table>
                 </div>
             </div>
+
+            {showAddQueueModal && (
+                <AddToQueueModal
+                    onClose={() => setShowAddQueueModal(false)}
+                    onQueueAdded={handleQueueAdded}
+                />
+            )}
         </PageContainer>
     );
 }
