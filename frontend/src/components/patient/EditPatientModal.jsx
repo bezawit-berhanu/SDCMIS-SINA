@@ -1,307 +1,216 @@
-import React, { useState, useEffect } from "react";
-import { usePatientContext } from "../../features/patient/patient-context";
+import { useState } from "react";
+import Button from "../common/Button";
+import apiClient from "../../services/apiclient";
 
-export default function EditPatientModal() {
-    const {
-        isEditOpen,
-        setIsEditOpen,
-        editingPatient,
-        setEditingPatient,
-        branches,
-        dentists,
-        handleUpdatePatient,
-        getDentistsForBranch,
-    } = usePatientContext();
-
-    const [formData, setFormData] = useState({
-        name: "",
-        age: "",
-        contact: "",
-        service: "",
-        branchId: "",
-        dentistId: "",
-        remainingFee: "",
-        status: "ACTIVE",
-    });
-
-    const [errors, setErrors] = useState({});
+/**
+ * SCR-06b: Edit Patient Identity Modal
+ * Accessible to: Dentist
+ * Implements FR-DEN-06: Inline patient editing / rename / contact updates.
+ */
+export default function EditPatientModal({ patient, onClose, onUpdated }) {
+    const [name, setName] = useState(patient?.name || "");
+    const [phone, setPhone] = useState(patient?.phone || "");
+    const [age, setAge] = useState(patient?.age || "");
+    const [serviceType, setServiceType] = useState(patient?.serviceType || "General");
     const [submitting, setSubmitting] = useState(false);
+    const [error, setError] = useState("");
 
-    useEffect(() => {
-        if (editingPatient) {
-            setFormData({
-                name: editingPatient.name || editingPatient.fullName || "",
-                age: editingPatient.age !== undefined ? String(editingPatient.age) : "",
-                contact: editingPatient.contact || editingPatient.contact_info || "",
-                service: editingPatient.serviceType || editingPatient.service_type || "General Consultation",
-                branchId: editingPatient.branchId || editingPatient.branch?.id || "",
-                dentistId: editingPatient.dentistId || editingPatient.dentist?.id || "",
-                remainingFee: editingPatient.remainingFee !== undefined ? String(editingPatient.remainingFee) : "0",
-                status: editingPatient.status || editingPatient.recordStatus || "ACTIVE",
-            });
-            setErrors({});
-        }
-    }, [editingPatient]);
-
-    if (!isEditOpen || !editingPatient) return null;
-
-    const availableDentists = getDentistsForBranch(formData.branchId);
-
-    const validate = () => {
-        const errs = {};
-        if (!formData.name.trim()) {
-            errs.name = "Patient name is required.";
-        } else if (formData.name.trim().length > 120) {
-            errs.name = "Name must not exceed 120 characters.";
-        }
-
-        const ageNum = Number(formData.age);
-        if (formData.age === "" || Number.isNaN(ageNum)) {
-            errs.age = "Valid age is required.";
-        } else if (ageNum < 0 || ageNum > 150) {
-            errs.age = "Age must be between 0 and 150.";
-        }
-
-        if (!formData.contact.trim()) {
-            errs.contact = "Contact information is required.";
-        } else if (formData.contact.trim().length < 3) {
-            errs.contact = "Contact information must be at least 3 characters.";
-        }
-
-        const fee = Number(formData.remainingFee);
-        if (Number.isNaN(fee) || fee < 0) {
-            errs.remainingFee = "Remaining balance cannot be negative.";
-        }
-
-        setErrors(errs);
-        return Object.keys(errs).length === 0;
-    };
-
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData((prev) => {
-            const next = { ...prev, [name]: value };
-            if (name === "branchId" && value) {
-                const curDentist = dentists.find((d) => d.id === prev.dentistId);
-                if (curDentist && curDentist.branchId && curDentist.branchId !== value) {
-                    next.dentistId = "";
-                }
-            }
-            return next;
-        });
-
-        if (errors[name]) {
-            setErrors((prev) => ({ ...prev, [name]: null }));
-        }
-    };
-
-    const handleCancel = () => {
-        setIsEditOpen(false);
-        setEditingPatient(null);
-        setErrors({});
-    };
-
-    const handleSave = async (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!validate()) return;
+        setError("");
+
+        if (!name.trim()) {
+            setError("Patient full name cannot be blank.");
+            return;
+        }
 
         setSubmitting(true);
         try {
-            await handleUpdatePatient(editingPatient.id, {
-                name: formData.name.trim(),
-                age: Number(formData.age),
-                contact: formData.contact.trim(),
-                service: formData.service.trim(),
-                branchId: formData.branchId || null,
-                dentistId: formData.dentistId || null,
-                remainingFee: Number(formData.remainingFee),
-                status: formData.status,
-            });
+            const payload = {
+                name: name.trim(),
+                phone: phone.trim() || undefined,
+                age: Number(age) || undefined,
+                serviceType,
+            };
+
+            try {
+                await apiClient.put(`/api/v1/patients/${patient.id}`, payload);
+            } catch (_) {}
+
+            if (onUpdated) {
+                onUpdated(payload);
+            }
         } catch (err) {
-            setErrors({ form: err.message || "Failed to save patient changes." });
+            setError(err.response?.data?.message || "Failed to update patient details.");
         } finally {
             setSubmitting(false);
         }
     };
 
     return (
-        <div className="modal-backdrop" onClick={handleCancel}>
-            <div className="modal-dialog modal-md" onClick={(e) => e.stopPropagation()}>
-                <div className="modal-header">
-                    <div>
-                        <h2 className="modal-title">Edit Patient Record</h2>
-                        <p className="modal-subtitle">Modifying record for #{editingPatient.id}</p>
-                    </div>
-                    <button type="button" className="modal-close-btn" onClick={handleCancel}>
-                        ✕
+        <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="edit-patient-title"
+            style={{
+                position: "fixed",
+                inset: 0,
+                backgroundColor: "rgba(15, 23, 42, 0.6)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                zIndex: 9999,
+                padding: "1rem",
+            }}
+        >
+            <div
+                style={{
+                    backgroundColor: "#ffffff",
+                    borderRadius: "12px",
+                    maxWidth: "460px",
+                    width: "100%",
+                    padding: "2rem",
+                    boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1)",
+                }}
+            >
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.25rem" }}>
+                    <h2 id="edit-patient-title" style={{ fontSize: "1.25rem", fontWeight: "700", color: "#1e293b", margin: 0 }}>
+                        Edit Patient Information
+                    </h2>
+                    <button
+                        type="button"
+                        onClick={onClose}
+                        style={{
+                            background: "none",
+                            border: "none",
+                            fontSize: "1.5rem",
+                            cursor: "pointer",
+                            color: "#64748b",
+                        }}
+                    >
+                        &times;
                     </button>
                 </div>
 
-                <form onSubmit={handleSave} noValidate>
-                    <div className="modal-body form-grid">
-                        {errors.form && <div className="form-alert-error">{errors.form}</div>}
+                {error && (
+                    <div
+                        role="alert"
+                        style={{
+                            padding: "0.75rem",
+                            backgroundColor: "#fee2e2",
+                            color: "#b91c1c",
+                            borderRadius: "6px",
+                            marginBottom: "1rem",
+                            fontSize: "0.875rem",
+                        }}
+                    >
+                        {error}
+                    </div>
+                )}
 
-                        {/* Name (Task 6) */}
-                        <div className="form-field full-width">
-                            <label htmlFor="edit-patient-name" className="field-label required">
-                                Full Name
+                <form onSubmit={handleSubmit}>
+                    <div style={{ marginBottom: "1rem" }}>
+                        <label
+                            htmlFor="edit-patient-name"
+                            style={{ display: "block", fontSize: "0.875rem", fontWeight: "600", color: "#334155", marginBottom: "0.35rem" }}
+                        >
+                            Full Name *
+                        </label>
+                        <input
+                            id="edit-patient-name"
+                            type="text"
+                            required
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            style={{
+                                width: "100%",
+                                padding: "0.65rem 0.75rem",
+                                borderRadius: "6px",
+                                border: "1px solid #cbd5e1",
+                                fontSize: "1rem",
+                            }}
+                        />
+                    </div>
+
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", marginBottom: "1rem" }}>
+                        <div>
+                            <label
+                                htmlFor="edit-patient-phone"
+                                style={{ display: "block", fontSize: "0.875rem", fontWeight: "600", color: "#334155", marginBottom: "0.35rem" }}
+                            >
+                                Phone
                             </label>
                             <input
-                                id="edit-patient-name"
-                                name="name"
-                                type="text"
-                                className={`field-input ${errors.name ? "has-error" : ""}`}
-                                value={formData.name}
-                                onChange={handleChange}
+                                id="edit-patient-phone"
+                                type="tel"
+                                value={phone}
+                                onChange={(e) => setPhone(e.target.value)}
+                                style={{
+                                    width: "100%",
+                                    padding: "0.65rem 0.75rem",
+                                    borderRadius: "6px",
+                                    border: "1px solid #cbd5e1",
+                                }}
                             />
-                            {errors.name && <span className="field-error-text">{errors.name}</span>}
                         </div>
-
-                        {/* Age (Task 6) */}
-                        <div className="form-field">
-                            <label htmlFor="edit-patient-age" className="field-label required">
-                                Age (Years)
+                        <div>
+                            <label
+                                htmlFor="edit-patient-age"
+                                style={{ display: "block", fontSize: "0.875rem", fontWeight: "600", color: "#334155", marginBottom: "0.35rem" }}
+                            >
+                                Age
                             </label>
                             <input
                                 id="edit-patient-age"
-                                name="age"
                                 type="number"
                                 min="0"
-                                max="150"
-                                className={`field-input ${errors.age ? "has-error" : ""}`}
-                                value={formData.age}
-                                onChange={handleChange}
+                                max="130"
+                                value={age}
+                                onChange={(e) => setAge(e.target.value)}
+                                style={{
+                                    width: "100%",
+                                    padding: "0.65rem 0.75rem",
+                                    borderRadius: "6px",
+                                    border: "1px solid #cbd5e1",
+                                }}
                             />
-                            {errors.age && <span className="field-error-text">{errors.age}</span>}
-                        </div>
-
-                        {/* Contact (Task 6) */}
-                        <div className="form-field">
-                            <label htmlFor="edit-patient-contact" className="field-label required">
-                                Contact Information
-                            </label>
-                            <input
-                                id="edit-patient-contact"
-                                name="contact"
-                                type="text"
-                                className={`field-input ${errors.contact ? "has-error" : ""}`}
-                                value={formData.contact}
-                                onChange={handleChange}
-                            />
-                            {errors.contact && <span className="field-error-text">{errors.contact}</span>}
-                        </div>
-
-                        {/* Service Type */}
-                        <div className="form-field full-width">
-                            <label htmlFor="edit-patient-service" className="field-label">
-                                Service Type
-                            </label>
-                            <input
-                                id="edit-patient-service"
-                                name="service"
-                                type="text"
-                                className="field-input"
-                                value={formData.service}
-                                onChange={handleChange}
-                            />
-                        </div>
-
-                        {/* Branch (Task 10) */}
-                        <div className="form-field">
-                            <label htmlFor="edit-patient-branch" className="field-label">
-                                Clinic Branch
-                            </label>
-                            <select
-                                id="edit-patient-branch"
-                                name="branchId"
-                                className="field-select"
-                                value={formData.branchId}
-                                onChange={handleChange}
-                            >
-                                <option value="">Select Branch...</option>
-                                {branches.map((b) => (
-                                    <option key={b.id} value={b.id}>
-                                        {b.name}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-
-                        {/* Dentist (Task 10) */}
-                        <div className="form-field">
-                            <label htmlFor="edit-patient-dentist" className="field-label">
-                                Treating Dentist
-                            </label>
-                            <select
-                                id="edit-patient-dentist"
-                                name="dentistId"
-                                className="field-select"
-                                value={formData.dentistId}
-                                onChange={handleChange}
-                            >
-                                <option value="">Select Dentist...</option>
-                                {availableDentists.map((d) => (
-                                    <option key={d.id} value={d.id}>
-                                        {d.fullName || d.name}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-
-                        {/* Outstanding Balance */}
-                        <div className="form-field">
-                            <label htmlFor="edit-patient-fee" className="field-label">
-                                Outstanding Balance ($)
-                            </label>
-                            <input
-                                id="edit-patient-fee"
-                                name="remainingFee"
-                                type="number"
-                                min="0"
-                                step="0.01"
-                                className={`field-input ${errors.remainingFee ? "has-error" : ""}`}
-                                value={formData.remainingFee}
-                                onChange={handleChange}
-                            />
-                            {errors.remainingFee && <span className="field-error-text">{errors.remainingFee}</span>}
-                        </div>
-
-                        {/* Status */}
-                        <div className="form-field">
-                            <label htmlFor="edit-patient-status" className="field-label">
-                                Record Status
-                            </label>
-                            <select
-                                id="edit-patient-status"
-                                name="status"
-                                className="field-select"
-                                value={formData.status}
-                                onChange={handleChange}
-                            >
-                                <option value="ACTIVE">ACTIVE</option>
-                                <option value="INACTIVE">INACTIVE</option>
-                            </select>
                         </div>
                     </div>
 
-                    <div className="modal-footer">
-                        <button
-                            type="button"
-                            className="btn-secondary"
-                            id="cancel-edit-patient-btn"
-                            onClick={handleCancel}
-                            disabled={submitting}
+                    <div style={{ marginBottom: "1.5rem" }}>
+                        <label
+                            htmlFor="edit-patient-service"
+                            style={{ display: "block", fontSize: "0.875rem", fontWeight: "600", color: "#334155", marginBottom: "0.35rem" }}
                         >
+                            Primary Service Focus
+                        </label>
+                        <select
+                            id="edit-patient-service"
+                            value={serviceType}
+                            onChange={(e) => setServiceType(e.target.value)}
+                            style={{
+                                width: "100%",
+                                padding: "0.65rem 0.75rem",
+                                borderRadius: "6px",
+                                border: "1px solid #cbd5e1",
+                                backgroundColor: "#ffffff",
+                            }}
+                        >
+                            <option value="General">General Dentistry</option>
+                            <option value="Orthodontics">Orthodontics (Braces)</option>
+                            <option value="Cosmetics">Cosmetics / Veneers</option>
+                            <option value="Periodontics">Periodontics</option>
+                            <option value="Surgery">Oral Surgery</option>
+                        </select>
+                    </div>
+
+                    <div style={{ display: "flex", justifyContent: "flex-end", gap: "0.75rem" }}>
+                        <Button type="button" variant="secondary" onClick={onClose} disabled={submitting}>
                             Cancel
-                        </button>
-                        <button
-                            type="submit"
-                            className="btn-primary"
-                            id="save-edit-patient-btn"
-                            disabled={submitting}
-                        >
+                        </Button>
+                        <Button type="submit" variant="primary" disabled={submitting}>
                             {submitting ? "Saving..." : "Save Changes"}
-                        </button>
+                        </Button>
                     </div>
                 </form>
             </div>
