@@ -1,7 +1,8 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import Button from "../components/common/Button";
 import RecordPaymentModal from "../components/payment/RecordPaymentModal";
 import apiClient from "../services/apiclient";
+import { signalRService } from "../services/signalr.service";
 
 /**
  * SCR-11: Customers & Fees Screen
@@ -17,34 +18,40 @@ export default function CustomerFeesPage() {
     const [selectedCustomerForPayment, setSelectedCustomerForPayment] = useState(null);
     const [feedback, setFeedback] = useState("");
 
-    // Fetch live customer dataset from API
-    useEffect(() => {
-        let isMounted = true;
-        const fetchCustomers = async () => {
-            try {
-                setLoading(true);
-                const res = await apiClient.get("/api/v1/patients");
-                if (isMounted) {
-                    if (res.data?.data && Array.isArray(res.data.data)) {
-                        setCustomers(res.data.data);
-                    } else if (Array.isArray(res.data?.patients)) {
-                        setCustomers(res.data.patients);
-                    } else {
-                        setCustomers([]);
-                    }
-                }
-            } catch (_) {
-                if (isMounted) {
-                    setCustomers([]);
-                }
-            } finally {
-                if (isMounted) setLoading(false);
+    const fetchCustomers = useCallback(async () => {
+        try {
+            setLoading(true);
+            const res = await apiClient.get("/api/v1/patients");
+            if (res.data?.data && Array.isArray(res.data.data)) {
+                setCustomers(res.data.data);
+            } else if (Array.isArray(res.data?.patients)) {
+                setCustomers(res.data.patients);
+            } else {
+                setCustomers([]);
             }
-        };
-
-        fetchCustomers();
-        return () => { isMounted = false; };
+        } catch (_) {
+            setCustomers([]);
+        } finally {
+            setLoading(false);
+        }
     }, []);
+
+    // Initial load and SignalR real-time synchronization
+    useEffect(() => {
+        fetchCustomers();
+
+        const unsubVisit = signalRService.on("VISIT_COMPLETED", () => {
+            fetchCustomers();
+        });
+        const unsubQueue = signalRService.on("QUEUE_UPDATED", () => {
+            fetchCustomers();
+        });
+
+        return () => {
+            unsubVisit();
+            unsubQueue();
+        };
+    }, [fetchCustomers]);
 
     // Filter customers
     const filteredCustomers = useMemo(() => {
