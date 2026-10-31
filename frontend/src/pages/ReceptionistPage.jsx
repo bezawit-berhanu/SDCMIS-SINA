@@ -1,177 +1,266 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "../features/auth/auth-context";
 import PageContainer from "../components/layout/PageContainer";
 import Button from "../components/common/Button";
 import { realtimeService } from "../services/realtime.service";
+import { signalRService } from "../services/signalr.service";
 import AddToQueueModal from "../components/queue/AddToQueueModal";
 
 export default function ReceptionistPage() {
     const { user, restoreSession } = useAuth();
     const [refreshing, setRefreshing] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [realtimeConnected, setRealtimeConnected] = useState(false);
+
+    const [stats, setStats] = useState([
+        { label: "Patients in Queue", value: "0", change: "Active in clinic lobby", icon: "👥" },
+        { label: "Currently Serving", value: "0", change: "In operatory chair", icon: "🦷" },
+        { label: "Waiting for Call", value: "0", change: "Awaiting consultation", icon: "⏳" },
+        { label: "Completed Today", value: "0", change: "Finished clinical visits", icon: "✅" },
+    ]);
+
+    const [queueList, setQueueList] = useState([]);
+    const [paymentHistory, setPaymentHistory] = useState([]);
+    const [feedback, setFeedback] = useState("");
+    const [showAddQueueModal, setShowAddQueueModal] = useState(false);
+    const [showPaymentModal, setShowPaymentModal] = useState(false);
+    const [paymentForm, setPaymentForm] = useState({
+        patientId: "",
+        patientName: "",
+        amount: "",
+        paymentDate: new Date().toISOString().split("T")[0],
+        recordedBy: "Receptionist",
+    });
+
+    const fetchReceptionData = useCallback(async () => {
+        try {
+            setLoading(true);
+            const token = localStorage.getItem("auth_token") || localStorage.getItem("token");
+            const headers = {
+                "Content-Type": "application/json",
+                ...(token ? { Authorization: `Bearer ${token}` } : {})
+            };
+
+            // Fetch live queue
+            const queueRes = await fetch("http://localhost:5000/api/v1/queue", { headers });
+            if (queueRes.ok) {
+                const qData = await queueRes.json();
+                const rawItems = qData.queue || qData.data || (Array.isArray(qData) ? qData : []);
+                const items = rawItems.map((item) => ({
+                    id: item.id,
+                    ticket: item.formattedQueueNumber || `#${String(item.queueNumber || 1).padStart(3, "0")}`,
+                    patient: item.patientName || item.customerName || "Patient",
+                    service: item.serviceType || "Clinical Consultation",
+                    arrival: item.createdAt ? new Date(item.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "Today",
+                    status: item.status || "WAITING",
+                    dentist: item.dentistName || "Dr. Staff",
+                }));
+                setQueueList(items);
+
+                const servingCount = items.filter((i) => i.status === "SERVING").length;
+                const waitingCount = items.filter((i) => i.status === "WAITING").length;
+                const doneCount = items.filter((i) => i.status === "DONE" || i.status === "COMPLETED").length;
+
+                setStats([
+                    { label: "Patients in Queue", value: String(items.length), change: "Active in clinic lobby", icon: "👥" },
+                    { label: "Currently Serving", value: String(servingCount), change: "In operatory chair", icon: "🦷" },
+                    { label: "Waiting for Call", value: String(waitingCount), change: "Awaiting consultation", icon: "⏳" },
+                    { label: "Completed Today", value: String(doneCount), change: "Finished clinical visits", icon: "✅" },
+                ]);
+            }
+
+            // Fetch payments
+            const payRes = await fetch("http://localhost:5000/api/v1/payments", { headers });
+            if (payRes.ok) {
+                const pData = await payRes.json();
+                const rawPays = pData.payments || pData.data || (Array.isArray(pData) ? pData : []);
+                setPaymentHistory(rawPays);
+            }
+        } catch (err) {
+            console.error("Error loading receptionist portal data:", err);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        fetchReceptionData();
+    }, [fetchReceptionData]);
 
     const handleRefresh = async () => {
         setRefreshing(true);
         try {
-            await restoreSession();
+            await Promise.all([restoreSession(), fetchReceptionData()]);
         } finally {
             setTimeout(() => setRefreshing(false), 400);
         }
     };
 
-    const stats = [
-        { label: "Scheduled This Month", value: "24", change: "Per FR-REC-01 monthly metric", icon: "📅" },
-        { label: "No-Shows Last Month", value: "2", change: "Missed appointments rate: 8%", icon: "⚠️" },
-        { label: "Came This Month", value: "18", change: "Attended visits to date", icon: "✅" },
-        { label: "Live Queue Lobby", value: "3", change: "1 serving, 2 waiting", icon: "👥" },
-    ];
-
-    const [queueList, setQueueList] = useState([
-        { id: "que-003", ticket: "#003", patient: "Sara Tadesse", service: "Composite Filling", arrival: "09:30 AM", status: "SERVING", dentist: "Dr. Sara" },
-        { id: "que-004", ticket: "#004", patient: "Michael Haile", service: "Orthodontic Adjustment", arrival: "09:45 AM", status: "WAITING", dentist: "Dr. Sara" },
-        { id: "que-005", ticket: "#005", patient: "Dawit Yohannes", service: "Root Canal Therapy", arrival: "10:00 AM", status: "WAITING", dentist: "Dr. Abebe" },
-    ]);
-
-    const [feedback, setFeedback] = useState("");
-    const [showAddQueueModal, setShowAddQueueModal] = useState(false);
-
-    const handleQueueAdded = (newEntry) => {
-        const item = {
-            id: newEntry.id || `que-${Date.now()}`,
-            ticket: newEntry.formattedQueueNumber || `#${String(newEntry.queueNumber || 1).padStart(3, "0")}`,
-            patient: newEntry.patientName,
-            service: newEntry.serviceType || "General",
-            arrival: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-            status: "WAITING",
-            dentist: "Dr. Bethel",
-        };
-        setQueueList((prev) => [...prev, item]);
-        setFeedback(`Checked in ${item.patient} with Ticket ${item.ticket}.`);
+    const handleQueueAdded = async (newEntry) => {
+        await fetchReceptionData();
+        const ticket = newEntry.formattedQueueNumber || `#${String(newEntry.queueNumber || 1).padStart(3, "0")}`;
+        setFeedback(`✓ Checked in ${newEntry.patientName || "patient"} with Ticket ${ticket}.`);
         setTimeout(() => setFeedback(""), 4000);
     };
 
-    // Real-time Gateway sync
+    // Real-time Gateway sync via SignalR and WebSocket
     useEffect(() => {
         realtimeService.connect({ role: "RECEPTIONIST", userId: user?.id || "usr-receptionist-01" });
 
         const unsubCall = realtimeService.subscribe("PATIENT_CALLED", (payload) => {
+            fetchReceptionData();
             const ticket = payload.formattedQueueNumber || payload.ticket;
             if (ticket) {
-                setQueueList((prev) =>
-                    prev.map((item) => (item.ticket === ticket ? { ...item, status: "SERVING" } : item))
-                );
+                setFeedback(`📢 Notification: Patient ${ticket} called to operatory.`);
+                setTimeout(() => setFeedback(""), 4000);
             }
         });
 
         const unsubComp = realtimeService.subscribe("VISIT_COMPLETED", (payload) => {
+            fetchReceptionData();
             const ticket = payload.queueEntry?.formattedQueueNumber || payload.ticket;
             if (ticket) {
-                setQueueList((prev) =>
-                    prev.map((item) => (item.ticket === ticket ? { ...item, status: "DONE" } : item))
-                );
+                setFeedback(`✓ Visit completed for ticket ${ticket}.`);
+                setTimeout(() => setFeedback(""), 4000);
             }
         });
+
+        const unsubQueueUpdated = realtimeService.subscribe("QUEUE_UPDATED", () => {
+            fetchReceptionData();
+        });
+
+        const unsubSignalRStatus = signalRService.on("STATUS_CHANGED", (data) => {
+            setRealtimeConnected(data.status === "CONNECTED");
+        });
+
+        setRealtimeConnected(signalRService.isConnected || true);
 
         return () => {
             unsubCall();
             unsubComp();
+            unsubQueueUpdated();
+            unsubSignalRStatus();
         };
-    }, [user]);
+    }, [user, fetchReceptionData]);
 
-    // Task 2: Complete Visit (Receptionist / Dentist Completes Visit)
-    const handleCompleteVisit = (ticketId) => {
-        let completedItem = null;
-        setQueueList((prev) =>
-            prev.map((item) => {
-                if ((!ticketId && item.status === "SERVING") || item.id === ticketId || item.ticket === ticketId) {
-                    completedItem = item;
-                    return { ...item, status: "DONE" };
-                }
-                return item;
-            })
-        );
+    // Complete Visit API call
+    const handleCompleteVisit = async (ticketId) => {
+        const target = queueList.find((q) => q.id === ticketId || q.ticket === ticketId || q.status === "SERVING");
+        const ticket = target ? target.ticket : ticketId;
 
-        const label = completedItem ? completedItem.ticket : "current";
-        setFeedback(`✓ Visit completed successfully for patient ${label}. Status transitioned to DONE.`);
+        try {
+            const token = localStorage.getItem("auth_token") || localStorage.getItem("token");
+            await fetch("http://localhost:5000/api/v1/queue/complete", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    ...(token ? { Authorization: `Bearer ${token}` } : {})
+                },
+                body: JSON.stringify({
+                    id: target?.id,
+                    queueNumber: ticket?.replace("#", ""),
+                    notes: "Visit completed by receptionist"
+                })
+            });
 
-        // Broadcast to real-time gateway so Dentist and Customer browsers receive it
-        realtimeService.emit("VISIT_COMPLETED", {
-            queueEntry: completedItem || { formattedQueueNumber: label, status: "DONE" },
-        });
+            setFeedback(`✓ Visit completed successfully for patient ${ticket}. Status transitioned to DONE.`);
 
+            realtimeService.emit("VISIT_COMPLETED", {
+                ticket,
+                formattedQueueNumber: ticket,
+                patientName: target?.patient || "Patient",
+                status: "DONE",
+            });
+
+            await fetchReceptionData();
+        } catch (err) {
+            console.error("Failed to complete visit:", err);
+            setFeedback("Error completing visit on server.");
+        }
         setTimeout(() => setFeedback(""), 4000);
     };
 
-    // Task 3: Auto Advance (WAITING #004 -> SERVING according to queue rules)
-    const handleAutoAdvance = () => {
-        const nextWaiting = queueList.find((q) => q.status === "WAITING");
-        if (!nextWaiting) {
-            setFeedback("Notice: No waiting patients left in queue to auto-advance.");
-            setTimeout(() => setFeedback(""), 3000);
-            return;
+    // Auto Advance (Call next WAITING patient -> SERVING)
+    const handleAutoAdvance = async () => {
+        try {
+            const token = localStorage.getItem("auth_token") || localStorage.getItem("token");
+            const res = await fetch("http://localhost:5000/api/v1/queue/auto-advance", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    ...(token ? { Authorization: `Bearer ${token}` } : {})
+                }
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                const advanced = data.serving || data.data || data;
+                const nextTicket = advanced.formattedQueueNumber || `#${String(advanced.queueNumber || 1).padStart(3, "0")}`;
+                const nextPatient = advanced.patientName || advanced.customerName || "Patient";
+
+                const msg = `⚡ Auto Advance: System identified next waiting patient (${nextTicket} - ${nextPatient}). Status transitioned WAITING → SERVING.`;
+                setFeedback(msg);
+
+                realtimeService.emit("PATIENT_CALLED", {
+                    queueNumber: advanced.queueNumber || 1,
+                    formattedQueueNumber: nextTicket,
+                    ticket: nextTicket,
+                    patientName: nextPatient,
+                    serviceType: advanced.serviceType || "Clinical Consultation",
+                    notification: {
+                        message: `Patient ${nextTicket} is ready.`,
+                    },
+                });
+
+                await fetchReceptionData();
+            } else {
+                setFeedback("Notice: No waiting patients left in queue to auto-advance.");
+            }
+        } catch (err) {
+            console.error("Auto advance error:", err);
+            setFeedback("Failed to auto-advance queue.");
         }
-
-        setQueueList((prev) =>
-            prev.map((item) =>
-                item.id === nextWaiting.id
-                    ? { ...item, status: "SERVING" }
-                    : item
-            )
-        );
-
-        const msg = `⚡ Auto Advance: System identified next waiting patient (${nextWaiting.ticket} - ${nextWaiting.patient}). Status transitioned WAITING → SERVING.`;
-        setFeedback(msg);
-
-        // Broadcast to Real-Time Gateway so Dentist receives "Patient #004 is ready."
-        realtimeService.emit("PATIENT_CALLED", {
-            queueNumber: parseInt(nextWaiting.ticket.replace("#", ""), 10) || 4,
-            formattedQueueNumber: nextWaiting.ticket,
-            ticket: nextWaiting.ticket,
-            patientName: nextWaiting.patient,
-            serviceType: nextWaiting.service,
-            notification: {
-                message: `Patient ${nextWaiting.ticket} is ready.`,
-            },
-        });
-
         setTimeout(() => setFeedback(""), 4000);
     };
 
     // Call individual customer
-    const handleCallCustomer = (item) => {
-        setQueueList((prev) =>
-            prev.map((q) => (q.id === item.id ? { ...q, status: "SERVING" } : q))
-        );
+    const handleCallCustomer = async (item) => {
+        try {
+            const token = localStorage.getItem("auth_token") || localStorage.getItem("token");
+            await fetch("http://localhost:5000/api/v1/queue/call", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    ...(token ? { Authorization: `Bearer ${token}` } : {})
+                },
+                body: JSON.stringify({
+                    id: item.id,
+                    queueNumber: item.ticket?.replace("#", "")
+                })
+            });
 
-        setFeedback(`📢 Patient ${item.ticket} (${item.patient}) called to ${item.dentist || "Operatory"}. Status: SERVING.`);
+            setFeedback(`📢 Patient ${item.ticket} (${item.patient}) called to operatory. Status: SERVING.`);
 
-        realtimeService.emit("PATIENT_CALLED", {
-            formattedQueueNumber: item.ticket,
-            ticket: item.ticket,
-            patientName: item.patient,
-            serviceType: item.service,
-            notification: {
-                message: `Patient ${item.ticket} is ready.`,
-            },
-        });
+            realtimeService.emit("PATIENT_CALLED", {
+                formattedQueueNumber: item.ticket,
+                ticket: item.ticket,
+                patientName: item.patient,
+                serviceType: item.service,
+                notification: {
+                    message: `Patient ${item.ticket} is ready.`,
+                },
+            });
 
+            await fetchReceptionData();
+        } catch (err) {
+            console.error("Error calling patient:", err);
+            setFeedback(`Failed to dispatch call alert for ${item.ticket}.`);
+        }
         setTimeout(() => setFeedback(""), 4000);
     };
 
-    const [showPaymentModal, setShowPaymentModal] = useState(false);
-    const [paymentForm, setPaymentForm] = useState({
-        patientId: "pat-1001",
-        patientName: "Dawit Yohannes",
-        amount: "",
-        paymentDate: new Date().toISOString().split("T")[0],
-        recordedBy: "Receptionist",
-    });
-    const [paymentHistory, setPaymentHistory] = useState([
-        { id: "RCP-201", patient: "Dawit Yohannes", amount: 150.00, dueDate: "2026-10-26", recordedBy: "Receptionist - Bethlehem", status: "VERIFIED" },
-        { id: "RCP-202", patient: "Hellen Bekele", amount: 75.00, dueDate: "2026-10-25", recordedBy: "Receptionist - Bethlehem", status: "VERIFIED" },
-        { id: "RCP-203", patient: "Michael Haile", amount: 200.00, dueDate: "2026-10-24", recordedBy: "Dr. Sara (Dentist)", status: "VERIFIED" },
-    ]);
-
-    const handleRecordPayment = (e) => {
+    // Record Payment
+    const handleRecordPayment = async (e) => {
         e.preventDefault();
         const amt = Number(paymentForm.amount);
         if (Number.isNaN(amt) || amt <= 0) {
@@ -179,37 +268,72 @@ export default function ReceptionistPage() {
             return;
         }
 
-        const newPayment = {
-            id: `RCP-${Math.floor(100 + Math.random() * 900)}`,
-            patient: paymentForm.patientName,
-            amount: amt,
-            dueDate: paymentForm.paymentDate,
-            recordedBy: `${paymentForm.recordedBy} (${user?.fullName || "Staff"})`,
-            status: "VERIFIED",
-        };
+        try {
+            const token = localStorage.getItem("auth_token") || localStorage.getItem("token");
+            const res = await fetch("http://localhost:5000/api/v1/payments", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    ...(token ? { Authorization: `Bearer ${token}` } : {})
+                },
+                body: JSON.stringify({
+                    patientId: paymentForm.patientId || `pat-${Date.now()}`,
+                    patientName: paymentForm.patientName,
+                    amount: amt,
+                    paymentDate: paymentForm.paymentDate,
+                    method: "CASH",
+                    recordedBy: `${paymentForm.recordedBy} (${user?.fullName || "Staff"})`
+                })
+            });
 
-        setPaymentHistory([newPayment, ...paymentHistory]);
-        setFeedback(`Success: Payment of $${amt.toFixed(2)} recorded for ${paymentForm.patientName}.`);
-        setShowPaymentModal(false);
-        setPaymentForm({
-            patientId: "pat-1001",
-            patientName: "Dawit Yohannes",
-            amount: "",
-            paymentDate: new Date().toISOString().split("T")[0],
-            recordedBy: "Receptionist",
-        });
+            if (res.ok) {
+                setFeedback(`✓ Success: Payment of ${amt.toFixed(2)} ETB recorded for ${paymentForm.patientName}.`);
+                setShowPaymentModal(false);
+                setPaymentForm({
+                    patientId: "",
+                    patientName: "",
+                    amount: "",
+                    paymentDate: new Date().toISOString().split("T")[0],
+                    recordedBy: "Receptionist",
+                });
+                await fetchReceptionData();
+            } else {
+                setFeedback("Failed to record payment on server.");
+            }
+        } catch (err) {
+            console.error("Error saving payment:", err);
+            setFeedback("Network error saving payment.");
+        }
         setTimeout(() => setFeedback(""), 4000);
     };
 
     return (
         <PageContainer
-            title={user ? `Reception Desk — ${user.fullName}` : "Reception Desk Portal"}
-            subtitle="Patient check-in, queue management, appointment scheduling, and fee collection"
+            title={user ? `Receptionist Portal — ${user.fullName}` : "Receptionist Portal"}
+            subtitle="Queue management, check-in lobby, payment records, and patient dispatch"
             actions={
-                <div style={{ display: "flex", gap: "0.5rem" }}>
-                    <Button variant="primary" size="sm" onClick={() => setShowAddQueueModal(true)}>
-                        + Check In (SCR-15)
-                    </Button>
+                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                    <span style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "6px",
+                        fontSize: "0.75rem",
+                        fontWeight: 600,
+                        color: "var(--primary)",
+                        backgroundColor: "rgba(27, 77, 46, 0.08)",
+                        border: "1px solid var(--border)",
+                        borderRadius: "9999px",
+                        padding: "4px 10px",
+                    }}>
+                        <span style={{
+                            width: "8px",
+                            height: "8px",
+                            borderRadius: "50%",
+                            backgroundColor: realtimeConnected ? "#10b981" : "#f59e0b",
+                            display: "inline-block",
+                        }} />
+                        {realtimeConnected ? "SignalR Live" : "Syncing..."}
+                    </span>
                     <Button variant="secondary" size="sm" onClick={handleRefresh} disabled={refreshing}>
                         {refreshing ? "Refreshing..." : "🔄 Refresh"}
                     </Button>
@@ -221,25 +345,26 @@ export default function ReceptionistPage() {
                     padding: "10px 16px",
                     marginBottom: "1rem",
                     borderRadius: "6px",
-                    backgroundColor: feedback.startsWith("Error") ? "#fee2e2" : "#ecfdf5",
-                    color: feedback.startsWith("Error") ? "#991b1b" : "#065f46",
-                    border: `1px solid ${feedback.startsWith("Error") ? "#fca5a5" : "#a7f3d0"}`,
-                    fontWeight: 500,
+                    backgroundColor: "rgba(27, 77, 46, 0.08)",
+                    color: "var(--primary)",
+                    border: "1px solid var(--border)",
+                    fontWeight: 600,
                     fontSize: "0.875rem"
                 }}>
                     {feedback}
                 </div>
             )}
 
+            {/* Metric Cards */}
             <div className="grid grid-cols-4" style={{ marginBottom: "1.5rem" }}>
                 {stats.map((stat, i) => (
-                    <div key={i} className="card">
+                    <div key={i} className="card" style={{ backgroundColor: "var(--bg-surface)", border: "1px solid var(--border)" }}>
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
                             <div>
                                 <p style={{ fontSize: "0.8125rem", color: "var(--text-muted)", fontWeight: 500 }}>
                                     {stat.label}
                                 </p>
-                                <p style={{ fontSize: "1.5rem", fontWeight: 700, marginTop: "0.25rem", color: "var(--text-main)" }}>
+                                <p style={{ fontSize: "1.5rem", fontWeight: 700, marginTop: "0.25rem", color: "var(--primary)" }}>
                                     {stat.value}
                                 </p>
                             </div>
@@ -252,284 +377,314 @@ export default function ReceptionistPage() {
                 ))}
             </div>
 
-            <div className="grid grid-cols-2" style={{ marginBottom: "1.5rem" }}>
-                <div className="card">
-                    <div className="card__header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                        <div>
-                            <h2 className="card__title">Active Reception Queue</h2>
-                            <p className="card__subtitle">Real-time patient flow and front-desk dispatch</p>
-                        </div>
-                        <div style={{ display: "flex", gap: "8px" }}>
-                            <Button
-                                variant="primary"
-                                size="sm"
-                                onClick={handleAutoAdvance}
-                                title="System identifies next waiting patient (WAITING → SERVING)"
-                                style={{ backgroundColor: "#2563eb" }}
-                            >
-                                ⚡ Auto Advance
-                            </Button>
-                            <Button
-                                variant="secondary"
-                                size="sm"
-                                onClick={() => handleCompleteVisit()}
-                                title="Receptionist / Dentist completes visit"
-                            >
-                                ✓ Complete Visit
-                            </Button>
-                        </div>
+            {/* Queue Management Card */}
+            <div className="card" style={{ marginBottom: "1.5rem", backgroundColor: "var(--bg-surface)", border: "1px solid var(--border)" }}>
+                <div className="card__header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "10px" }}>
+                    <div>
+                        <h2 className="card__title" style={{ color: "var(--primary)" }}>Clinic Queue Lobby & Real-Time Dispatch</h2>
+                        <p className="card__subtitle">Monitor waiting and serving patients, call next tickets, and mark completions</p>
                     </div>
-                    <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
-                        {queueList.map((item) => (
-                            <div
-                                key={item.id}
-                                style={{
-                                    display: "flex",
-                                    justifyContent: "space-between",
-                                    alignItems: "center",
-                                    padding: "0.75rem",
-                                    backgroundColor: "var(--bg-page)",
-                                    borderRadius: "var(--radius-md)",
-                                    border: item.status === "SERVING" ? "2px solid #2563eb" : "1px solid var(--border)",
-                                }}
-                            >
-                                <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-                                    <span
-                                        style={{
-                                            fontWeight: 700,
-                                            fontSize: "0.875rem",
-                                            backgroundColor: item.status === "SERVING" ? "#dbeafe" : item.status === "DONE" ? "#dcfce7" : "#fef3c7",
-                                            color: item.status === "SERVING" ? "#1e40af" : item.status === "DONE" ? "#166534" : "#92400e",
-                                            padding: "0.25rem 0.5rem",
-                                            borderRadius: "var(--radius-sm)",
-                                        }}
-                                    >
-                                        {item.ticket}
-                                    </span>
-                                    <div>
-                                        <p style={{ fontSize: "0.875rem", fontWeight: 600 }}>{item.patient}</p>
-                                        <p style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>
-                                            {item.service} • {item.dentist || "General Clinic"} • Arrived {item.arrival}
-                                        </p>
-                                    </div>
-                                </div>
-                                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                                    <span
-                                        style={{
-                                            fontSize: "0.75rem",
-                                            fontWeight: 700,
-                                            color: item.status === "SERVING" ? "#1d4ed8" : item.status === "DONE" ? "#15803d" : "#b45309",
-                                            backgroundColor: item.status === "SERVING" ? "#eff6ff" : item.status === "DONE" ? "#f0fdf4" : "#fffbeb",
-                                            padding: "0.25rem 0.5rem",
-                                            borderRadius: "var(--radius-sm)",
-                                            border: `1px solid ${item.status === "SERVING" ? "#bfdbfe" : item.status === "DONE" ? "#bbf7d0" : "#fde68a"}`,
-                                        }}
-                                    >
-                                        {item.status}
-                                    </span>
-                                    {item.status === "WAITING" && (
-                                        <button
-                                            type="button"
-                                            onClick={() => handleCallCustomer(item)}
-                                            style={{
-                                                fontSize: "0.75rem",
-                                                fontWeight: 600,
-                                                padding: "4px 8px",
-                                                borderRadius: "4px",
-                                                border: "1px solid #2563eb",
-                                                backgroundColor: "#2563eb",
-                                                color: "white",
-                                                cursor: "pointer",
-                                            }}
-                                        >
-                                            Call
-                                        </button>
-                                    )}
-                                    {item.status === "SERVING" && (
-                                        <button
-                                            type="button"
-                                            onClick={() => handleCompleteVisit(item.id)}
-                                            style={{
-                                                fontSize: "0.75rem",
-                                                fontWeight: 600,
-                                                padding: "4px 8px",
-                                                borderRadius: "4px",
-                                                border: "1px solid #059669",
-                                                backgroundColor: "#059669",
-                                                color: "white",
-                                                cursor: "pointer",
-                                            }}
-                                        >
-                                            Complete Visit
-                                        </button>
-                                    )}
-                                </div>
-                            </div>
-                        ))}
+                    <div style={{ display: "flex", gap: "8px" }}>
+                        <Button
+                            variant="secondary"
+                            size="sm"
+                            onClick={handleAutoAdvance}
+                            title="Auto Advance to next waiting patient (WAITING -> SERVING)"
+                        >
+                            ⚡ Auto Advance
+                        </Button>
+                        <Button
+                            variant="secondary"
+                            size="sm"
+                            onClick={() => handleCompleteVisit()}
+                            title="Mark current serving patient visit as DONE"
+                        >
+                            ✓ Complete Visit
+                        </Button>
+                        <Button
+                            variant="primary"
+                            size="sm"
+                            onClick={() => setShowAddQueueModal(true)}
+                        >
+                            + Check In Patient
+                        </Button>
                     </div>
                 </div>
 
-                <div className="card">
-                    <div className="card__header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                        <div>
-                            <h2 className="card__title">Desk Operations</h2>
-                            <p className="card__subtitle">Front office tasks and financial transactions</p>
-                        </div>
-                    </div>
-                    <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
-                        <Button
-                            variant="primary"
-                            fullWidth
-                            style={{ justifyContent: "flex-start", backgroundColor: "#059669" }}
-                            onClick={() => setShowPaymentModal(true)}
-                        >
-                            💰 Record Payment & Issue Receipt
-                        </Button>
-                        <Button variant="outline" fullWidth style={{ justifyContent: "flex-start" }}>
-                            🎟️ Issue New Queue Ticket & Check In
-                        </Button>
-                        <a href="/appointments" style={{ textDecoration: "none" }}>
-                            <Button variant="outline" fullWidth style={{ justifyContent: "flex-start", color: "#2563eb", borderColor: "#bfdbfe" }}>
-                                📅 Schedule & Manage Patient Appointments
-                            </Button>
-                        </a>
-                        <a href="/appointments/missed" style={{ textDecoration: "none" }}>
-                            <Button variant="outline" fullWidth style={{ justifyContent: "flex-start", color: "#dc2626", borderColor: "#fecaca" }}>
-                                ⚠️ Review Missed Appointments & Reschedule
-                            </Button>
-                        </a>
-                        <Button variant="outline" fullWidth style={{ justifyContent: "flex-start" }}>
-                            👤 Search or Register New Patient
-                        </Button>
-                    </div>
-
-                    {showPaymentModal && (
+                <div style={{ overflowX: "auto" }}>
+                    {queueList.length === 0 ? (
                         <div style={{
-                            marginTop: "1.25rem",
-                            padding: "1rem",
+                            padding: "3rem",
+                            textAlign: "center",
+                            color: "var(--text-muted)",
+                            backgroundColor: "var(--bg-page)",
                             borderRadius: "var(--radius-md)",
-                            backgroundColor: "#f0fdf4",
-                            border: "1px solid #bbf7d0"
+                            border: "1px dashed var(--border)",
+                            margin: "0.5rem"
                         }}>
-                            <h3 style={{ fontSize: "0.95rem", fontWeight: 700, color: "#166534", marginBottom: "0.75rem" }}>
-                                Record Patient Fee Payment
-                            </h3>
-                            <form onSubmit={handleRecordPayment} style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
-                                <div>
-                                    <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 600, color: "#374151", marginBottom: "4px" }}>
-                                        Select Patient *
-                                    </label>
-                                    <select
-                                        value={paymentForm.patientName}
-                                        onChange={(e) => setPaymentForm({ ...paymentForm, patientName: e.target.value })}
-                                        style={{ width: "100%", padding: "6px 8px", borderRadius: "4px", border: "1px solid #cbd5e1" }}
-                                    >
-                                        <option value="Dawit Yohannes">Dawit Yohannes (pat-1001)</option>
-                                        <option value="Hellen Bekele">Hellen Bekele (pat-1002)</option>
-                                        <option value="Amanuel Girma">Amanuel Girma (pat-1003)</option>
-                                        <option value="Selamawit Desta">Selamawit Desta (pat-1004)</option>
-                                    </select>
-                                </div>
-                                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
-                                    <div>
-                                        <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 600, color: "#374151", marginBottom: "4px" }}>
-                                            Amount ($) *
-                                        </label>
-                                        <input
-                                            type="number"
-                                            required
-                                            min="0.01"
-                                            step="0.01"
-                                            placeholder="e.g. 50.00"
-                                            value={paymentForm.amount}
-                                            onChange={(e) => setPaymentForm({ ...paymentForm, amount: e.target.value })}
-                                            style={{ width: "100%", padding: "6px 8px", borderRadius: "4px", border: "1px solid #cbd5e1" }}
-                                        />
-                                    </div>
-                                    <div>
-                                        <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 600, color: "#374151", marginBottom: "4px" }}>
-                                            Payment Date *
-                                        </label>
-                                        <input
-                                            type="date"
-                                            required
-                                            value={paymentForm.paymentDate}
-                                            onChange={(e) => setPaymentForm({ ...paymentForm, paymentDate: e.target.value })}
-                                            style={{ width: "100%", padding: "6px 8px", borderRadius: "4px", border: "1px solid #cbd5e1" }}
-                                        />
-                                    </div>
-                                </div>
-                                <div style={{ display: "flex", justifyContent: "flex-end", gap: "8px", marginTop: "4px" }}>
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowPaymentModal(false)}
-                                        style={{ padding: "6px 12px", borderRadius: "4px", border: "1px solid #cbd5e1", backgroundColor: "white", cursor: "pointer" }}
-                                    >
-                                        Cancel
-                                    </button>
-                                    <button
-                                        type="submit"
-                                        style={{ padding: "6px 14px", borderRadius: "4px", border: "none", backgroundColor: "#059669", color: "white", fontWeight: 600, cursor: "pointer" }}
-                                    >
-                                        Confirm Payment
-                                    </button>
-                                </div>
-                            </form>
+                            <span style={{ fontSize: "2rem", display: "block", marginBottom: "0.5rem" }}>👥</span>
+                            <p style={{ fontWeight: 600, margin: 0 }}>No patients currently in the queue lobby</p>
+                            <p style={{ fontSize: "0.8125rem", margin: "4px 0 0 0", color: "var(--text-light)" }}>
+                                Click "+ Check In Patient" to register a patient upon clinic arrival
+                            </p>
                         </div>
+                    ) : (
+                        <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.875rem" }}>
+                            <thead>
+                                <tr style={{ borderBottom: "1px solid var(--border)", textAlign: "left", color: "var(--text-muted)", backgroundColor: "var(--bg-page)" }}>
+                                    <th style={{ padding: "10px 12px" }}>Ticket</th>
+                                    <th style={{ padding: "10px 12px" }}>Patient Name</th>
+                                    <th style={{ padding: "10px 12px" }}>Service</th>
+                                    <th style={{ padding: "10px 12px" }}>Arrival</th>
+                                    <th style={{ padding: "10px 12px" }}>Assigned Operatory</th>
+                                    <th style={{ padding: "10px 12px" }}>Status</th>
+                                    <th style={{ padding: "10px 12px", textAlign: "right" }}>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {queueList.map((item) => (
+                                    <tr key={item.id} style={{ borderBottom: "1px solid var(--border)" }}>
+                                        <td style={{ padding: "12px", fontWeight: 700, color: "var(--primary)" }}>{item.ticket}</td>
+                                        <td style={{ padding: "12px", fontWeight: 600 }}>{item.patient}</td>
+                                        <td style={{ padding: "12px", color: "var(--text-main)" }}>{item.service}</td>
+                                        <td style={{ padding: "12px", color: "var(--text-muted)" }}>{item.arrival}</td>
+                                        <td style={{ padding: "12px", color: "var(--text-main)" }}>{item.dentist}</td>
+                                        <td style={{ padding: "12px" }}>
+                                            <span style={{
+                                                fontSize: "0.75rem",
+                                                fontWeight: 700,
+                                                padding: "3px 8px",
+                                                borderRadius: "9999px",
+                                                backgroundColor: item.status === "SERVING" ? "rgba(27, 77, 46, 0.15)" : item.status === "WAITING" ? "rgba(234, 179, 8, 0.12)" : "rgba(100, 116, 139, 0.1)",
+                                                color: item.status === "SERVING" ? "var(--primary)" : item.status === "WAITING" ? "#b45309" : "#475569",
+                                                border: "1px solid var(--border)"
+                                            }}>
+                                                {item.status}
+                                            </span>
+                                        </td>
+                                        <td style={{ padding: "12px", textAlign: "right" }}>
+                                            <div style={{ display: "flex", gap: "6px", justifyContent: "flex-end" }}>
+                                                {item.status === "WAITING" && (
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                        onClick={() => handleCallCustomer(item)}
+                                                    >
+                                                        📢 Call
+                                                    </Button>
+                                                )}
+                                                {item.status === "SERVING" && (
+                                                    <Button
+                                                        variant="primary"
+                                                        size="sm"
+                                                        onClick={() => handleCompleteVisit(item.id)}
+                                                    >
+                                                        ✓ Complete
+                                                    </Button>
+                                                )}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
                     )}
                 </div>
             </div>
 
-            {/* Task 9: Payment History Table */}
-            <div className="card">
-                <div className="card__header">
-                    <h2 className="card__title">Recent Payment History & Receipts</h2>
-                    <p className="card__subtitle">Displaying verified transactions with Amount, Due/Payment Date, and Recorded by</p>
+            {/* Payment Ledger Card */}
+            <div className="card" style={{ backgroundColor: "var(--bg-surface)", border: "1px solid var(--border)" }}>
+                <div className="card__header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "10px" }}>
+                    <div>
+                        <h2 className="card__title" style={{ color: "var(--primary)" }}>Recent Payment Transactions</h2>
+                        <p className="card__subtitle">Verified front-desk collections and customer payment history</p>
+                    </div>
+                    <div style={{ display: "flex", gap: "8px" }}>
+                        <a href="/customers/fees" style={{ textDecoration: "none" }}>
+                            <Button variant="outline" size="sm">
+                                📊 Customer Fee Ledger →
+                            </Button>
+                        </a>
+                        <Button
+                            variant="primary"
+                            size="sm"
+                            onClick={() => setShowPaymentModal(true)}
+                        >
+                            💳 Record Payment
+                        </Button>
+                    </div>
                 </div>
+
                 <div style={{ overflowX: "auto" }}>
-                    <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.875rem" }}>
-                        <thead>
-                            <tr style={{ borderBottom: "1px solid var(--border)", textAlign: "left", color: "var(--text-muted)" }}>
-                                <th style={{ padding: "8px 12px" }}>Receipt ID</th>
-                                <th style={{ padding: "8px 12px" }}>Patient</th>
-                                <th style={{ padding: "8px 12px" }}>Amount</th>
-                                <th style={{ padding: "8px 12px" }}>Due / Payment Date</th>
-                                <th style={{ padding: "8px 12px" }}>Recorded By</th>
-                                <th style={{ padding: "8px 12px" }}>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {paymentHistory.map((p) => (
-                                <tr key={p.id} style={{ borderBottom: "1px solid var(--border)" }}>
-                                    <td style={{ padding: "10px 12px", fontFamily: "monospace", fontWeight: 600 }}>{p.id}</td>
-                                    <td style={{ padding: "10px 12px", fontWeight: 600 }}>{p.patient}</td>
-                                    <td style={{ padding: "10px 12px", color: "#059669", fontWeight: 700 }}>${p.amount.toFixed(2)}</td>
-                                    <td style={{ padding: "10px 12px" }}>{new Date(p.dueDate).toLocaleDateString()}</td>
-                                    <td style={{ padding: "10px 12px", color: "var(--text-muted)" }}>{p.recordedBy}</td>
-                                    <td style={{ padding: "10px 12px" }}>
-                                        <span style={{
-                                            fontSize: "0.75rem",
-                                            fontWeight: 600,
-                                            padding: "2px 6px",
-                                            borderRadius: "4px",
-                                            backgroundColor: "#d1fae5",
-                                            color: "#065f46"
-                                        }}>
-                                            {p.status}
-                                        </span>
-                                    </td>
+                    {paymentHistory.length === 0 ? (
+                        <div style={{
+                            padding: "3rem",
+                            textAlign: "center",
+                            color: "var(--text-muted)",
+                            backgroundColor: "var(--bg-page)",
+                            borderRadius: "var(--radius-md)",
+                            border: "1px dashed var(--border)",
+                            margin: "0.5rem"
+                        }}>
+                            <span style={{ fontSize: "2rem", display: "block", marginBottom: "0.5rem" }}>💳</span>
+                            <p style={{ fontWeight: 600, margin: 0 }}>No payments recorded yet</p>
+                            <p style={{ fontSize: "0.8125rem", margin: "4px 0 0 0", color: "var(--text-light)" }}>
+                                Click "Record Payment" to log patient fees and receipts
+                            </p>
+                        </div>
+                    ) : (
+                        <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.875rem" }}>
+                            <thead>
+                                <tr style={{ borderBottom: "1px solid var(--border)", textAlign: "left", color: "var(--text-muted)", backgroundColor: "var(--bg-page)" }}>
+                                    <th style={{ padding: "10px 12px" }}>Receipt ID</th>
+                                    <th style={{ padding: "10px 12px" }}>Patient</th>
+                                    <th style={{ padding: "10px 12px" }}>Amount Paid</th>
+                                    <th style={{ padding: "10px 12px" }}>Date</th>
+                                    <th style={{ padding: "10px 12px" }}>Recorded By</th>
+                                    <th style={{ padding: "10px 12px" }}>Status</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                {paymentHistory.map((pay) => (
+                                    <tr key={pay.id || pay._id} style={{ borderBottom: "1px solid var(--border)" }}>
+                                        <td style={{ padding: "12px", fontFamily: "monospace", fontWeight: 600 }}>{pay.receipt || pay.id}</td>
+                                        <td style={{ padding: "12px", fontWeight: 600 }}>{pay.patient || pay.patientName}</td>
+                                        <td style={{ padding: "12px", color: "var(--primary)", fontWeight: 700 }}>{Number(pay.amount || 0).toFixed(2)} ETB</td>
+                                        <td style={{ padding: "12px", color: "var(--text-muted)" }}>{pay.dueDate || pay.date || pay.paymentDate}</td>
+                                        <td style={{ padding: "12px", color: "var(--text-main)" }}>{pay.recordedBy || "Receptionist"}</td>
+                                        <td style={{ padding: "12px" }}>
+                                            <span style={{
+                                                fontSize: "0.75rem",
+                                                fontWeight: 700,
+                                                padding: "3px 8px",
+                                                borderRadius: "9999px",
+                                                backgroundColor: "rgba(27, 77, 46, 0.1)",
+                                                color: "var(--primary)",
+                                                border: "1px solid var(--border)"
+                                            }}>
+                                                {pay.status || "VERIFIED"}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    )}
                 </div>
             </div>
 
+            {/* Add to Queue Modal */}
             {showAddQueueModal && (
                 <AddToQueueModal
+                    isOpen={showAddQueueModal}
                     onClose={() => setShowAddQueueModal(false)}
-                    onQueueAdded={handleQueueAdded}
+                    onSuccess={handleQueueAdded}
                 />
+            )}
+
+            {/* Record Payment Modal */}
+            {showPaymentModal && (
+                <div style={{
+                    position: "fixed",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    backgroundColor: "rgba(0, 0, 0, 0.4)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    zIndex: 1000,
+                    padding: "1rem"
+                }}>
+                    <div className="card" style={{ maxWidth: "480px", width: "100%", backgroundColor: "var(--bg-surface)", border: "1px solid var(--border)", boxShadow: "var(--shadow-lg)" }}>
+                        <div className="card__header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                            <h3 className="card__title" style={{ color: "var(--primary)" }}>Record Patient Payment</h3>
+                            <button
+                                type="button"
+                                onClick={() => setShowPaymentModal(false)}
+                                style={{ background: "none", border: "none", fontSize: "1.25rem", cursor: "pointer", color: "var(--text-muted)" }}
+                            >
+                                ✕
+                            </button>
+                        </div>
+                        <form onSubmit={handleRecordPayment} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+                            <div>
+                                <label style={{ display: "block", fontSize: "0.875rem", fontWeight: 600, marginBottom: "4px" }}>
+                                    Patient Name
+                                </label>
+                                <input
+                                    type="text"
+                                    required
+                                    placeholder="e.g. Hana Bekele"
+                                    value={paymentForm.patientName}
+                                    onChange={(e) => setPaymentForm({ ...paymentForm, patientName: e.target.value })}
+                                    style={{
+                                        width: "100%",
+                                        padding: "8px 12px",
+                                        borderRadius: "6px",
+                                        border: "1px solid var(--border)",
+                                        backgroundColor: "var(--bg-card)",
+                                    }}
+                                />
+                            </div>
+                            <div>
+                                <label style={{ display: "block", fontSize: "0.875rem", fontWeight: 600, marginBottom: "4px" }}>
+                                    Amount (ETB)
+                                </label>
+                                <input
+                                    type="number"
+                                    step="0.01"
+                                    min="0.01"
+                                    required
+                                    placeholder="0.00"
+                                    value={paymentForm.amount}
+                                    onChange={(e) => setPaymentForm({ ...paymentForm, amount: e.target.value })}
+                                    style={{
+                                        width: "100%",
+                                        padding: "8px 12px",
+                                        borderRadius: "6px",
+                                        border: "1px solid var(--border)",
+                                        backgroundColor: "var(--bg-card)",
+                                    }}
+                                />
+                            </div>
+                            <div>
+                                <label style={{ display: "block", fontSize: "0.875rem", fontWeight: 600, marginBottom: "4px" }}>
+                                    Payment Date
+                                </label>
+                                <input
+                                    type="date"
+                                    required
+                                    value={paymentForm.paymentDate}
+                                    onChange={(e) => setPaymentForm({ ...paymentForm, paymentDate: e.target.value })}
+                                    style={{
+                                        width: "100%",
+                                        padding: "8px 12px",
+                                        borderRadius: "6px",
+                                        border: "1px solid var(--border)",
+                                        backgroundColor: "var(--bg-card)",
+                                    }}
+                                />
+                            </div>
+                            <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end", marginTop: "0.5rem" }}>
+                                <Button
+                                    variant="secondary"
+                                    type="button"
+                                    onClick={() => setShowPaymentModal(false)}
+                                >
+                                    Cancel
+                                </Button>
+                                <Button
+                                    variant="primary"
+                                    type="submit"
+                                >
+                                    Save Payment
+                                </Button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             )}
         </PageContainer>
     );
