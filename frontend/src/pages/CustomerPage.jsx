@@ -120,6 +120,27 @@ export default function CustomerPage() {
                 </Button>
             }
         >
+            {/* FR-CUS-01 Alt 1: Unlinked Customer Account Notice */}
+            {user?.linkedPatientId === null && (
+                <div
+                    role="alert"
+                    style={{
+                        padding: "1rem 1.25rem",
+                        backgroundColor: "#fef3c7",
+                        borderLeft: "4px solid #f59e0b",
+                        borderRadius: "8px",
+                        marginBottom: "1.5rem",
+                        color: "#92400e",
+                    }}
+                >
+                    <h3 style={{ margin: "0 0 0.25rem", fontSize: "1rem", fontWeight: "700" }}>
+                        Account Pending Front-Desk Linking (FR-CUS-01 Alt 1)
+                    </h3>
+                    <p style={{ margin: 0, fontSize: "0.875rem", lineHeight: 1.5 }}>
+                        Your self-service account is active, but not yet linked to your clinic dental record. Please provide your phone number or ID at the reception desk to sync your historical treatments and live queue ticket.
+                    </p>
+                </div>
+            )}
             {/* Task 4 & 5: Live Queue Status Widget */}
             <CustomerQueueWidget
                 initialQueue={dashboardData?.queue}
