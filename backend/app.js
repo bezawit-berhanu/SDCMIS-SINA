@@ -99,6 +99,21 @@ app.use("/api/v1/queue", queueRoutes);
 app.use("/api/queue", queueRoutes);
 app.use("/queue", queueRoutes);
 
+// SignalR Hub Negotiation endpoint per SignalR protocol specification
+app.post(["/hub/queue/negotiate", "/api/v1/queue/negotiate"], (req, res) => {
+    res.json({
+        negotiateVersion: 1,
+        connectionId: `sig-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`,
+        connectionToken: `sig-tok-${Date.now()}`,
+        availableTransports: [
+            {
+                transport: "WebSockets",
+                transferFormats: ["Text", "Binary"],
+            },
+        ],
+    });
+});
+
 // Notification endpoints (Dentist & Receptionist real-time alerts)
 app.use("/api/v1/notifications", notificationRoutes);
 app.use("/api/notifications", notificationRoutes);

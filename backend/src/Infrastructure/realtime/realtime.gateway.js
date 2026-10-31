@@ -29,7 +29,14 @@ class RealtimeGateway extends EventEmitter {
 
             httpServer.on("upgrade", (request, socket, head) => {
                 const url = new URL(request.url, `http://${request.headers.host || "localhost"}`);
-                if (url.pathname === path || url.pathname === "/ws" || url.pathname === "/api/v1/queue/ws") {
+                const isSupportedPath =
+                    url.pathname === path ||
+                    url.pathname === "/ws" ||
+                    url.pathname === "/api/v1/queue/ws" ||
+                    url.pathname === "/hub/queue" ||
+                    url.pathname.startsWith("/hub/");
+
+                if (isSupportedPath) {
                     this.wss.handleUpgrade(request, socket, head, (ws) => {
                         this.wss.emit("connection", ws, request);
                     });
@@ -61,9 +68,20 @@ class RealtimeGateway extends EventEmitter {
 
                 ws.on("message", (raw) => {
                     try {
-                        const parsed = JSON.parse(raw.toString());
-                        if (parsed.type === "PING") {
-                            this._safeSend(ws, { type: "PONG", timestamp: new Date().toISOString() });
+                        const rawStr = raw.toString();
+                        // SignalR Protocol Handshake detection
+                        if (rawStr.includes('"protocol":"json"') || rawStr.includes('"protocol": "json"')) {
+                            ws.isSignalR = true;
+                            ws.send("{}\x1e");
+                            return;
+                        }
+                        const parsed = JSON.parse(rawStr.replace(/\x1e/g, ""));
+                        if (parsed.type === "PING" || parsed.type === 6) {
+                            if (ws.isSignalR) {
+                                ws.send('{"type":6}\x1e'); // SignalR ping/keepalive response
+                            } else {
+                                this._safeSend(ws, { type: "PONG", timestamp: new Date().toISOString() });
+                            }
                         }
                     } catch (_) {}
                 });
@@ -86,7 +104,17 @@ class RealtimeGateway extends EventEmitter {
     _safeSend(ws, data) {
         if (!ws || ws.readyState !== 1) return; // 1 = OPEN
         try {
-            ws.send(JSON.stringify(data));
+            if (ws.isSignalR) {
+                // Format SignalR text invocation record with 0x1E delimiter
+                const signalRMsg = JSON.stringify({
+                    type: 1,
+                    target: data.type,
+                    arguments: [data.payload || data],
+                }) + "\x1e";
+                ws.send(signalRMsg);
+            } else {
+                ws.send(JSON.stringify(data));
+            }
         } catch (_) {}
     }
 
