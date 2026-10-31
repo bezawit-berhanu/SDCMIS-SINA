@@ -1,0 +1,77 @@
+version: "3.8"
+
+services:
+  db:
+    image: mariadb:10.11
+    container_name: sdcmis_prod_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-RootSecurePass2026!}
+      MYSQL_DATABASE: sdcmis_sina
+      MYSQL_USER: sdcmis_user
+      MYSQL_PASSWORD: ${DB_PASSWORD:-StrongProdPassword2026!}
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - internal_network
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    container_name: sdcmis_prod_backend
+    restart: always
+    environment:
+      NODE_ENV: production
+      PORT: 5000
+      DATABASE_URL: mysql://sdcmis_user:${DB_PASSWORD:-StrongProdPassword2026!}@db:3306/sdcmis_sina?sslaccept=strict
+      JWT_SECRET: ${JWT_SECRET}
+      CORS_ORIGIN: https://sdcmis-sina.com
+      LOG_LEVEL: INFO
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - internal_network
+    expose:
+      - "5000"
+
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    container_name: sdcmis_prod_frontend
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ../deploy/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - certbot_certs:/etc/letsencrypt
+      - certbot_challenge:/var/www/certbot
+    depends_on:
+      - backend
+    networks:
+      - internal_network
+
+  certbot:
+    image: certbot/certbot
+    container_name: sdcmis_certbot
+    volumes:
+      - certbot_certs:/etc/letsencrypt
+      - certbot_challenge:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+
+volumes:
+  db_data:
+  certbot_certs:
+  certbot_challenge:
+
+networks:
+  internal_network:
+    driver: bridge
