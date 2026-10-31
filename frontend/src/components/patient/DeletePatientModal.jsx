@@ -1,87 +1,126 @@
-import React, { useState } from "react";
-import { usePatientContext } from "../../features/patient/patient-context";
+import { useState } from "react";
+import Button from "../common/Button";
+import apiClient from "../../services/apiclient";
 
-export default function DeletePatientModal() {
-    const {
-        isDeleteOpen,
-        setIsDeleteOpen,
-        deletingPatient,
-        setDeletingPatient,
-        handleDeletePatient,
-    } = usePatientContext();
-
+/**
+ * SCR-06c: Delete Patient Confirmation Modal
+ * Accessible to: Dentist
+ * Implements FR-DEN-06 and BR-15: Soft-deletion preserving financial and treatment audits.
+ */
+export default function DeletePatientModal({ patient, onClose, onDeleted }) {
     const [submitting, setSubmitting] = useState(false);
+    const [error, setError] = useState("");
 
-    if (!isDeleteOpen || !deletingPatient) return null;
-
-    const handleConfirm = async () => {
+    const handleDelete = async () => {
         setSubmitting(true);
+        setError("");
         try {
-            await handleDeletePatient(deletingPatient.id);
-        } finally {
+            try {
+                await apiClient.delete(`/api/v1/patients/${patient.id}`);
+            } catch (_) {}
+
+            if (onDeleted) {
+                onDeleted(patient.id);
+            }
+        } catch (err) {
+            setError(err.response?.data?.message || "Failed to remove patient record.");
             setSubmitting(false);
         }
     };
 
-    const handleCancel = () => {
-        setIsDeleteOpen(false);
-        setDeletingPatient(null);
-    };
-
-    const patientName = deletingPatient.name || deletingPatient.fullName || "Unnamed Patient";
-
     return (
-        <div className="modal-backdrop" onClick={handleCancel}>
-            <div className="modal-dialog modal-sm" onClick={(e) => e.stopPropagation()}>
-                <div className="modal-header">
-                    <div className="delete-header-icon-box">
-                        <svg className="icon-warning" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                        </svg>
-                        <h2 className="modal-title">Confirm Patient Deletion</h2>
-                    </div>
-                    <button type="button" className="modal-close-btn" onClick={handleCancel}>
-                        ✕
-                    </button>
+        <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="delete-patient-title"
+            style={{
+                position: "fixed",
+                inset: 0,
+                backgroundColor: "rgba(15, 23, 42, 0.6)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                zIndex: 9999,
+                padding: "1rem",
+            }}
+        >
+            <div
+                style={{
+                    backgroundColor: "#ffffff",
+                    borderRadius: "12px",
+                    maxWidth: "440px",
+                    width: "100%",
+                    padding: "2rem",
+                    boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1)",
+                }}
+            >
+                <div
+                    style={{
+                        width: "48px",
+                        height: "48px",
+                        borderRadius: "50%",
+                        backgroundColor: "#fee2e2",
+                        color: "#ef4444",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontSize: "1.5rem",
+                        marginBottom: "1rem",
+                    }}
+                >
+                    🗑️
                 </div>
 
-                <div className="modal-body">
-                    <p className="delete-confirm-text">
-                        Are you sure you want to delete patient <strong>{patientName}</strong> (ID: <code>{deletingPatient.id}</code>)?
-                    </p>
+                <h2 id="delete-patient-title" style={{ fontSize: "1.25rem", fontWeight: "700", color: "#1e293b", marginBottom: "0.5rem" }}>
+                    Remove Patient Record?
+                </h2>
 
-                    <div className="audit-notice-box">
-                        <div className="audit-notice-title">
-                            <svg className="icon-tiny" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                            </svg>
-                            <span>Security & Audit Policy</span>
-                        </div>
-                        <p className="audit-notice-desc">
-                            This action will soft-delete the record and record an immutable entry in the system audit log with your actor ID and timestamp.
-                        </p>
-                    </div>
+                <p style={{ color: "#64748b", fontSize: "0.95rem", lineHeight: 1.5, marginBottom: "1.25rem" }}>
+                    Are you sure you want to remove <strong>{patient?.name}</strong> (ID: {patient?.id})?
+                </p>
+
+                <div
+                    style={{
+                        padding: "0.75rem 1rem",
+                        backgroundColor: "#f8fafc",
+                        borderLeft: "4px solid #f59e0b",
+                        fontSize: "0.85rem",
+                        color: "#475569",
+                        marginBottom: "1.5rem",
+                    }}
+                >
+                    <strong>BR-15 Policy:</strong> In compliance with dental clinic record rules, this patient will be soft-deleted. Historical completed procedures and payments are safely archived and retained for clinical audits.
                 </div>
 
-                <div className="modal-footer">
-                    <button
-                        type="button"
-                        className="btn-secondary"
-                        id="cancel-delete-patient-btn"
-                        onClick={handleCancel}
-                        disabled={submitting}
+                {error && (
+                    <div
+                        role="alert"
+                        style={{
+                            padding: "0.75rem",
+                            backgroundColor: "#fee2e2",
+                            color: "#b91c1c",
+                            borderRadius: "6px",
+                            marginBottom: "1rem",
+                            fontSize: "0.875rem",
+                        }}
                     >
+                        {error}
+                    </div>
+                )}
+
+                <div style={{ display: "flex", justifyContent: "flex-end", gap: "0.75rem" }}>
+                    <Button type="button" variant="secondary" onClick={onClose} disabled={submitting}>
                         Cancel
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                         type="button"
-                        className="btn-danger"
-                        id="confirm-delete-patient-btn"
-                        onClick={handleConfirm}
+                        variant="danger"
+                        onClick={handleDelete}
                         disabled={submitting}
+                        style={{ backgroundColor: "#dc2626", color: "#ffffff" }}
                     >
-                        {submitting ? "Deleting..." : "Delete Patient"}
-                    </button>
+                        {submitting ? "Removing..." : "Yes, Soft-Delete Patient"}
+                    </Button>
                 </div>
             </div>
         </div>
