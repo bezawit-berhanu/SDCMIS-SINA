@@ -15,13 +15,13 @@ class CustomerService {
         try {
             const response = await apiClient.get("/api/v1/customers/me");
             if (response && response.data) {
-                return response.data;
+                return response.data.data || response.data;
             }
         } catch (_) {
             try {
                 const alt = await apiClient.get("/api/patients/me");
                 if (alt && alt.data) {
-                    return alt.data;
+                    return alt.data.data || alt.data;
                 }
             } catch (_) {}
         }
