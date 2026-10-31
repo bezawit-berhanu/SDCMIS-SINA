@@ -18,6 +18,7 @@ import SettingsPage from "../pages/SettingsPage.jsx";
 import PatientsPage from "../pages/PatientsPage.jsx";
 import AppointmentsPage from "../pages/AppointmentsPage.jsx";
 import MissedAppointmentsPage from "../pages/MissedAppointmentsPage.jsx";
+import HelpPage from "../pages/HelpPage.jsx";
 
 const router = createBrowserRouter([
     // Public home route
@@ -28,6 +29,10 @@ const router = createBrowserRouter([
             {
                 index: true,
                 element: <HomePage />,
+            },
+            {
+                path: "/help",
+                element: <HelpPage />,
             },
         ],
     },
@@ -118,6 +123,10 @@ const router = createBrowserRouter([
             {
                 path: "/settings",
                 element: <SettingsPage />,
+            },
+            {
+                path: "/help",
+                element: <HelpPage />,
             },
             {
                 path: "/dashboard",
