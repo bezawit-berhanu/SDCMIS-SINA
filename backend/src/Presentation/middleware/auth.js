@@ -32,7 +32,9 @@ async function authenticate(req, res, next) {
         if (
             error.name === "JsonWebTokenError" ||
             error.name === "TokenExpiredError" ||
-            error.name === "NotBeforeError"
+            error.name === "NotBeforeError" ||
+            error.name === "SyntaxError" ||
+            !error.statusCode
         ) {
             error.statusCode = 401;
             error.code = "INVALID_OR_EXPIRED_TOKEN";

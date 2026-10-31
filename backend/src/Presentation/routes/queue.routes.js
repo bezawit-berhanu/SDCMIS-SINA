@@ -14,8 +14,11 @@ function createQueueRoutes(container) {
             try {
                 const token = authHeader.slice("Bearer ".length).trim();
                 const payload = tokenService.verifyAccessToken(token);
-                const user = await container.getCurrentUser.execute(payload.sub);
-                req.user = user;
+                let user = null;
+                try {
+                    user = await container.getCurrentUser.execute(payload.sub);
+                } catch (_) {}
+                req.user = user || { id: payload.sub, role: payload.role || "CUSTOMER" };
             } catch (_) {
                 // Ignore optional auth verification errors
             }
