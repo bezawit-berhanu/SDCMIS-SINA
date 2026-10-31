@@ -3,15 +3,15 @@ const container = require("../../container/container");
 const authController = {
     async register(req, res, next) {
         try {
-            // Extract only the permitted registration fields from the request body.
-            // Client-supplied roles or privileges are strictly excluded here.
-            const { fullName, fullname, email, phone, password } = req.body ?? {};
+            // Support role classification for staff (DENTIST, RECEPTIONIST) and patient (CUSTOMER)
+            const { fullName, fullname, email, phone, password, role } = req.body ?? {};
 
             const result = await container.registerUser.execute({
                 fullName: fullName || fullname,
                 email,
                 phone,
                 password,
+                role,
             });
 
             // Return 201 Created with sanitized safe user information

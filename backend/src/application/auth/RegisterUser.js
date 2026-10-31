@@ -29,7 +29,7 @@ class RegisterUser {
         this.passwordService = passwordService;
     }
 
-    async execute({ fullName, email, phone, password }) {
+    async execute({ fullName, email, phone, password, role }) {
         const fields = {};
 
         // 1. Required fields validation: Full Name
@@ -121,8 +121,9 @@ class RegisterUser {
         // 5. Secure password hashing
         const passwordHash = await this.passwordService.hash(password);
 
-        // 6. Enforce server-side default registration role (Never permit elevated roles)
-        const role = UserRole.CUSTOMER;
+        // 6. Role classification: Support staff (Dentist vs Receptionist) and patient (Customer)
+        const validRoles = [UserRole.CUSTOMER, UserRole.DENTIST, UserRole.RECEPTIONIST];
+        const assignedRole = (role && validRoles.includes(role)) ? role : UserRole.CUSTOMER;
 
         // 7. Domain entity validation
         const userEntity = new User({
@@ -130,7 +131,7 @@ class RegisterUser {
             email: normalizedEmail,
             phone: normalizedPhone,
             passwordHash,
-            role,
+            role: assignedRole,
             themePreference: ThemePreference.LIGHT,
             recordStatus: RecordStatus.ACTIVE,
         });
