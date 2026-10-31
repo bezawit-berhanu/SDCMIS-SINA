@@ -5,6 +5,7 @@ import Button from "../components/common/Button";
 import CustomerQueueWidget from "../components/customer/CustomerQueueWidget";
 import customerService from "../services/customer.service";
 import { realtimeService } from "../services/realtime.service";
+import CustomerReadOnlyNotice from "../components/customer/CustomerReadOnlyNotice";
 
 /**
  * Customer Dashboard UI
@@ -141,6 +142,7 @@ export default function CustomerPage() {
                     </p>
                 </div>
             )}
+            <CustomerReadOnlyNotice />
             {/* Task 4 & 5: Live Queue Status Widget */}
             <CustomerQueueWidget
                 initialQueue={dashboardData?.queue}
