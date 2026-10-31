@@ -135,6 +135,11 @@ export default function CustomerQueueWidget({ initialQueue = null, patientId = n
                     <p data-testid="queue-position-value" style={{ fontSize: "1.75rem", fontWeight: 800, color: isServing ? "#059669" : "#1e293b", marginTop: "4px" }}>
                         {isServing ? "Serving Now" : isDone ? "Completed" : queue.position !== null ? queue.position : "2"}
                     </p>
+                    {isWaiting && (
+                        <span style={{ fontSize: "0.75rem", color: "#64748b", display: "block", marginTop: "2px" }}>
+                            {queue.position > 1 ? `${queue.position - 1} ahead of you` : "You are next in line"}
+                        </span>
+                    )}
                 </div>
 
                 <div style={{ padding: "0.75rem", backgroundColor: "var(--bg-page)", borderRadius: "var(--radius-md)", border: "1px solid var(--border)" }}>
