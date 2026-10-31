@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Button from "../common/Button";
 import { realtimeService } from "../../services/realtime.service";
+import { signalRService } from "../../services/signalr.service";
 import apiClient from "../../services/apiclient";
 
 /**
@@ -10,82 +11,88 @@ import apiClient from "../../services/apiclient";
  * Per SDCIMP SRS Section 5.4, FR-REC-03 - FR-REC-07, BR-24, BR-27, BR-28.
  */
 export default function QueueBoard({ readOnly = false }) {
-    const [queueEntries, setQueueEntries] = useState([
-        {
-            id: "q-101",
-            ticket: "#001",
-            patientName: "Abebe Bikila",
-            serviceType: "Orthodontics",
-            checkInTime: "08:45 AM",
-            status: "DONE",
-            dentist: "Dr. Bethel",
-        },
-        {
-            id: "q-102",
-            ticket: "#002",
-            patientName: "Hana Bekele",
-            serviceType: "General",
-            checkInTime: "09:15 AM",
-            status: "SERVING",
-            dentist: "Dr. Bethel",
-        },
-        {
-            id: "q-103",
-            ticket: "#003",
-            patientName: "Dawit Wolde",
-            serviceType: "Cosmetics",
-            checkInTime: "09:30 AM",
-            status: "WAITING",
-            dentist: "Dr. Bethel",
-        },
-        {
-            id: "q-104",
-            ticket: "#004",
-            patientName: "Tigist Assefa",
-            serviceType: "Periodontics",
-            checkInTime: "09:40 AM",
-            status: "WAITING",
-            dentist: "Dr. Bethel",
-        },
-    ]);
+    const [queueEntries, setQueueEntries] = useState([]);
+    const [loading, setLoading] = useState(true);
     const [actionFeedback, setActionFeedback] = useState("");
 
-    // Real-time synchronization
+    const fetchLiveQueue = useCallback(async () => {
+        try {
+            setLoading(true);
+            const res = await apiClient.get("/api/v1/queue");
+            if (res.data?.queue && Array.isArray(res.data.queue)) {
+                const formatted = res.data.queue.map((item) => ({
+                    id: item.id,
+                    ticket: item.formattedQueueNumber || `#${String(item.queueNumber || 1).padStart(3, "0")}`,
+                    patientName: item.patientName || item.customerName || "Patient",
+                    serviceType: item.serviceType || "Clinical Consultation",
+                    checkInTime: item.createdAt ? new Date(item.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "Today",
+                    status: item.status || "WAITING",
+                    dentist: item.dentistName || "Dr. Staff",
+                }));
+                setQueueEntries(formatted);
+            } else if (Array.isArray(res.data?.data)) {
+                const formatted = res.data.data.map((item) => ({
+                    id: item.id,
+                    ticket: item.formattedQueueNumber || `#${String(item.queueNumber || 1).padStart(3, "0")}`,
+                    patientName: item.patientName || item.customerName || "Patient",
+                    serviceType: item.serviceType || "Clinical Consultation",
+                    checkInTime: item.createdAt ? new Date(item.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "Today",
+                    status: item.status || "WAITING",
+                    dentist: item.dentistName || "Dr. Staff",
+                }));
+                setQueueEntries(formatted);
+            } else {
+                setQueueEntries([]);
+            }
+        } catch (_) {
+            setQueueEntries([]);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    // Initial fetch & Real-time synchronization
     useEffect(() => {
+        fetchLiveQueue();
+
         const unsubCall = realtimeService.subscribe("PATIENT_CALLED", (payload) => {
+            fetchLiveQueue();
             const ticket = payload.formattedQueueNumber || payload.ticket;
             if (ticket) {
-                setQueueEntries((prev) =>
-                    prev.map((e) => (e.ticket === ticket ? { ...e, status: "SERVING" } : e))
-                );
+                setActionFeedback(`📢 Patient ${ticket} called to operatory.`);
+                setTimeout(() => setActionFeedback(""), 4000);
             }
         });
 
         const unsubComplete = realtimeService.subscribe("VISIT_COMPLETED", (payload) => {
+            fetchLiveQueue();
             const ticket = payload.queueEntry?.formattedQueueNumber || payload.ticket;
             if (ticket) {
-                setQueueEntries((prev) =>
-                    prev.map((e) => (e.ticket === ticket ? { ...e, status: "DONE" } : e))
-                );
+                setActionFeedback(`✓ Visit completed for ${ticket}.`);
+                setTimeout(() => setActionFeedback(""), 4000);
             }
         });
 
-        const unsubStatus = realtimeService.subscribe("QUEUE_STATUS_CHANGED", (payload) => {
-            const ticket = payload.formattedQueueNumber;
-            const newStatus = payload.newStatus || payload.status;
-            if (ticket && newStatus) {
-                setQueueEntries((prev) =>
-                    prev.map((e) => (e.ticket === ticket ? { ...e, status: newStatus } : e))
-                );
-            }
+        const unsubStatus = realtimeService.subscribe("QUEUE_STATUS_CHANGED", () => {
+            fetchLiveQueue();
+        });
+
+        const unsubQueueUpdated = realtimeService.subscribe("QUEUE_UPDATED", () => {
+            fetchLiveQueue();
+        });
+
+        const unsubSignalRQueue = signalRService.on("QUEUE_UPDATED", () => {
+            fetchLiveQueue();
         });
 
         return () => {
             unsubCall();
             unsubComplete();
             unsubStatus();
+            unsubQueueUpdated();
+            unsubSignalRQueue();
         };
-    }, []);
+    }, [fetchLiveQueue]);
 
     // Action: Call Patient (WAITING -> SERVING, sends Dentist push notification)
     const handleCallPatient = async (entry) => {
@@ -101,6 +108,7 @@ export default function QueueBoard({ readOnly = false }) {
             ticket: entry.ticket,
             formattedQueueNumber: entry.ticket,
             patientName: entry.patientName,
+            serviceType: entry.serviceType,
             notification: { message: `Patient ${entry.ticket} is ready.` },
         });
 
@@ -108,7 +116,7 @@ export default function QueueBoard({ readOnly = false }) {
         setTimeout(() => setActionFeedback(""), 4000);
     };
 
-    // Action: Complete Visit (SERVING -> DONE, auto-advances next patient)
+    // Action: Complete Visit (SERVING -> DONE, auto-advances next patient per BR-28)
     const handleCompleteVisit = async (entry) => {
         try {
             await apiClient.post(`/api/v1/queue/${entry.id}/complete`);
@@ -136,6 +144,7 @@ export default function QueueBoard({ readOnly = false }) {
                 ticket: nextPatient.ticket,
                 formattedQueueNumber: nextPatient.ticket,
                 patientName: nextPatient.patientName,
+                serviceType: nextPatient.serviceType,
                 notification: { message: `Auto-Advanced: Patient ${nextPatient.ticket} is ready.` },
             });
             setActionFeedback(`Visit completed for ${entry.patientName}. Auto-advanced ${nextPatient.patientName} (${nextPatient.ticket}) to SERVING.`);
@@ -147,7 +156,7 @@ export default function QueueBoard({ readOnly = false }) {
 
     const waitingList = queueEntries.filter((e) => e.status === "WAITING");
     const servingList = queueEntries.filter((e) => e.status === "SERVING");
-    const doneList = queueEntries.filter((e) => e.status === "DONE");
+    const doneList = queueEntries.filter((e) => e.status === "DONE" || e.status === "COMPLETED");
 
     const columns = [
         {
@@ -155,27 +164,27 @@ export default function QueueBoard({ readOnly = false }) {
             title: "Waiting in Lobby",
             count: waitingList.length,
             items: waitingList,
-            headerBg: "#fef3c7",
-            headerColor: "#92400e",
-            badgeBg: "#fde68a",
+            headerBg: "rgba(234, 179, 8, 0.12)",
+            headerColor: "#b45309",
+            badgeBg: "rgba(234, 179, 8, 0.2)",
         },
         {
             id: "SERVING",
             title: "Serving / In Chair",
             count: servingList.length,
             items: servingList,
-            headerBg: "#e0f2fe",
-            headerColor: "#0369a1",
-            badgeBg: "#bae6fd",
+            headerBg: "rgba(27, 77, 46, 0.12)",
+            headerColor: "var(--primary)",
+            badgeBg: "rgba(27, 77, 46, 0.2)",
         },
         {
             id: "DONE",
             title: "Completed Today",
             count: doneList.length,
             items: doneList,
-            headerBg: "#dcfce7",
-            headerColor: "#166534",
-            badgeBg: "#bbf7d0",
+            headerBg: "rgba(27, 77, 46, 0.06)",
+            headerColor: "var(--primary)",
+            badgeBg: "rgba(27, 77, 46, 0.15)",
         },
     ];
 
@@ -186,12 +195,12 @@ export default function QueueBoard({ readOnly = false }) {
                     role="alert"
                     style={{
                         padding: "0.75rem 1rem",
-                        backgroundColor: "#ecfdf5",
-                        color: "#065f46",
+                        backgroundColor: "rgba(27, 77, 46, 0.08)",
+                        color: "var(--primary)",
                         borderRadius: "8px",
                         marginBottom: "1rem",
                         fontWeight: "600",
-                        border: "1px solid #a7f3d0",
+                        border: "1px solid var(--border)",
                     }}
                 >
                     ⚡ {actionFeedback}
@@ -211,9 +220,9 @@ export default function QueueBoard({ readOnly = false }) {
                     <div
                         key={col.id}
                         style={{
-                            backgroundColor: "var(--bg-card, #f8fafc)",
+                            backgroundColor: "var(--bg-surface)",
                             borderRadius: "10px",
-                            border: "1px solid var(--border-color, #e2e8f0)",
+                            border: "1px solid var(--border)",
                             overflow: "hidden",
                         }}
                     >
@@ -228,6 +237,7 @@ export default function QueueBoard({ readOnly = false }) {
                                 alignItems: "center",
                                 fontWeight: "700",
                                 fontSize: "0.95rem",
+                                borderBottom: "1px solid var(--border)",
                             }}
                         >
                             <span>{col.title}</span>
@@ -237,6 +247,7 @@ export default function QueueBoard({ readOnly = false }) {
                                     borderRadius: "9999px",
                                     padding: "0.15rem 0.55rem",
                                     fontSize: "0.8rem",
+                                    fontWeight: 700,
                                 }}
                             >
                                 {col.count}
@@ -245,15 +256,20 @@ export default function QueueBoard({ readOnly = false }) {
 
                         {/* Column Cards */}
                         <div style={{ padding: "0.85rem", display: "flex", flexDirection: "column", gap: "0.75rem" }}>
-                            {col.items.length === 0 ? (
+                            {loading ? (
+                                <div style={{ padding: "1.5rem", textAlign: "center", color: "var(--text-muted)", fontSize: "0.85rem" }}>
+                                    Loading queue...
+                                </div>
+                            ) : col.items.length === 0 ? (
                                 <div
                                     style={{
                                         padding: "2rem 1rem",
                                         textAlign: "center",
-                                        color: "#94a3b8",
+                                        color: "var(--text-muted)",
                                         fontSize: "0.875rem",
-                                        border: "1px dashed #cbd5e1",
+                                        border: "1px dashed var(--border)",
                                         borderRadius: "8px",
+                                        backgroundColor: "var(--bg-page)",
                                     }}
                                 >
                                     No patients currently {col.title.toLowerCase()}.
@@ -263,11 +279,11 @@ export default function QueueBoard({ readOnly = false }) {
                                     <div
                                         key={entry.id}
                                         style={{
-                                            backgroundColor: "#ffffff",
+                                            backgroundColor: "var(--bg-card)",
                                             borderRadius: "8px",
                                             padding: "1rem",
-                                            border: "1px solid #e2e8f0",
-                                            boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
+                                            border: "1px solid var(--border)",
+                                            boxShadow: "var(--shadow-sm)",
                                         }}
                                     >
                                         <div
@@ -283,7 +299,7 @@ export default function QueueBoard({ readOnly = false }) {
                                                     fontFamily: "monospace",
                                                     fontWeight: "800",
                                                     fontSize: "1.1rem",
-                                                    color: "var(--primary-color, #0284c7)",
+                                                    color: "var(--primary)",
                                                 }}
                                             >
                                                 {entry.ticket}
@@ -291,7 +307,7 @@ export default function QueueBoard({ readOnly = false }) {
                                             <span
                                                 style={{
                                                     fontSize: "0.75rem",
-                                                    color: "#64748b",
+                                                    color: "var(--text-muted)",
                                                 }}
                                             >
                                                 {entry.checkInTime}
@@ -303,7 +319,7 @@ export default function QueueBoard({ readOnly = false }) {
                                                 margin: "0 0 0.25rem",
                                                 fontSize: "0.95rem",
                                                 fontWeight: "600",
-                                                color: "#1e293b",
+                                                color: "var(--text-main)",
                                             }}
                                         >
                                             {entry.patientName}
@@ -312,7 +328,7 @@ export default function QueueBoard({ readOnly = false }) {
                                             style={{
                                                 margin: "0 0 0.75rem",
                                                 fontSize: "0.825rem",
-                                                color: "#64748b",
+                                                color: "var(--text-muted)",
                                             }}
                                         >
                                             {entry.serviceType} • {entry.dentist}
@@ -332,13 +348,10 @@ export default function QueueBoard({ readOnly = false }) {
 
                                         {!readOnly && col.id === "SERVING" && (
                                             <Button
-                                                variant="success"
+                                                variant="secondary"
                                                 size="sm"
                                                 style={{
                                                     width: "100%",
-                                                    backgroundColor: "#16a34a",
-                                                    color: "#ffffff",
-                                                    border: "none",
                                                 }}
                                                 onClick={() => handleCompleteVisit(entry)}
                                             >
@@ -352,11 +365,12 @@ export default function QueueBoard({ readOnly = false }) {
                                                     display: "block",
                                                     textAlign: "center",
                                                     fontSize: "0.75rem",
-                                                    color: "#166534",
+                                                    color: "var(--primary)",
                                                     fontWeight: "600",
                                                     padding: "0.25rem",
-                                                    backgroundColor: "#f0fdf4",
+                                                    backgroundColor: "rgba(27, 77, 46, 0.08)",
                                                     borderRadius: "4px",
+                                                    border: "1px solid var(--border)",
                                                 }}
                                             >
                                                 Visit Concluded
@@ -372,4 +386,3 @@ export default function QueueBoard({ readOnly = false }) {
         </div>
     );
 }
-
