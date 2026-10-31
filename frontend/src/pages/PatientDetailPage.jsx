@@ -33,103 +33,33 @@ export default function PatientDetailPage({ readOnly = false }) {
     const [showPaymentModal, setShowPaymentModal] = useState(false);
     const [showPaymentHistoryModal, setShowPaymentHistoryModal] = useState(false);
 
-    // Fetch patient record
+    // Fetch patient record strictly from backend API
     useEffect(() => {
         let isMounted = true;
         const fetchPatient = async () => {
-            try {
-                const res = await apiClient.get(`/api/v1/patients/${id || "pat-001"}`);
-                if (isMounted && res.data?.data) {
-                    setPatient(res.data.data);
-                } else if (isMounted) {
-                    // Fallback to comprehensive mock patient conforming to SRS
-                    setPatient({
-                        id: id || "pat-001",
-                        name: "Abebe Bikila",
-                        age: 32,
-                        gender: "MALE",
-                        phone: "+251911223344",
-                        serviceType: "Orthodontics",
-                        registeredAt: "2026-08-15",
-                        nextAppointment: "2026-11-05 10:00 AM",
-                        totalCost: 4500.0,
-                        totalPaid: 3000.0,
-                        remainingFee: 1500.0,
-                        nextProcedure: {
-                            id: "proc-next-01",
-                            name: "Bracket Adjustment & Archwire Replacement",
-                            cost: 800.0,
-                            plannedDate: "2026-11-05",
-                            status: "NEXT",
-                            notes: "Inspect upper premolar movement",
-                        },
-                        ongoingProcedure: {
-                            id: "proc-on-01",
-                            name: "Deep Cleaning & Scaling",
-                            cost: 1200.0,
-                            startedDate: "2026-10-24",
-                            status: "ONGOING",
-                            notes: "Lower quadrant scaling in progress",
-                        },
-                        doneProcedures: [
-                            {
-                                id: "proc-done-01",
-                                name: "Initial Clinical Examination & X-Ray",
-                                cost: 1000.0,
-                                completedDate: "2026-08-15",
-                                status: "DONE",
-                                notes: "Full panoramic radiograph taken",
-                            },
-                            {
-                                id: "proc-done-02",
-                                name: "Composite Filling - Tooth #14",
-                                cost: 1500.0,
-                                completedDate: "2026-09-10",
-                                status: "DONE",
-                                notes: "Caries removed, sealed with shade A2",
-                            },
-                        ],
-                        payments: [
-                            { id: "pay-01", amount: 1500.0, method: "CASH", date: "2026-08-15", receipt: "REC-101" },
-                            { id: "pay-02", amount: 1500.0, method: "TELEBIRR", date: "2026-09-10", receipt: "REC-142" },
-                        ],
-                    });
-                }
-            } catch (_) {
+            if (!id) {
                 if (isMounted) {
-                    setPatient({
-                        id: id || "pat-001",
-                        name: "Abebe Bikila",
-                        age: 32,
-                        gender: "MALE",
-                        phone: "+251911223344",
-                        serviceType: "Orthodontics",
-                        registeredAt: "2026-08-15",
-                        nextAppointment: "2026-11-05 10:00 AM",
-                        totalCost: 4500.0,
-                        totalPaid: 3000.0,
-                        remainingFee: 1500.0,
-                        nextProcedure: {
-                            id: "proc-next-01",
-                            name: "Bracket Adjustment",
-                            cost: 800.0,
-                            plannedDate: "2026-11-05",
-                            status: "NEXT",
-                        },
-                        ongoingProcedure: null,
-                        doneProcedures: [
-                            {
-                                id: "proc-done-01",
-                                name: "Initial Examination",
-                                cost: 1000.0,
-                                completedDate: "2026-08-15",
-                                status: "DONE",
-                            },
-                        ],
-                        payments: [
-                            { id: "pay-01", amount: 1000.0, method: "CASH", date: "2026-08-15" },
-                        ],
-                    });
+                    setError("No patient ID provided.");
+                    setLoading(false);
+                }
+                return;
+            }
+            try {
+                const res = await apiClient.get(`/api/v1/patients/${id}`);
+                if (isMounted) {
+                    if (res.data?.data) {
+                        setPatient(res.data.data);
+                    } else if (res.data?.patient) {
+                        setPatient(res.data.patient);
+                    } else {
+                        setError("Patient record not found.");
+                        setPatient(null);
+                    }
+                }
+            } catch (err) {
+                if (isMounted) {
+                    setError(err.response?.data?.message || "Failed to load patient record from clinical database.");
+                    setPatient(null);
                 }
             } finally {
                 if (isMounted) setLoading(false);
