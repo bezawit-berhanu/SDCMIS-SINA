@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "test": "node --test test.routes.js && node --test test.settings.js && node --test test.security.js && node --test test.patient.js",
+    "test": "node --test test.routes.js && node --test test.settings.js && node --test test.security.js && node --test test.patient.js && node --test test.srs.receptionist.js && node --test test.srs.dentist.js && node --test test.srs.customer.js",
+    "test:srs": "node --test test.srs.receptionist.js && node --test test.srs.dentist.js && node --test test.srs.customer.js",
     "test:security": "node --test test.security.js",
     "test:patient": "node --test test.patient.js",
     "preview": "vite preview"
