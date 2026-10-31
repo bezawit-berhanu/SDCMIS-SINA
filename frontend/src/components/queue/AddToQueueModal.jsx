@@ -36,21 +36,11 @@ export default function AddToQueueModal({ onClose, onQueueAdded }) {
 
             let newEntry;
             try {
-                const res = await apiClient.post("/api/v1/queue/checkin", payload);
-                newEntry = res.data?.data;
-            } catch (_) {
-                // Mock fallback if offline
-                const randomNum = Math.floor(Math.random() * 90) + 10;
-                newEntry = {
-                    id: `queue-${Date.now()}`,
-                    patientId: `pat-${Date.now()}`,
-                    patientName: patientName.trim(),
-                    queueNumber: randomNum,
-                    formattedQueueNumber: `#${String(randomNum).padStart(3, "0")}`,
-                    status: "WAITING",
-                    serviceType,
-                    checkInTime: new Date().toISOString(),
-                };
+                const res = await apiClient.post("/api/v1/queue/check-in", payload);
+                newEntry = res.data?.data || res.data?.queue || res.data;
+            } catch (apiErr) {
+                const fallbackRes = await apiClient.post("/api/v1/queue/checkin", payload);
+                newEntry = fallbackRes.data?.data || fallbackRes.data?.queue || fallbackRes.data;
             }
 
             if (onQueueAdded) {
@@ -58,7 +48,7 @@ export default function AddToQueueModal({ onClose, onQueueAdded }) {
             }
             onClose();
         } catch (err) {
-            setError(err.response?.data?.message || "Failed to add patient to queue.");
+            setError(err.response?.data?.message || err.message || "Failed to add patient to queue.");
         } finally {
             setIsSubmitting(false);
         }
@@ -82,16 +72,17 @@ export default function AddToQueueModal({ onClose, onQueueAdded }) {
         >
             <div
                 style={{
-                    backgroundColor: "#ffffff",
+                    backgroundColor: "var(--bg-surface)",
                     borderRadius: "12px",
                     maxWidth: "480px",
                     width: "100%",
                     padding: "2rem",
-                    boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1)",
+                    border: "1px solid var(--border)",
+                    boxShadow: "var(--shadow-lg)",
                 }}
             >
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.25rem" }}>
-                    <h2 id="add-queue-title" style={{ fontSize: "1.25rem", fontWeight: "700", color: "#1e293b", margin: 0 }}>
+                    <h2 id="add-queue-title" style={{ fontSize: "1.25rem", fontWeight: "700", color: "var(--primary)", margin: 0 }}>
                         Check In Patient to Queue (SCR-15)
                     </h2>
                     <button
@@ -102,7 +93,7 @@ export default function AddToQueueModal({ onClose, onQueueAdded }) {
                             border: "none",
                             fontSize: "1.5rem",
                             cursor: "pointer",
-                            color: "#64748b",
+                            color: "var(--text-muted)",
                             lineHeight: 1,
                         }}
                     >
@@ -115,8 +106,9 @@ export default function AddToQueueModal({ onClose, onQueueAdded }) {
                         role="alert"
                         style={{
                             padding: "0.75rem",
-                            backgroundColor: "#fee2e2",
+                            backgroundColor: "rgba(220, 38, 38, 0.08)",
                             color: "#b91c1c",
+                            border: "1px solid #fca5a5",
                             borderRadius: "6px",
                             marginBottom: "1rem",
                             fontSize: "0.875rem",
@@ -131,7 +123,7 @@ export default function AddToQueueModal({ onClose, onQueueAdded }) {
                     <div style={{ marginBottom: "1rem" }}>
                         <label
                             htmlFor="queue-patient-name"
-                            style={{ display: "block", fontSize: "0.875rem", fontWeight: "600", color: "#334155", marginBottom: "0.35rem" }}
+                            style={{ display: "block", fontSize: "0.875rem", fontWeight: "600", color: "var(--text-main)", marginBottom: "0.35rem" }}
                         >
                             Patient Full Name *
                         </label>
@@ -139,14 +131,15 @@ export default function AddToQueueModal({ onClose, onQueueAdded }) {
                             id="queue-patient-name"
                             type="text"
                             required
-                            placeholder="e.g. Dawit Wolde"
+                            placeholder="e.g. Hana Bekele"
                             value={patientName}
                             onChange={(e) => setPatientName(e.target.value)}
                             style={{
                                 width: "100%",
                                 padding: "0.65rem 0.75rem",
                                 borderRadius: "6px",
-                                border: "1px solid #cbd5e1",
+                                border: "1px solid var(--border)",
+                                backgroundColor: "var(--bg-card)",
                                 fontSize: "1rem",
                                 outline: "none",
                             }}
