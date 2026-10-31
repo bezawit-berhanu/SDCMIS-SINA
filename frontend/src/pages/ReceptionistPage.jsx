@@ -129,6 +129,14 @@ export default function ReceptionistPage() {
             fetchReceptionData();
         });
 
+        const unsubSignalRQueue = signalRService.on("QUEUE_UPDATED", () => {
+            fetchReceptionData();
+        });
+
+        const unsubSignalRStatusChanged = signalRService.on("QUEUE_STATUS_CHANGED", () => {
+            fetchReceptionData();
+        });
+
         const unsubSignalRStatus = signalRService.on("STATUS_CHANGED", (data) => {
             setRealtimeConnected(data.status === "CONNECTED");
         });
@@ -139,6 +147,8 @@ export default function ReceptionistPage() {
             unsubCall();
             unsubComp();
             unsubQueueUpdated();
+            unsubSignalRQueue();
+            unsubSignalRStatusChanged();
             unsubSignalRStatus();
         };
     }, [user, fetchReceptionData]);
