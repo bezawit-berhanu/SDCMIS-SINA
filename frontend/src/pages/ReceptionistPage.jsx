@@ -153,7 +153,6 @@ export default function ReceptionistPage() {
         { id: "RCP-202", patient: "Hellen Bekele", amount: 75.00, dueDate: "2026-10-25", recordedBy: "Receptionist - Bethlehem", status: "VERIFIED" },
         { id: "RCP-203", patient: "Michael Haile", amount: 200.00, dueDate: "2026-10-24", recordedBy: "Dr. Sara (Dentist)", status: "VERIFIED" },
     ]);
-    const [feedback, setFeedback] = useState("");
 
     const handleRecordPayment = (e) => {
         e.preventDefault();
