@@ -5,10 +5,15 @@ export default function Sidebar({ isOpen = false, onClose }) {
     const { user } = useAuth();
 
     const navItems = [
+        { path: "/dentist", label: "Dentist Dashboard", icon: "🦷", roles: [UserRole.DENTIST] },
         { path: "/patients", label: "Patient Directory", icon: "👥", roles: [UserRole.DENTIST, UserRole.RECEPTIONIST] },
-        { path: "/dentist", label: "Dentist Portal", icon: "🦷", roles: [UserRole.DENTIST] },
+        { path: "/dentist/tasks", label: "Upcoming Tasks", icon: "📌", roles: [UserRole.DENTIST] },
+        { path: "/appointments/missed", label: "Missed Appointments", icon: "⚠️", roles: [UserRole.DENTIST, UserRole.RECEPTIONIST] },
+        { path: "/dentist/notifications", label: "Notification History", icon: "🔔", roles: [UserRole.DENTIST] },
         { path: "/receptionist", label: "Receptionist Desk", icon: "📋", roles: [UserRole.RECEPTIONIST] },
+        { path: "/receptionist/customers", label: "Customers & Fees", icon: "💰", roles: [UserRole.RECEPTIONIST] },
         { path: "/customer", label: "Customer Portal", icon: "👤", roles: [UserRole.CUSTOMER] },
+        { path: "/help", label: "Help & FAQs", icon: "❓" },
         { path: "/settings", label: "Settings", icon: "⚙️" },
         { path: "/", label: "Home Page", icon: "🏠" },
     ];
