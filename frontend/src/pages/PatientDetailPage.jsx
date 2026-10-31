@@ -133,11 +133,11 @@ export default function PatientDetailPage({ readOnly = false }) {
             )}
 
             {/* Patient Header Card */}
-            <div className="card" style={{ padding: "1.5rem", marginBottom: "1.5rem" }}>
+            <div className="card" style={{ padding: "1.5rem", marginBottom: "1.5rem", backgroundColor: "var(--bg-surface)", border: "1px solid var(--border)" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "1rem" }}>
                     <div>
                         <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "0.25rem" }}>
-                            <h1 style={{ fontSize: "1.75rem", fontWeight: "800", color: "#1e293b", margin: 0 }}>
+                            <h1 style={{ fontSize: "1.75rem", fontWeight: "800", color: "var(--primary)", margin: 0 }}>
                                 {patient.name}
                             </h1>
                             <span
@@ -146,21 +146,22 @@ export default function PatientDetailPage({ readOnly = false }) {
                                     fontWeight: "700",
                                     padding: "0.2rem 0.6rem",
                                     borderRadius: "9999px",
-                                    backgroundColor: "#e0f2fe",
-                                    color: "#0369a1",
+                                    backgroundColor: "rgba(27, 77, 46, 0.1)",
+                                    color: "var(--primary)",
+                                    border: "1px solid var(--border)",
                                 }}
                             >
-                                {patient.serviceType || "General"}
+                                {patient.serviceType || "General Dentistry"}
                             </span>
                         </div>
-                        <p style={{ color: "#64748b", margin: 0, fontSize: "0.9rem" }}>
+                        <p style={{ color: "var(--text-muted)", margin: 0, fontSize: "0.9rem" }}>
                             ID: <span style={{ fontFamily: "monospace", fontWeight: "600" }}>{patient.id}</span> • {patient.gender}, {patient.age} yrs • Phone: {patient.phone}
                         </p>
                     </div>
 
                     <div style={{ textAlign: "right" }}>
-                        <span style={{ fontSize: "0.8rem", color: "#64748b", display: "block" }}>Next Appointment</span>
-                        <strong style={{ fontSize: "1.1rem", color: "#0284c7" }}>
+                        <span style={{ fontSize: "0.8rem", color: "var(--text-muted)", display: "block" }}>Next Appointment</span>
+                        <strong style={{ fontSize: "1.1rem", color: "var(--primary)" }}>
                             {patient.nextAppointment || "None scheduled"}
                         </strong>
                     </div>
@@ -172,9 +173,9 @@ export default function PatientDetailPage({ readOnly = false }) {
                 {/* Left Column: Procedures Management per BR-11, BR-12, BR-13, BR-14 */}
                 <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
                     {/* Next Procedure Card */}
-                    <div className="card" style={{ padding: "1.25rem", borderLeft: "4px solid #38bdf8" }}>
+                    <div className="card" style={{ padding: "1.25rem", borderLeft: "4px solid var(--primary)", backgroundColor: "var(--bg-surface)" }}>
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.75rem" }}>
-                            <h3 style={{ fontSize: "1.1rem", fontWeight: "700", color: "#0369a1", margin: 0 }}>
+                            <h3 style={{ fontSize: "1.1rem", fontWeight: "700", color: "var(--primary)", margin: 0 }}>
                                 1. Next Procedure (Planned)
                             </h3>
                             {!readOnly && (
@@ -190,10 +191,10 @@ export default function PatientDetailPage({ readOnly = false }) {
 
                         {patient.nextProcedure ? (
                             <div>
-                                <h4 style={{ margin: "0 0 0.25rem", fontSize: "1rem", color: "#1e293b" }}>
+                                <h4 style={{ margin: "0 0 0.25rem", fontSize: "1rem", color: "var(--text-main)" }}>
                                     {patient.nextProcedure.name}
                                 </h4>
-                                <p style={{ color: "#64748b", fontSize: "0.85rem", margin: "0 0 0.75rem" }}>
+                                <p style={{ color: "var(--text-muted)", fontSize: "0.85rem", margin: "0 0 0.75rem" }}>
                                     Est. Cost: <strong>{Number(patient.nextProcedure.cost || 0).toFixed(2)} ETB</strong> • Planned: {patient.nextProcedure.plannedDate}
                                     {patient.nextProcedure.notes && ` • Notes: ${patient.nextProcedure.notes}`}
                                 </p>
@@ -208,20 +209,20 @@ export default function PatientDetailPage({ readOnly = false }) {
                                 )}
                             </div>
                         ) : (
-                            <p style={{ color: "#94a3b8", fontSize: "0.9rem", margin: 0 }}>
+                            <p style={{ color: "var(--text-muted)", fontSize: "0.9rem", margin: 0 }}>
                                 No upcoming procedure planned. Click '+ Log Next' to record one (BR-11).
                             </p>
                         )}
                     </div>
 
                     {/* Ongoing Procedure Card */}
-                    <div className="card" style={{ padding: "1.25rem", borderLeft: "4px solid #f59e0b" }}>
+                    <div className="card" style={{ padding: "1.25rem", borderLeft: "4px solid var(--accent)", backgroundColor: "var(--bg-surface)" }}>
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.75rem" }}>
-                            <h3 style={{ fontSize: "1.1rem", fontWeight: "700", color: "#b45309", margin: 0 }}>
+                            <h3 style={{ fontSize: "1.1rem", fontWeight: "700", color: "var(--text-main)", margin: 0 }}>
                                 2. Ongoing Procedure (In Progress)
                             </h3>
                             {patient.ongoingProcedure && (
-                                <span style={{ fontSize: "0.75rem", fontWeight: "700", color: "#d97706", backgroundColor: "#fef3c7", padding: "0.2rem 0.5rem", borderRadius: "4px" }}>
+                                <span style={{ fontSize: "0.75rem", fontWeight: "700", color: "var(--primary)", backgroundColor: "rgba(27, 77, 46, 0.1)", padding: "0.2rem 0.5rem", borderRadius: "4px" }}>
                                     ACTIVE
                                 </span>
                             )}
@@ -229,18 +230,17 @@ export default function PatientDetailPage({ readOnly = false }) {
 
                         {patient.ongoingProcedure ? (
                             <div>
-                                <h4 style={{ margin: "0 0 0.25rem", fontSize: "1rem", color: "#1e293b" }}>
+                                <h4 style={{ margin: "0 0 0.25rem", fontSize: "1rem", color: "var(--text-main)" }}>
                                     {patient.ongoingProcedure.name}
                                 </h4>
-                                <p style={{ color: "#64748b", fontSize: "0.85rem", margin: "0 0 0.75rem" }}>
+                                <p style={{ color: "var(--text-muted)", fontSize: "0.85rem", margin: "0 0 0.75rem" }}>
                                     Cost: <strong>{Number(patient.ongoingProcedure.cost || 0).toFixed(2)} ETB</strong> • Started: {patient.ongoingProcedure.startedDate}
                                     {patient.ongoingProcedure.notes && ` • Notes: ${patient.ongoingProcedure.notes}`}
                                 </p>
                                 {!readOnly && (
                                     <Button
-                                        variant="success"
+                                        variant="primary"
                                         size="sm"
-                                        style={{ backgroundColor: "#16a34a", color: "#ffffff", border: "none" }}
                                         onClick={() => setShowCompleteModal(true)}
                                     >
                                         ✓ Tick Done (Mark Complete)
@@ -248,19 +248,19 @@ export default function PatientDetailPage({ readOnly = false }) {
                                 )}
                             </div>
                         ) : (
-                            <p style={{ color: "#94a3b8", fontSize: "0.9rem", margin: 0 }}>
+                            <p style={{ color: "var(--text-muted)", fontSize: "0.9rem", margin: 0 }}>
                                 No procedure currently ongoing (BR-12).
                             </p>
                         )}
                     </div>
 
                     {/* Done Procedures History (Permanent Record per BR-14) */}
-                    <div className="card" style={{ padding: "1.25rem" }}>
-                        <h3 style={{ fontSize: "1.1rem", fontWeight: "700", color: "#1e293b", marginBottom: "0.75rem" }}>
+                    <div className="card" style={{ padding: "1.25rem", backgroundColor: "var(--bg-surface)" }}>
+                        <h3 style={{ fontSize: "1.1rem", fontWeight: "700", color: "var(--text-main)", marginBottom: "0.75rem" }}>
                             3. Done Procedures History ({patient.doneProcedures?.length || 0})
                         </h3>
-                        {patient.doneProcedures?.length === 0 ? (
-                            <p style={{ color: "#94a3b8", fontSize: "0.9rem", margin: 0 }}>
+                        {!patient.doneProcedures || patient.doneProcedures.length === 0 ? (
+                            <p style={{ color: "var(--text-muted)", fontSize: "0.9rem", margin: 0 }}>
                                 No completed procedures on file yet.
                             </p>
                         ) : (
@@ -270,18 +270,18 @@ export default function PatientDetailPage({ readOnly = false }) {
                                         key={proc.id}
                                         style={{
                                             padding: "0.75rem",
-                                            backgroundColor: "#f8fafc",
+                                            backgroundColor: "var(--bg-page)",
                                             borderRadius: "6px",
-                                            border: "1px solid #e2e8f0",
+                                            border: "1px solid var(--border)",
                                         }}
                                     >
                                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                                            <strong style={{ color: "#334155", fontSize: "0.9rem" }}>{proc.name}</strong>
-                                            <span style={{ fontSize: "0.85rem", fontWeight: "600", color: "#166534" }}>
+                                            <strong style={{ color: "var(--text-main)", fontSize: "0.9rem" }}>{proc.name}</strong>
+                                            <span style={{ fontSize: "0.85rem", fontWeight: "600", color: "var(--primary)" }}>
                                                 {Number(proc.cost || 0).toFixed(2)} ETB
                                             </span>
                                         </div>
-                                        <div style={{ fontSize: "0.8rem", color: "#64748b", marginTop: "0.25rem" }}>
+                                        <div style={{ fontSize: "0.8rem", color: "var(--text-muted)", marginTop: "0.25rem" }}>
                                             Completed: {proc.completedDate} {proc.notes && `• ${proc.notes}`}
                                         </div>
                                     </li>
@@ -293,34 +293,35 @@ export default function PatientDetailPage({ readOnly = false }) {
 
                 {/* Right Column: Financial Balance & Payments per BR-17, BR-18 */}
                 <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
-                    <div className="card" style={{ padding: "1.5rem" }}>
-                        <h3 style={{ fontSize: "1.1rem", fontWeight: "700", color: "#1e293b", marginBottom: "1rem" }}>
+                    <div className="card" style={{ padding: "1.5rem", backgroundColor: "var(--bg-surface)", border: "1px solid var(--border)" }}>
+                        <h3 style={{ fontSize: "1.1rem", fontWeight: "700", color: "var(--primary)", marginBottom: "1rem" }}>
                             Financial Balance & Ledger (BR-17, BR-18)
                         </h3>
 
                         <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem", marginBottom: "1.5rem" }}>
-                            <div style={{ display: "flex", justifyContent: "space-between", padding: "0.5rem 0", borderBottom: "1px solid #f1f5f9" }}>
-                                <span style={{ color: "#64748b" }}>Total Procedure Costs:</span>
-                                <strong style={{ color: "#1e293b" }}>{Number(patient.totalCost || 0).toFixed(2)} ETB</strong>
+                            <div style={{ display: "flex", justifyContent: "space-between", padding: "0.5rem 0", borderBottom: "1px solid var(--border)" }}>
+                                <span style={{ color: "var(--text-muted)" }}>Total Procedure Costs:</span>
+                                <strong style={{ color: "var(--text-main)" }}>{Number(patient.totalCost || 0).toFixed(2)} ETB</strong>
                             </div>
-                            <div style={{ display: "flex", justifyContent: "space-between", padding: "0.5rem 0", borderBottom: "1px solid #f1f5f9" }}>
-                                <span style={{ color: "#64748b" }}>Total Recorded Payments:</span>
-                                <strong style={{ color: "#166534" }}>- {Number(patient.totalPaid || 0).toFixed(2)} ETB</strong>
+                            <div style={{ display: "flex", justifyContent: "space-between", padding: "0.5rem 0", borderBottom: "1px solid var(--border)" }}>
+                                <span style={{ color: "var(--text-muted)" }}>Total Recorded Payments:</span>
+                                <strong style={{ color: "var(--primary)" }}>- {Number(patient.totalPaid || 0).toFixed(2)} ETB</strong>
                             </div>
                             <div
                                 style={{
                                     display: "flex",
                                     justifyContent: "space-between",
                                     padding: "0.75rem 1rem",
-                                    backgroundColor: Number(patient.remainingFee || 0) > 0 ? "#fee2e2" : "#dcfce7",
+                                    backgroundColor: Number(patient.remainingFee || 0) > 0 ? "rgba(220, 38, 38, 0.08)" : "rgba(27, 77, 46, 0.08)",
                                     borderRadius: "8px",
                                     marginTop: "0.5rem",
+                                    border: `1px solid ${Number(patient.remainingFee || 0) > 0 ? "#fca5a5" : "var(--border)"}`,
                                 }}
                             >
-                                <strong style={{ color: Number(patient.remainingFee || 0) > 0 ? "#991b1b" : "#166534" }}>
+                                <strong style={{ color: Number(patient.remainingFee || 0) > 0 ? "#991b1b" : "var(--primary)" }}>
                                     Remaining Fee Balance:
                                 </strong>
-                                <strong style={{ fontSize: "1.25rem", color: Number(patient.remainingFee || 0) > 0 ? "#991b1b" : "#166534" }}>
+                                <strong style={{ fontSize: "1.25rem", color: Number(patient.remainingFee || 0) > 0 ? "#991b1b" : "var(--primary)" }}>
                                     {Number(patient.remainingFee || 0).toFixed(2)} ETB
                                 </strong>
                             </div>
