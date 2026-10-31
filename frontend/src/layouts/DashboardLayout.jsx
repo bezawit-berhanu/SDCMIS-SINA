@@ -2,8 +2,11 @@ import { useState } from "react";
 import { Outlet } from "react-router-dom";
 import Header from "../components/layout/Header";
 import Sidebar from "../components/layout/Sidebar";
+import OnboardingTour from "../components/onboarding/OnboardingTour";
+import { useAuth } from "../features/auth/auth-context";
 
 export default function DashboardLayout() {
+    const { user } = useAuth();
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     const toggleSidebar = () => {
@@ -25,6 +28,9 @@ export default function DashboardLayout() {
                     </div>
                 </main>
             </div>
+            {user && (user.role === "DENTIST" || user.role === "RECEPTIONIST") && (
+                <OnboardingTour role={user.role} />
+            )}
         </div>
     );
 }
