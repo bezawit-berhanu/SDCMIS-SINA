@@ -3,6 +3,7 @@ import { useAuth } from "../features/auth/auth-context";
 import PageContainer from "../components/layout/PageContainer";
 import Button from "../components/common/Button";
 import CustomerQueueWidget from "../components/customer/CustomerQueueWidget";
+import CustomerPaymentHistory from "../components/customer/CustomerPaymentHistory";
 import customerService from "../services/customer.service";
 import { realtimeService } from "../services/realtime.service";
 import CustomerReadOnlyNotice from "../components/customer/CustomerReadOnlyNotice";
@@ -424,33 +425,10 @@ export default function CustomerPage() {
                     </div>
                 </div>
 
-                <h3 style={{ fontSize: "0.875rem", fontWeight: 700, marginBottom: "0.5rem", color: "var(--text-main)" }}>Payment Receipt History</h3>
-                {balance.payments && balance.payments.length > 0 ? (
-                    <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-                        {balance.payments.map((pay, idx) => (
-                            <div
-                                key={pay.id || idx}
-                                style={{
-                                    display: "flex",
-                                    justifyContent: "space-between",
-                                    alignItems: "center",
-                                    padding: "0.625rem 0.875rem",
-                                    backgroundColor: "var(--bg-page)",
-                                    borderRadius: "var(--radius-sm)",
-                                    border: "1px solid var(--border)",
-                                    fontSize: "0.8125rem",
-                                }}
-                            >
-                                <span>Receipt #{pay.id || `RCP-${100 + idx}`} • {pay.date || "Today"} ({pay.method || "Cash"})</span>
-                                <span style={{ fontWeight: 700, color: "var(--primary)" }}>{Number(pay.amount || 0).toFixed(2)} ETB</span>
-                            </div>
-                        ))}
-                    </div>
-                ) : (
-                    <p style={{ fontSize: "0.8125rem", color: "var(--text-muted)", margin: "0.5rem 0 0" }}>
-                        No payment receipts logged yet.
-                    </p>
-                )}
+                <CustomerPaymentHistory
+                    payments={balance.payments}
+                    remainingFee={balance.remainingFee || balance.balance || 0}
+                />
             </section>
         </PageContainer>
     );
