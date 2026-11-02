@@ -136,6 +136,35 @@ export default function CustomerPage() {
                 patientId={myInfo.patientId !== "Not Linked" ? myInfo.patientId : undefined}
             />
 
+            {/* Quick Patient Actions Bar */}
+            <div style={{
+                display: "flex",
+                gap: "12px",
+                marginBottom: "1.5rem",
+                flexWrap: "wrap",
+                alignItems: "center",
+                padding: "1rem",
+                backgroundColor: "var(--bg-surface)",
+                borderRadius: "var(--radius-md)",
+                border: "1px solid var(--border)",
+            }}>
+                <div style={{ flex: 1, minWidth: "240px" }}>
+                    <p style={{ margin: 0, fontWeight: 700, fontSize: "0.95rem", color: "var(--primary)" }}>
+                        Sina Dental Clinic Patient Care
+                    </p>
+                    <p style={{ margin: "2px 0 0 0", fontSize: "0.8125rem", color: "var(--text-muted)" }}>
+                        Need to schedule a follow-up visit or consultation? Contact our front desk or check in at the reception lobby.
+                    </p>
+                </div>
+                <div style={{ display: "flex", gap: "8px" }}>
+                    <a href="tel:+251116612233" style={{ textDecoration: "none" }}>
+                        <Button variant="outline" size="sm">
+                            📞 Call Reception (+251 11 661 2233)
+                        </Button>
+                    </a>
+                </div>
+            </div>
+
             {/* Hierarchy Level 1: My Information */}
             <section
                 data-testid="section-my-information"
