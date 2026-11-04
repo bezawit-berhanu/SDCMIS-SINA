@@ -96,3 +96,4 @@ All frontend and backend unit, SRS, and audit test suites are passing with zero 
 6. `node --test test.srs.customer.js`: 5/5 passing (SCR-13, FR-CUS-01 through FR-CUS-03).
 7. `node --test test.patient.js`: 17/17 passing (Search, filter, patient management).
 8. `node --test test.security.js`: 8/8 passing (RBAC, security guards, token validation).
+

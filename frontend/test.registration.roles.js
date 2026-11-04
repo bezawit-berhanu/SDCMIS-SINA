@@ -68,3 +68,4 @@ describe('Staff vs Patient Registration Classification Tests', () => {
         assert.strictEqual(receptionistPayload.role, 'RECEPTIONIST');
     });
 });
+
