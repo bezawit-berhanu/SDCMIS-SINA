@@ -26,10 +26,14 @@ class CreateNextProcedure {
             }
         }
 
-        // 2. Enforce: "Only one next procedure per patient" (Task 2)
+        // 2. Enforce: "Only one next procedure per patient" (SRS BR-11, BR-13)
         const existingNext = await this.procedureRepository.findNextByPatientId(patientId);
         if (existingNext) {
-            throw new Error("Only one next procedure per patient is allowed. Please complete or update the existing next procedure first.");
+            const error = new Error("This patient already has a Next Procedure. Complete or start it before adding another.");
+            error.statusCode = 409;
+            error.code = "DUPLICATE_NEXT_PROCEDURE";
+            error.errorCode = "ERR-DUPLICATE-NEXT-PROCEDURE";
+            throw error;
         }
 
         // 3. Create Procedure with status NEXT
