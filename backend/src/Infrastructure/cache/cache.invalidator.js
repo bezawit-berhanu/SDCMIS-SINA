@@ -49,4 +49,5 @@ class CacheInvalidator {
     }
 }
 
+CacheInvalidator.CacheInvalidator = CacheInvalidator;
 module.exports = CacheInvalidator;
