@@ -5,6 +5,21 @@ import Button from "../components/common/Button";
 import { realtimeService } from "../services/realtime.service";
 import { signalRService } from "../services/signalr.service";
 import AddToQueueModal from "../components/queue/AddToQueueModal";
+import apiClient from "../services/apiclient";
+import {
+    FiUsers,
+    FiActivity,
+    FiClock,
+    FiCheckCircle,
+    FiRefreshCw,
+    FiFastForward,
+    FiUserPlus,
+    FiVolume2,
+    FiCheck,
+    FiDollarSign,
+    FiCreditCard,
+    FiX
+} from "react-icons/fi";
 
 export default function ReceptionistPage() {
     const { user, restoreSession } = useAuth();
@@ -13,10 +28,10 @@ export default function ReceptionistPage() {
     const [realtimeConnected, setRealtimeConnected] = useState(false);
 
     const [stats, setStats] = useState([
-        { label: "Patients in Queue", value: "0", change: "Active in clinic lobby", icon: "👥" },
-        { label: "Currently Serving", value: "0", change: "In operatory chair", icon: "🦷" },
-        { label: "Waiting for Call", value: "0", change: "Awaiting consultation", icon: "⏳" },
-        { label: "Completed Today", value: "0", change: "Finished clinical visits", icon: "✅" },
+        { label: "Patients in Queue", value: "0", change: "Active in clinic lobby", icon: FiUsers },
+        { label: "Currently Serving", value: "0", change: "In operatory chair", icon: FiActivity },
+        { label: "Waiting for Call", value: "0", change: "Awaiting consultation", icon: FiClock },
+        { label: "Completed Today", value: "0", change: "Finished clinical visits", icon: FiCheckCircle },
     ]);
 
     const [queueList, setQueueList] = useState([]);
@@ -35,16 +50,10 @@ export default function ReceptionistPage() {
     const fetchReceptionData = useCallback(async () => {
         try {
             setLoading(true);
-            const token = localStorage.getItem("auth_token") || localStorage.getItem("token");
-            const headers = {
-                "Content-Type": "application/json",
-                ...(token ? { Authorization: `Bearer ${token}` } : {})
-            };
-
             // Fetch live queue
-            const queueRes = await fetch("http://localhost:5000/api/v1/queue", { headers });
-            if (queueRes.ok) {
-                const qData = await queueRes.json();
+            const queueRes = await apiClient.get("/api/v1/queue").catch(() => null);
+            if (queueRes && queueRes.status === 200) {
+                const qData = queueRes.data;
                 const rawItems = qData.queue || qData.data || (Array.isArray(qData) ? qData : []);
                 const items = rawItems.map((item) => ({
                     id: item.id,
@@ -62,17 +71,17 @@ export default function ReceptionistPage() {
                 const doneCount = items.filter((i) => i.status === "DONE" || i.status === "COMPLETED").length;
 
                 setStats([
-                    { label: "Patients in Queue", value: String(items.length), change: "Active in clinic lobby", icon: "👥" },
-                    { label: "Currently Serving", value: String(servingCount), change: "In operatory chair", icon: "🦷" },
-                    { label: "Waiting for Call", value: String(waitingCount), change: "Awaiting consultation", icon: "⏳" },
-                    { label: "Completed Today", value: String(doneCount), change: "Finished clinical visits", icon: "✅" },
+                    { label: "Patients in Queue", value: String(items.length), change: "Active in clinic lobby", icon: FiUsers },
+                    { label: "Currently Serving", value: String(servingCount), change: "In operatory chair", icon: FiActivity },
+                    { label: "Waiting for Call", value: String(waitingCount), change: "Awaiting consultation", icon: FiClock },
+                    { label: "Completed Today", value: String(doneCount), change: "Finished clinical visits", icon: FiCheckCircle },
                 ]);
             }
 
             // Fetch payments
-            const payRes = await fetch("http://localhost:5000/api/v1/payments", { headers });
-            if (payRes.ok) {
-                const pData = await payRes.json();
+            const payRes = await apiClient.get("/api/v1/payments").catch(() => null);
+            if (payRes && payRes.status === 200) {
+                const pData = payRes.data;
                 const rawPays = pData.payments || pData.data || (Array.isArray(pData) ? pData : []);
                 setPaymentHistory(rawPays);
             }
@@ -99,7 +108,7 @@ export default function ReceptionistPage() {
     const handleQueueAdded = async (newEntry) => {
         await fetchReceptionData();
         const ticket = newEntry.formattedQueueNumber || `#${String(newEntry.queueNumber || 1).padStart(3, "0")}`;
-        setFeedback(`✓ Checked in ${newEntry.patientName || "patient"} with Ticket ${ticket}.`);
+        setFeedback(`Checked in ${newEntry.patientName || "patient"} with Ticket ${ticket}.`);
         setTimeout(() => setFeedback(""), 4000);
     };
 
@@ -111,7 +120,7 @@ export default function ReceptionistPage() {
             fetchReceptionData();
             const ticket = payload.formattedQueueNumber || payload.ticket;
             if (ticket) {
-                setFeedback(`📢 Notification: Patient ${ticket} called to operatory.`);
+                setFeedback(`Notification: Patient ${ticket} called to operatory.`);
                 setTimeout(() => setFeedback(""), 4000);
             }
         });
@@ -120,7 +129,7 @@ export default function ReceptionistPage() {
             fetchReceptionData();
             const ticket = payload.queueEntry?.formattedQueueNumber || payload.ticket;
             if (ticket) {
-                setFeedback(`✓ Visit completed for ticket ${ticket}.`);
+                setFeedback(`Visit completed for ticket ${ticket}.`);
                 setTimeout(() => setFeedback(""), 4000);
             }
         });
@@ -159,21 +168,13 @@ export default function ReceptionistPage() {
         const ticket = target ? target.ticket : ticketId;
 
         try {
-            const token = localStorage.getItem("auth_token") || localStorage.getItem("token");
-            await fetch("http://localhost:5000/api/v1/queue/complete", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    ...(token ? { Authorization: `Bearer ${token}` } : {})
-                },
-                body: JSON.stringify({
-                    id: target?.id,
-                    queueNumber: ticket?.replace("#", ""),
-                    notes: "Visit completed by receptionist"
-                })
+            await apiClient.post("/api/v1/queue/complete", {
+                id: target?.id,
+                queueNumber: ticket?.replace("#", ""),
+                notes: "Visit completed by receptionist"
             });
 
-            setFeedback(`✓ Visit completed successfully for patient ${ticket}. Status transitioned to DONE.`);
+            setFeedback(`Visit completed successfully for patient ${ticket}. Status transitioned to DONE.`);
 
             realtimeService.emit("VISIT_COMPLETED", {
                 ticket,
@@ -193,42 +194,30 @@ export default function ReceptionistPage() {
     // Auto Advance (Call next WAITING patient -> SERVING)
     const handleAutoAdvance = async () => {
         try {
-            const token = localStorage.getItem("auth_token") || localStorage.getItem("token");
-            const res = await fetch("http://localhost:5000/api/v1/queue/auto-advance", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    ...(token ? { Authorization: `Bearer ${token}` } : {})
-                }
+            const res = await apiClient.post("/api/v1/queue/auto-advance", {});
+            const data = res.data;
+            const advanced = data.serving || data.data || data;
+            const nextTicket = advanced.formattedQueueNumber || `#${String(advanced.queueNumber || 1).padStart(3, "0")}`;
+            const nextPatient = advanced.patientName || advanced.customerName || "Patient";
+
+            const msg = `Auto Advance: Called next waiting patient (${nextTicket} - ${nextPatient}). Status transitioned WAITING to SERVING.`;
+            setFeedback(msg);
+
+            realtimeService.emit("PATIENT_CALLED", {
+                queueNumber: advanced.queueNumber || 1,
+                formattedQueueNumber: nextTicket,
+                ticket: nextTicket,
+                patientName: nextPatient,
+                serviceType: advanced.serviceType || "Clinical Consultation",
+                notification: {
+                    message: `Patient ${nextTicket} is ready.`,
+                },
             });
 
-            if (res.ok) {
-                const data = await res.json();
-                const advanced = data.serving || data.data || data;
-                const nextTicket = advanced.formattedQueueNumber || `#${String(advanced.queueNumber || 1).padStart(3, "0")}`;
-                const nextPatient = advanced.patientName || advanced.customerName || "Patient";
-
-                const msg = `⚡ Auto Advance: System identified next waiting patient (${nextTicket} - ${nextPatient}). Status transitioned WAITING → SERVING.`;
-                setFeedback(msg);
-
-                realtimeService.emit("PATIENT_CALLED", {
-                    queueNumber: advanced.queueNumber || 1,
-                    formattedQueueNumber: nextTicket,
-                    ticket: nextTicket,
-                    patientName: nextPatient,
-                    serviceType: advanced.serviceType || "Clinical Consultation",
-                    notification: {
-                        message: `Patient ${nextTicket} is ready.`,
-                    },
-                });
-
-                await fetchReceptionData();
-            } else {
-                setFeedback("Notice: No waiting patients left in queue to auto-advance.");
-            }
+            await fetchReceptionData();
         } catch (err) {
             console.error("Auto advance error:", err);
-            setFeedback("Failed to auto-advance queue.");
+            setFeedback("Notice: No waiting patients left in queue to auto-advance.");
         }
         setTimeout(() => setFeedback(""), 4000);
     };
@@ -236,20 +225,12 @@ export default function ReceptionistPage() {
     // Call individual customer
     const handleCallCustomer = async (item) => {
         try {
-            const token = localStorage.getItem("auth_token") || localStorage.getItem("token");
-            await fetch("http://localhost:5000/api/v1/queue/call", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    ...(token ? { Authorization: `Bearer ${token}` } : {})
-                },
-                body: JSON.stringify({
-                    id: item.id,
-                    queueNumber: item.ticket?.replace("#", "")
-                })
+            await apiClient.post("/api/v1/queue/call", {
+                id: item.id,
+                queueNumber: item.ticket?.replace("#", "")
             });
 
-            setFeedback(`📢 Patient ${item.ticket} (${item.patient}) called to operatory. Status: SERVING.`);
+            setFeedback(`Patient ${item.ticket} (${item.patient}) called to operatory. Status: SERVING.`);
 
             realtimeService.emit("PATIENT_CALLED", {
                 formattedQueueNumber: item.ticket,
@@ -279,37 +260,25 @@ export default function ReceptionistPage() {
         }
 
         try {
-            const token = localStorage.getItem("auth_token") || localStorage.getItem("token");
-            const res = await fetch("http://localhost:5000/api/v1/payments", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    ...(token ? { Authorization: `Bearer ${token}` } : {})
-                },
-                body: JSON.stringify({
-                    patientId: paymentForm.patientId || `pat-${Date.now()}`,
-                    patientName: paymentForm.patientName,
-                    amount: amt,
-                    paymentDate: paymentForm.paymentDate,
-                    method: "CASH",
-                    recordedBy: `${paymentForm.recordedBy} (${user?.fullName || "Staff"})`
-                })
+            await apiClient.post("/api/v1/payments", {
+                patientId: paymentForm.patientId || `pat-${Date.now()}`,
+                patientName: paymentForm.patientName,
+                amount: amt,
+                paymentDate: paymentForm.paymentDate,
+                method: "CASH",
+                recordedBy: `${paymentForm.recordedBy} (${user?.fullName || "Staff"})`
             });
 
-            if (res.ok) {
-                setFeedback(`✓ Success: Payment of ${amt.toFixed(2)} ETB recorded for ${paymentForm.patientName}.`);
-                setShowPaymentModal(false);
-                setPaymentForm({
-                    patientId: "",
-                    patientName: "",
-                    amount: "",
-                    paymentDate: new Date().toISOString().split("T")[0],
-                    recordedBy: "Receptionist",
-                });
-                await fetchReceptionData();
-            } else {
-                setFeedback("Failed to record payment on server.");
-            }
+            setFeedback(`Success: Payment of ${amt.toFixed(2)} ETB recorded for ${paymentForm.patientName}.`);
+            setShowPaymentModal(false);
+            setPaymentForm({
+                patientId: "",
+                patientName: "",
+                amount: "",
+                paymentDate: new Date().toISOString().split("T")[0],
+                recordedBy: "Receptionist",
+            });
+            await fetchReceptionData();
         } catch (err) {
             console.error("Error saving payment:", err);
             setFeedback("Network error saving payment.");
@@ -342,10 +311,10 @@ export default function ReceptionistPage() {
                             backgroundColor: realtimeConnected ? "#10b981" : "#f59e0b",
                             display: "inline-block",
                         }} />
-                        {realtimeConnected ? "SignalR Live" : "Syncing..."}
+                        {realtimeConnected ? "Live Connected" : "Connecting..."}
                     </span>
-                    <Button variant="secondary" size="sm" onClick={handleRefresh} disabled={refreshing}>
-                        {refreshing ? "Refreshing..." : "🔄 Refresh"}
+                    <Button variant="secondary" size="sm" onClick={handleRefresh} disabled={refreshing} icon={<FiRefreshCw />}>
+                        {refreshing ? "Refreshing..." : "Refresh"}
                     </Button>
                 </div>
             }
@@ -359,32 +328,41 @@ export default function ReceptionistPage() {
                     color: "var(--primary)",
                     border: "1px solid var(--border)",
                     fontWeight: 600,
-                    fontSize: "0.875rem"
+                    fontSize: "0.875rem",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.5rem"
                 }}>
-                    {feedback}
+                    <FiCheck />
+                    <span>{feedback}</span>
                 </div>
             )}
 
             {/* Metric Cards */}
             <div className="grid grid-cols-4" style={{ marginBottom: "1.5rem" }}>
-                {stats.map((stat, i) => (
-                    <div key={i} className="card" style={{ backgroundColor: "var(--bg-surface)", border: "1px solid var(--border)" }}>
-                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-                            <div>
-                                <p style={{ fontSize: "0.8125rem", color: "var(--text-muted)", fontWeight: 500 }}>
-                                    {stat.label}
-                                </p>
-                                <p style={{ fontSize: "1.5rem", fontWeight: 700, marginTop: "0.25rem", color: "var(--primary)" }}>
-                                    {stat.value}
-                                </p>
+                {stats.map((stat, i) => {
+                    const IconComp = stat.icon;
+                    return (
+                        <div key={i} className="card" style={{ backgroundColor: "var(--bg-surface)", border: "1px solid var(--border)" }}>
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                                <div>
+                                    <p style={{ fontSize: "0.8125rem", color: "var(--text-muted)", fontWeight: 500 }}>
+                                        {stat.label}
+                                    </p>
+                                    <p style={{ fontSize: "1.5rem", fontWeight: 700, marginTop: "0.25rem", color: "var(--primary)" }}>
+                                        {stat.value}
+                                    </p>
+                                </div>
+                                <span style={{ fontSize: "1.25rem", color: "var(--primary)" }}>
+                                    <IconComp />
+                                </span>
                             </div>
-                            <span style={{ fontSize: "1.5rem" }}>{stat.icon}</span>
+                            <p style={{ fontSize: "0.75rem", color: "var(--text-light)", marginTop: "0.5rem" }}>
+                                {stat.change}
+                            </p>
                         </div>
-                        <p style={{ fontSize: "0.75rem", color: "var(--text-light)", marginTop: "0.5rem" }}>
-                            {stat.change}
-                        </p>
-                    </div>
-                ))}
+                    );
+                })}
             </div>
 
             {/* Queue Management Card */}
@@ -400,23 +378,26 @@ export default function ReceptionistPage() {
                             size="sm"
                             onClick={handleAutoAdvance}
                             title="Auto Advance to next waiting patient (WAITING -> SERVING)"
+                            icon={<FiFastForward />}
                         >
-                            ⚡ Auto Advance
+                            Auto Advance
                         </Button>
                         <Button
                             variant="secondary"
                             size="sm"
                             onClick={() => handleCompleteVisit()}
                             title="Mark current serving patient visit as DONE"
+                            icon={<FiCheckCircle />}
                         >
-                            ✓ Complete Visit
+                            Complete Visit
                         </Button>
                         <Button
                             variant="primary"
                             size="sm"
                             onClick={() => setShowAddQueueModal(true)}
+                            icon={<FiUserPlus />}
                         >
-                            + Check In Patient
+                            Check In Patient
                         </Button>
                     </div>
                 </div>
@@ -432,10 +413,10 @@ export default function ReceptionistPage() {
                             border: "1px dashed var(--border)",
                             margin: "0.5rem"
                         }}>
-                            <span style={{ fontSize: "2rem", display: "block", marginBottom: "0.5rem" }}>👥</span>
+                            <FiUsers style={{ fontSize: "2rem", display: "block", margin: "0 auto 0.5rem", color: "var(--text-light)" }} />
                             <p style={{ fontWeight: 600, margin: 0 }}>No patients currently in the queue lobby</p>
                             <p style={{ fontSize: "0.8125rem", margin: "4px 0 0 0", color: "var(--text-light)" }}>
-                                Click "+ Check In Patient" to register a patient upon clinic arrival
+                                Click "Check In Patient" to register a patient upon clinic arrival
                             </p>
                         </div>
                     ) : (
@@ -479,8 +460,9 @@ export default function ReceptionistPage() {
                                                         variant="outline"
                                                         size="sm"
                                                         onClick={() => handleCallCustomer(item)}
+                                                        icon={<FiVolume2 />}
                                                     >
-                                                        📢 Call
+                                                        Call
                                                     </Button>
                                                 )}
                                                 {item.status === "SERVING" && (
@@ -488,8 +470,9 @@ export default function ReceptionistPage() {
                                                         variant="primary"
                                                         size="sm"
                                                         onClick={() => handleCompleteVisit(item.id)}
+                                                        icon={<FiCheck />}
                                                     >
-                                                        ✓ Complete
+                                                        Complete
                                                     </Button>
                                                 )}
                                             </div>
@@ -511,16 +494,17 @@ export default function ReceptionistPage() {
                     </div>
                     <div style={{ display: "flex", gap: "8px" }}>
                         <a href="/customers/fees" style={{ textDecoration: "none" }}>
-                            <Button variant="outline" size="sm">
-                                📊 Customer Fee Ledger →
+                            <Button variant="outline" size="sm" icon={<FiDollarSign />}>
+                                Customer Fee Ledger
                             </Button>
                         </a>
                         <Button
                             variant="primary"
                             size="sm"
                             onClick={() => setShowPaymentModal(true)}
+                            icon={<FiCreditCard />}
                         >
-                            💳 Record Payment
+                            Record Payment
                         </Button>
                     </div>
                 </div>
@@ -536,7 +520,7 @@ export default function ReceptionistPage() {
                             border: "1px dashed var(--border)",
                             margin: "0.5rem"
                         }}>
-                            <span style={{ fontSize: "2rem", display: "block", marginBottom: "0.5rem" }}>💳</span>
+                            <FiCreditCard style={{ fontSize: "2rem", display: "block", margin: "0 auto 0.5rem", color: "var(--text-light)" }} />
                             <p style={{ fontWeight: 600, margin: 0 }}>No payments recorded yet</p>
                             <p style={{ fontSize: "0.8125rem", margin: "4px 0 0 0", color: "var(--text-light)" }}>
                                 Click "Record Payment" to log patient fees and receipts
@@ -613,9 +597,9 @@ export default function ReceptionistPage() {
                             <button
                                 type="button"
                                 onClick={() => setShowPaymentModal(false)}
-                                style={{ background: "none", border: "none", fontSize: "1.25rem", cursor: "pointer", color: "var(--text-muted)" }}
+                                style={{ background: "none", border: "none", fontSize: "1.1rem", cursor: "pointer", color: "var(--text-muted)", display: "flex", alignItems: "center" }}
                             >
-                                ✕
+                                <FiX />
                             </button>
                         </div>
                         <form onSubmit={handleRecordPayment} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
