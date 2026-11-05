@@ -1,4 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
+import { FiMenu, FiLogOut, FiLogIn } from "react-icons/fi";
 import { useAuth, getDefaultDashboardForRole } from "../../features/auth/auth-context";
 import Button from "../common/Button";
 import DentistNotificationDropdown from "../notification/DentistNotificationDropdown";
@@ -23,12 +24,13 @@ export default function Header({ onToggleSidebar, isSidebarOpen }) {
                         className="menu-toggle"
                         onClick={onToggleSidebar}
                         aria-label={isSidebarOpen ? "Close menu" : "Open menu"}
+                        style={{ display: "flex", alignItems: "center", justifyContent: "center" }}
                     >
-                        ☰
+                        <FiMenu size={20} />
                     </button>
                 )}
                 <Link to={brandDestination} className="header-brand">
-                    SDCMIS-SINA
+                    Sina Dental Clinic
                 </Link>
             </div>
 
@@ -44,12 +46,12 @@ export default function Header({ onToggleSidebar, isSidebarOpen }) {
                 </div>
 
                 {user ? (
-                    <Button variant="secondary" size="sm" onClick={handleLogout}>
+                    <Button variant="secondary" size="sm" onClick={handleLogout} icon={<FiLogOut />}>
                         Logout
                     </Button>
                 ) : (
                     <Link to="/login">
-                        <Button variant="primary" size="sm">
+                        <Button variant="primary" size="sm" icon={<FiLogIn />}>
                             Login
                         </Button>
                     </Link>
