@@ -92,7 +92,7 @@ export default function CompleteProcedureModal({ patient, onClose, onCompleted }
                         color: "#166534",
                     }}
                 >
-                    <strong>BR-14 Audit Compliance:</strong> Concluding '{ongoingProc?.name}' will archive it into the patient's permanent treatment history. Completed procedures are immutable.
+                    Concluding '{ongoingProc?.name}' will archive it into the patient's permanent treatment history. Completed procedures cannot be modified.
                 </div>
 
                 {error && (
