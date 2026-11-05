@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Button from "../components/common/Button";
 import apiClient from "../services/apiclient";
+import { FiClipboard, FiArrowLeft, FiSearch } from "react-icons/fi";
 
 /**
  * SCR-08: Upcoming Tasks Screen
@@ -79,8 +80,9 @@ export default function UpcomingTasksPage() {
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem", flexWrap: "wrap", gap: "1rem" }}>
                 <div>
                     <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.25rem" }}>
-                        <Link to="/dentist" style={{ color: "var(--text-muted)", textDecoration: "none", fontSize: "0.9rem" }}>
-                            ← Dentist Dashboard
+                        <Link to="/dentist" style={{ color: "var(--text-muted)", textDecoration: "none", fontSize: "0.9rem", display: "inline-flex", alignItems: "center", gap: "0.25rem" }}>
+                            <FiArrowLeft />
+                            <span>Dentist Dashboard</span>
                         </Link>
                         <span style={{ color: "var(--border)" }}>/</span>
                         <span style={{ fontWeight: 700, color: "var(--primary)", fontSize: "0.9rem" }}>Upcoming Tasks</span>
@@ -136,7 +138,7 @@ export default function UpcomingTasksPage() {
                     <div style={{ padding: "3rem", textAlign: "center", color: "var(--text-muted)" }}>Loading upcoming tasks...</div>
                 ) : filteredTasks.length === 0 ? (
                     <div style={{ padding: "3rem", textAlign: "center", color: "var(--text-muted)" }}>
-                        <span style={{ fontSize: "2rem", display: "block", marginBottom: "0.5rem" }}>📋</span>
+                        <FiClipboard style={{ fontSize: "2rem", display: "block", margin: "0 auto 0.5rem", color: "var(--text-light)" }} />
                         <p style={{ fontWeight: 600, fontSize: "1rem", margin: 0 }}>No upcoming tasks scheduled</p>
                         <p style={{ fontSize: "0.85rem", margin: "0.25rem 0 0" }}>Patients with planned procedures will appear here</p>
                     </div>
@@ -183,7 +185,7 @@ export default function UpcomingTasksPage() {
                                     <td style={{ padding: "0.75rem 1rem", textAlign: "right" }}>
                                         <Link to={`/patients/${task.patientId}`}>
                                             <Button variant="outline" size="sm">
-                                                Open Record →
+                                                Open Record
                                             </Button>
                                         </Link>
                                     </td>
