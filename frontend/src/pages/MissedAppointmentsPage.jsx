@@ -3,6 +3,7 @@ import PageContainer from "../components/layout/PageContainer";
 import Button from "../components/common/Button";
 import appointmentService from "../services/appointment.service";
 import AppointmentDetailModal from "../components/appointment/AppointmentDetailModal";
+import { FiRefreshCw, FiCalendar, FiCheckCircle, FiAlertCircle } from "react-icons/fi";
 
 export default function MissedAppointmentsPage() {
     const [missedList, setMissedList] = useState([]);
@@ -88,11 +89,11 @@ export default function MissedAppointmentsPage() {
             subtitle="Identify unattended clinical appointments and re-engage patients with rescheduling"
             actions={
                 <div style={{ display: "flex", gap: "8px" }}>
-                    <Button variant="outline" size="sm" onClick={handleSync} disabled={syncing}>
-                        {syncing ? "Auditing..." : "⚙️ Sync Missed Check"}
+                    <Button variant="outline" size="sm" onClick={handleSync} disabled={syncing} icon={<FiRefreshCw />}>
+                        {syncing ? "Auditing..." : "Audit Missed"}
                     </Button>
-                    <Button variant="secondary" size="sm" onClick={fetchMissed} disabled={loading}>
-                        {loading ? "Refreshing..." : "🔄 Refresh"}
+                    <Button variant="secondary" size="sm" onClick={fetchMissed} disabled={loading} icon={<FiRefreshCw />}>
+                        {loading ? "Refreshing..." : "Refresh"}
                     </Button>
                 </div>
             }
@@ -163,14 +164,14 @@ export default function MissedAppointmentsPage() {
                     <div style={{
                         padding: "2.5rem",
                         textAlign: "center",
-                        backgroundColor: "#f0fdf4",
+                        backgroundColor: "var(--success-bg)",
                         borderRadius: "8px",
-                        border: "1px dashed #bbf7d0",
-                        color: "#166534"
+                        border: "1px dashed var(--border)",
+                        color: "var(--primary)"
                     }}>
-                        <span style={{ fontSize: "2rem" }}>🎉</span>
+                        <FiCheckCircle style={{ fontSize: "2rem", display: "block", margin: "0 auto 0.5rem" }} />
                         <h3 style={{ margin: "0.5rem 0 0.25rem 0", fontWeight: 700 }}>Zero Missed Appointments</h3>
-                        <p style={{ fontSize: "0.875rem", color: "#15803d", margin: 0 }}>
+                        <p style={{ fontSize: "0.875rem", color: "var(--text-muted)", margin: 0 }}>
                             All clinical appointments are current or have been attended/rescheduled.
                         </p>
                     </div>
@@ -216,8 +217,9 @@ export default function MissedAppointmentsPage() {
 
                                         {/* 3. Original Appointment */}
                                         <td style={{ padding: "12px" }}>
-                                            <div style={{ fontWeight: 600, color: "#dc2626" }}>
-                                                📅 {new Date(apt.appointmentDate || apt.scheduledDate).toLocaleDateString()}
+                                            <div style={{ fontWeight: 600, color: "#dc2626", display: "flex", alignItems: "center", gap: "4px" }}>
+                                                <FiCalendar />
+                                                <span>{new Date(apt.appointmentDate || apt.scheduledDate).toLocaleDateString()}</span>
                                             </div>
                                             <div style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>
                                                 {new Date(apt.appointmentDate || apt.scheduledDate).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
@@ -258,15 +260,19 @@ export default function MissedAppointmentsPage() {
                                                     style={{
                                                         padding: "6px 12px",
                                                         borderRadius: "6px",
-                                                        backgroundColor: "#2563eb",
+                                                        backgroundColor: "var(--primary)",
                                                         color: "white",
                                                         border: "none",
                                                         fontWeight: 600,
                                                         fontSize: "0.8125rem",
                                                         cursor: "pointer",
+                                                        display: "inline-flex",
+                                                        alignItems: "center",
+                                                        gap: "4px"
                                                     }}
                                                 >
-                                                    📅 Reschedule
+                                                    <FiCalendar />
+                                                    <span>Reschedule</span>
                                                 </button>
                                                 <button
                                                     type="button"
@@ -274,9 +280,9 @@ export default function MissedAppointmentsPage() {
                                                     style={{
                                                         padding: "6px 10px",
                                                         borderRadius: "6px",
-                                                        backgroundColor: "#f1f5f9",
-                                                        color: "#334155",
-                                                        border: "1px solid #cbd5e1",
+                                                        backgroundColor: "var(--bg-page)",
+                                                        color: "var(--text-main)",
+                                                        border: "1px solid var(--border)",
                                                         fontWeight: 600,
                                                         fontSize: "0.8125rem",
                                                         cursor: "pointer",
@@ -364,7 +370,7 @@ export default function MissedAppointmentsPage() {
                                         padding: "8px 18px",
                                         borderRadius: "6px",
                                         border: "none",
-                                        backgroundColor: "#2563eb",
+                                        backgroundColor: "var(--primary)",
                                         color: "white",
                                         cursor: "pointer",
                                         fontWeight: 600
