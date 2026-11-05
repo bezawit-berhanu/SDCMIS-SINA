@@ -1,4 +1,5 @@
 const container = require("../../container/container");
+const CacheInvalidator = require("../../Infrastructure/cache/cache.invalidator");
 
 /**
  * Payment Controller
@@ -25,6 +26,7 @@ class PaymentController {
             };
 
             const result = await container.recordPayment.execute(payload, actor);
+            CacheInvalidator.onPaymentMutated(patientId);
             return res.status(201).json({
                 success: true,
                 message: result.message,
