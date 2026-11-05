@@ -19,7 +19,7 @@ export default function HomePage() {
                         display: "inline-block",
                         padding: "0.35rem 1rem",
                         borderRadius: "9999px",
-                        backgroundColor: "rgba(27, 77, 46, 0.08)",
+                        backgroundColor: "rgba(37, 99, 235, 0.08)",
                         color: "var(--primary)",
                         fontSize: "0.875rem",
                         fontWeight: 700,
