@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { useAuth, getDefaultDashboardForRole } from "../features/auth/auth-context";
 import Button from "../components/common/Button";
+import { FiActivity, FiBell, FiUser, FiZap, FiLock, FiDollarSign } from "react-icons/fi";
 
 /**
  * SCR-01 & Landing Page per SDCIMP SRS Section 2.6 and Executive Summary.
@@ -62,7 +63,9 @@ export default function HomePage() {
             <div className="grid grid-cols-3" style={{ marginBottom: "3rem" }}>
                 <div className="card" style={{ backgroundColor: "var(--bg-surface)", border: "1px solid var(--border)", borderLeft: "4px solid var(--primary)" }}>
                     <div className="card__header">
-                        <div style={{ fontSize: "2rem", marginBottom: "0.5rem" }}>🩺</div>
+                        <div style={{ marginBottom: "0.5rem" }}>
+                            <FiActivity style={{ color: "var(--primary)", fontSize: "1.75rem" }} />
+                        </div>
                         <h2 className="card__title" style={{ color: "var(--primary)" }}>Dentist Portal</h2>
                         <p className="card__subtitle">
                             Single at-a-glance clinical picture: Next/Ongoing/Done procedures, upcoming tasks, missed appointments reschedule, and instant queue alerts.
@@ -72,7 +75,9 @@ export default function HomePage() {
 
                 <div className="card" style={{ backgroundColor: "var(--bg-surface)", border: "1px solid var(--border)", borderLeft: "4px solid var(--primary)" }}>
                     <div className="card__header">
-                        <div style={{ fontSize: "2rem", marginBottom: "0.5rem" }}>🛎️</div>
+                        <div style={{ marginBottom: "0.5rem" }}>
+                            <FiBell style={{ color: "var(--primary)", fontSize: "1.75rem" }} />
+                        </div>
                         <h2 className="card__title" style={{ color: "var(--primary)" }}>Receptionist Portal</h2>
                         <p className="card__subtitle">
                             Live 3-column front-desk queue (Waiting, Serving, Done), single-tap Call alerting the dentist chair, auto-advance, and fee payment recording.
@@ -82,7 +87,9 @@ export default function HomePage() {
 
                 <div className="card" style={{ backgroundColor: "var(--bg-surface)", border: "1px solid var(--border)", borderLeft: "4px solid var(--primary)" }}>
                     <div className="card__header">
-                        <div style={{ fontSize: "2rem", marginBottom: "0.5rem" }}>👤</div>
+                        <div style={{ marginBottom: "0.5rem" }}>
+                            <FiUser style={{ color: "var(--primary)", fontSize: "1.75rem" }} />
+                        </div>
                         <h2 className="card__title" style={{ color: "var(--primary)" }}>Patient Portal</h2>
                         <p className="card__subtitle">
                             Self-service transparency: personal treatment history, next procedure, upcoming appointment date, fee balance, and live queue position.
@@ -95,7 +102,9 @@ export default function HomePage() {
             <div className="grid grid-cols-3">
                 <div className="card" style={{ backgroundColor: "var(--bg-surface)", border: "1px solid var(--border)" }}>
                     <div className="card__header">
-                        <div style={{ fontSize: "1.5rem", marginBottom: "0.5rem" }}>⚡</div>
+                        <div style={{ marginBottom: "0.5rem" }}>
+                            <FiZap style={{ color: "var(--primary)", fontSize: "1.25rem" }} />
+                        </div>
                         <h3 className="card__title" style={{ fontSize: "1.1rem", color: "var(--primary)" }}>SignalR Real-Time Sync</h3>
                         <p className="card__subtitle">Bidirectional SignalR hub updates deliver queue transitions and callouts with zero manual refreshing.</p>
                     </div>
@@ -103,7 +112,9 @@ export default function HomePage() {
 
                 <div className="card" style={{ backgroundColor: "var(--bg-surface)", border: "1px solid var(--border)" }}>
                     <div className="card__header">
-                        <div style={{ fontSize: "1.5rem", marginBottom: "0.5rem" }}>🔒</div>
+                        <div style={{ marginBottom: "0.5rem" }}>
+                            <FiLock style={{ color: "var(--primary)", fontSize: "1.25rem" }} />
+                        </div>
                         <h3 className="card__title" style={{ fontSize: "1.1rem", color: "var(--primary)" }}>Strict Data Isolation</h3>
                         <p className="card__subtitle">Rigorous RBAC and patient data ownership policies enforce access control across all roles.</p>
                     </div>
@@ -111,7 +122,9 @@ export default function HomePage() {
 
                 <div className="card" style={{ backgroundColor: "var(--bg-surface)", border: "1px solid var(--border)" }}>
                     <div className="card__header">
-                        <div style={{ fontSize: "1.5rem", marginBottom: "0.5rem" }}>💰</div>
+                        <div style={{ marginBottom: "0.5rem" }}>
+                            <FiDollarSign style={{ color: "var(--primary)", fontSize: "1.25rem" }} />
+                        </div>
                         <h3 className="card__title" style={{ fontSize: "1.1rem", color: "var(--primary)" }}>Precise Fee Ledgers</h3>
                         <p className="card__subtitle">Fixed-point arithmetic guarantees consistent remaining fee computations clinic-wide in ETB.</p>
                     </div>
