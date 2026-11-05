@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { FiBell, FiCheckCircle, FiInfo } from "react-icons/fi";
 import Button from "../common/Button";
 import { realtimeService } from "../../services/realtime.service";
 import { signalRService } from "../../services/signalr.service";
@@ -59,7 +60,7 @@ export default function QueueBoard({ readOnly = false }) {
             fetchLiveQueue();
             const ticket = payload.formattedQueueNumber || payload.ticket;
             if (ticket) {
-                setActionFeedback(`📢 Patient ${ticket} called to operatory.`);
+                setActionFeedback(`Patient ${ticket} called to operatory.`);
                 setTimeout(() => setActionFeedback(""), 4000);
             }
         });
@@ -68,7 +69,7 @@ export default function QueueBoard({ readOnly = false }) {
             fetchLiveQueue();
             const ticket = payload.queueEntry?.formattedQueueNumber || payload.ticket;
             if (ticket) {
-                setActionFeedback(`✓ Visit completed for ${ticket}.`);
+                setActionFeedback(`Visit completed for ${ticket}.`);
                 setTimeout(() => setActionFeedback(""), 4000);
             }
         });
@@ -164,27 +165,27 @@ export default function QueueBoard({ readOnly = false }) {
             title: "Waiting in Lobby",
             count: waitingList.length,
             items: waitingList,
-            headerBg: "rgba(234, 179, 8, 0.12)",
+            headerBg: "rgba(234, 179, 8, 0.1)",
             headerColor: "#b45309",
-            badgeBg: "rgba(234, 179, 8, 0.2)",
+            badgeBg: "#fef3c7",
         },
         {
             id: "SERVING",
             title: "Serving / In Chair",
             count: servingList.length,
             items: servingList,
-            headerBg: "rgba(27, 77, 46, 0.12)",
-            headerColor: "var(--primary)",
-            badgeBg: "rgba(27, 77, 46, 0.2)",
+            headerBg: "#e8f5e9",
+            headerColor: "#2e7d32",
+            badgeBg: "#c8e6c9",
         },
         {
             id: "DONE",
             title: "Completed Today",
             count: doneList.length,
             items: doneList,
-            headerBg: "rgba(27, 77, 46, 0.06)",
-            headerColor: "var(--primary)",
-            badgeBg: "rgba(27, 77, 46, 0.15)",
+            headerBg: "#f3f4f6",
+            headerColor: "#374151",
+            badgeBg: "#e5e7eb",
         },
     ];
 
@@ -195,15 +196,19 @@ export default function QueueBoard({ readOnly = false }) {
                     role="alert"
                     style={{
                         padding: "0.75rem 1rem",
-                        backgroundColor: "rgba(27, 77, 46, 0.08)",
-                        color: "var(--primary)",
-                        borderRadius: "8px",
+                        backgroundColor: "#e8f5e9",
+                        color: "#2e7d32",
+                        borderRadius: "6px",
                         marginBottom: "1rem",
-                        fontWeight: "600",
-                        border: "1px solid var(--border)",
+                        fontWeight: "500",
+                        border: "1px solid #c8e6c9",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "8px",
                     }}
                 >
-                    ⚡ {actionFeedback}
+                    <FiInfo />
+                    <span>{actionFeedback}</span>
                 </div>
             )}
 
@@ -341,8 +346,9 @@ export default function QueueBoard({ readOnly = false }) {
                                                 size="sm"
                                                 style={{ width: "100%" }}
                                                 onClick={() => handleCallPatient(entry)}
+                                                icon={<FiBell />}
                                             >
-                                                📢 Call to Chair (Alert Dentist)
+                                                Call Patient
                                             </Button>
                                         )}
 
@@ -354,8 +360,9 @@ export default function QueueBoard({ readOnly = false }) {
                                                     width: "100%",
                                                 }}
                                                 onClick={() => handleCompleteVisit(entry)}
+                                                icon={<FiCheckCircle />}
                                             >
-                                                ✓ Complete Visit & Auto-Advance
+                                                Complete Visit
                                             </Button>
                                         )}
 
