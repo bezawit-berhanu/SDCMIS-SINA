@@ -4,6 +4,7 @@ const branchController = {
     async getBranches(req, res, next) {
         try {
             const result = await container.getBranchesAndDentists.execute();
+            res.setHeader("Cache-Control", "public, max-age=300, stale-while-revalidate=60");
             return res.status(200).json({
                 success: true,
                 data: result.branches,
@@ -17,6 +18,7 @@ const branchController = {
     async getDentists(req, res, next) {
         try {
             const result = await container.getBranchesAndDentists.execute();
+            res.setHeader("Cache-Control", "public, max-age=300, stale-while-revalidate=60");
             return res.status(200).json({
                 success: true,
                 data: result.dentists,
