@@ -44,8 +44,12 @@ function createQueueRoutes(container) {
         next();
     };
 
-    // Customer position endpoint (Task 4: Your Queue Number: #007, Position: 2, Status: WAITING)
+    // Customer position endpoint (SRS 8.5.4: GET /queue/mine, FR-CUS-02)
     router.get("/my-position", controller.getMyQueuePosition);
+    router.get("/mine", controller.getMyQueuePosition);
+
+    // Today's queue endpoint (SRS 8.5.4: GET /queue/today)
+    router.get("/today", controller.getQueue);
 
     // Specific endpoints
     router.post("/check-in", requireStaff, controller.checkIn);
