@@ -1,3 +1,4 @@
+import { FiX } from "react-icons/fi";
 import Button from "../common/Button";
 
 /**
@@ -43,7 +44,7 @@ export default function PaymentHistoryModal({ patient, onClose }) {
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.25rem" }}>
                     <div>
                         <h2 id="payment-history-title" style={{ fontSize: "1.25rem", fontWeight: "700", color: "#1e293b", margin: 0 }}>
-                            Payment Audit Ledger (FR-DEN-15)
+                            Payment Audit Ledger
                         </h2>
                         <span style={{ fontSize: "0.85rem", color: "#64748b" }}>
                             Patient: <strong>{patient?.name}</strong> (ID: {patient?.id})
@@ -52,9 +53,9 @@ export default function PaymentHistoryModal({ patient, onClose }) {
                     <button
                         type="button"
                         onClick={onClose}
-                        style={{ background: "none", border: "none", fontSize: "1.5rem", cursor: "pointer", color: "#64748b" }}
+                        style={{ background: "none", border: "none", fontSize: "1.25rem", cursor: "pointer", color: "#64748b", display: "inline-flex", alignItems: "center" }}
                     >
-                        &times;
+                        <FiX />
                     </button>
                 </div>
 
