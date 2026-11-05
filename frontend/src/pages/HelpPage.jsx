@@ -21,7 +21,7 @@ export default function HelpPage() {
             role: "RECEPTIONIST",
             question: "How does the daily queue numbering and calling work?",
             answer:
-                "Queue tickets are issued sequentially starting from #001 every single morning (BR-24, BR-25). When a Receptionist clicks 'Call', the patient moves from WAITING to SERVING and a high-priority push notification is delivered to the Dentist immediately. When the visit is finished, clicking 'Complete' moves the patient to DONE and automatically prompts auto-advancement for the next patient in line.",
+                "Queue tickets are issued sequentially starting from #001 every single morning. When a Receptionist clicks 'Call', the patient moves from Waiting to Serving and a high-priority push notification is delivered to the Dentist immediately. When the visit is finished, clicking 'Complete' moves the patient to Done and automatically prompts auto-advancement for the next patient in line.",
         },
         {
             id: "faq-q2",
@@ -29,7 +29,7 @@ export default function HelpPage() {
             role: "DENTIST",
             question: "What is the procedure lifecycle (Next -> Ongoing -> Done)?",
             answer:
-                "A patient can have exactly one 'Next' procedure (BR-11, BR-13) and at most one 'Ongoing' procedure (BR-12). Starting a treatment moves it to 'Ongoing'. Clicking 'Tick Done' marks it complete, records the completion date, and archives it in permanent treatment history (BR-14) which is never deleted.",
+                "A patient can have exactly one 'Next' procedure and at most one 'Ongoing' procedure. Starting a treatment moves it to 'Ongoing'. Clicking 'Mark Complete' marks it complete, records the completion date, and archives it in permanent treatment history which is never deleted.",
         },
         {
             id: "faq-q3",
@@ -37,7 +37,7 @@ export default function HelpPage() {
             role: "ALL",
             question: "How is the Remaining Fee balance computed?",
             answer:
-                "Remaining Fee is always strictly calculated as: Total Planned & Completed Procedure Cost minus Total Recorded Payments (BR-17, BR-18). Fixed-point decimal arithmetic is used everywhere so numbers match across the Dentist, Receptionist, and Customer views.",
+                "Remaining Fee is always strictly calculated as: Total Planned & Completed Procedure Cost minus Total Recorded Payments. Fixed-point decimal arithmetic is used everywhere so numbers match across the Dentist, Receptionist, and Customer views.",
         },
         {
             id: "faq-q4",
@@ -45,7 +45,7 @@ export default function HelpPage() {
             role: "DENTIST",
             question: "How do Missed Appointments get rescheduled?",
             answer:
-                "Any appointment whose scheduled date passes without completion is automatically surfaced under Missed Appointments (FR-DEN-12). Dentists can directly select a new date and time to reschedule the patient back into Upcoming status.",
+                "Any appointment whose scheduled date passes without completion is automatically surfaced under Missed Appointments. Dentists can directly select a new date and time to reschedule the patient back into Upcoming status.",
         },
         {
             id: "faq-q5",
@@ -53,7 +53,7 @@ export default function HelpPage() {
             role: "CUSTOMER",
             question: "What information can Customers see on their dashboard?",
             answer:
-                "Customers have self-service visibility into their personal profile, treatment history, next procedure, scheduled appointment, remaining balance, and live queue ticket status (#007, Position, WAITING/SERVING). All customer views are strictly read-only and restricted to their own record (BR-31, 403 Forbidden for other patients).",
+                "Customers have self-service visibility into their personal profile, treatment history, next procedure, scheduled appointment, remaining balance, and live queue ticket status (#007, Position, Waiting/Serving). All customer views are strictly read-only and restricted to their own record.",
         },
         {
             id: "faq-q6",
@@ -86,7 +86,7 @@ export default function HelpPage() {
                         </h1>
                     </div>
                     <p style={{ color: "var(--text-muted)", fontSize: "1rem", margin: 0 }}>
-                        System guidelines, clinical procedures, queue mechanics, and account help (SCR-17).
+                        System guidelines, clinical procedures, queue mechanics, and account help.
                     </p>
                 </div>
                 <Link to={returnPath}>
