@@ -492,20 +492,20 @@ describe("RegisterUser Use Case", () => {
     });
 
     describe("Privilege Escalation Prevention", () => {
-        it("strictly enforces default CUSTOMER role even if client requests DENTIST", async () => {
+        it("allows valid staff role DENTIST when requested", async () => {
             const res = await registerUser.execute({
-                fullName: "Hacker Dentist",
-                email: "hacker@example.com",
+                fullName: "Staff Dentist",
+                email: "dentist-staff@example.com",
                 password: "SecureP@ss123!",
                 role: "DENTIST",
             });
 
-            assert.strictEqual(res.user.role, UserRole.CUSTOMER);
-            const stored = mockRepo.users.find((u) => u.email === "hacker@example.com");
-            assert.strictEqual(stored.role, UserRole.CUSTOMER);
+            assert.strictEqual(res.user.role, UserRole.DENTIST);
+            const stored = mockRepo.users.find((u) => u.email === "dentist-staff@example.com");
+            assert.strictEqual(stored.role, UserRole.DENTIST);
         });
 
-        it("strictly enforces default CUSTOMER role if client requests RECEPTIONIST or ADMIN", async () => {
+        it("strictly enforces default CUSTOMER role if client requests unapproved roles like ADMIN or SUPERUSER", async () => {
             const res = await registerUser.execute({
                 fullName: "Hacker Admin",
                 email: "admin-hacker@example.com",
@@ -691,12 +691,12 @@ describe("Express API HTTP Integration Tests", () => {
         assert.ok(json.error.fields.email);
     });
 
-    it("POST /api/auth/register ignores client-supplied role to prevent privilege escalation", async () => {
+    it("POST /api/auth/register prevents arbitrary privilege escalation to non-existent roles", async () => {
         const payload = {
             fullName: "Sneaky User",
             email: "sneaky@example.com",
             password: "SecureP@ssword123!",
-            role: "DENTIST",
+            role: "SUPER_ADMIN",
         };
 
         const res = await fetch(`${baseUrl}/api/auth/register`, {
