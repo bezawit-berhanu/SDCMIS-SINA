@@ -3,6 +3,7 @@ import Button from "../components/common/Button";
 import RecordPaymentModal from "../components/payment/RecordPaymentModal";
 import apiClient from "../services/apiclient";
 import { signalRService } from "../services/signalr.service";
+import { FiCreditCard, FiCheck } from "react-icons/fi";
 
 /**
  * SCR-11: Customers & Fees Screen
@@ -88,7 +89,7 @@ export default function CustomerFeesPage() {
             })
         );
         setSelectedCustomerForPayment(null);
-        setFeedback(`✓ Payment of ${Number(paymentData.amount).toFixed(2)} ETB successfully recorded.`);
+        setFeedback(`Payment of ${Number(paymentData.amount).toFixed(2)} ETB successfully recorded.`);
         setTimeout(() => setFeedback(""), 4000);
     };
 
@@ -137,9 +138,13 @@ export default function CustomerFeesPage() {
                         borderRadius: "8px",
                         marginBottom: "1.25rem",
                         fontWeight: "600",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "0.5rem"
                     }}
                 >
-                    {feedback}
+                    <FiCheck />
+                    <span>{feedback}</span>
                 </div>
             )}
 
@@ -204,7 +209,7 @@ export default function CustomerFeesPage() {
                     </div>
                 ) : filteredCustomers.length === 0 ? (
                     <div style={{ padding: "3rem", textAlign: "center", color: "var(--text-muted)" }}>
-                        <span style={{ fontSize: "2rem", display: "block", marginBottom: "0.5rem" }}>💳</span>
+                        <FiCreditCard style={{ fontSize: "2rem", display: "block", margin: "0 auto 0.5rem", color: "var(--text-light)" }} />
                         <p style={{ fontWeight: 600, fontSize: "1rem", margin: 0 }}>No customer fee records match your search or filter</p>
                         <p style={{ fontSize: "0.85rem", margin: "4px 0 0 0" }}>Patient balance ledger is clean or empty</p>
                     </div>
@@ -262,6 +267,7 @@ export default function CustomerFeesPage() {
                                                 variant="primary"
                                                 size="sm"
                                                 onClick={() => setSelectedCustomerForPayment(cust)}
+                                                icon={<FiCreditCard />}
                                             >
                                                 Record Payment
                                             </Button>
