@@ -29,9 +29,11 @@ class CompleteVisit {
             entry = servingList[0];
         }
 
-        if (entry.status === QueueStatus.DONE) {
-            const error = new Error(`Queue entry ${entry.formattedQueueNumber} is already completed.`);
+        if (entry.status !== QueueStatus.SERVING) {
+            const error = new Error("This patient's status can't be changed that way.");
             error.statusCode = 400;
+            error.code = "INVALID_QUEUE_TRANSITION";
+            error.errorCode = "ERR-INVALID-QUEUE-TRANSITION";
             throw error;
         }
 
