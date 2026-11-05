@@ -2,6 +2,7 @@
 const express = require("express");
 
 const requestId = require("./src/Presentation/middleware/requestId");
+const inputSanitizer = require("./src/Presentation/middleware/inputSanitizer");
 const notFound = require("./src/Presentation/middleware/notFound");
 const errorHandler = require("./src/Presentation/middleware/errorHandler");
 
@@ -48,6 +49,7 @@ app.use((req, res, next) => {
 
 app.use(express.json());
 app.use(requestId);
+app.use(inputSanitizer);
 
 // Global API Rate Limiter (NFR-SEC-05, BR-09): 200 req/min
 const globalApiLimiter = createRateLimiter({
