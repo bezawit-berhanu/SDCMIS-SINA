@@ -4,7 +4,7 @@ const { UserRole } = require("../enums/enum");
  * CustomerAccessPolicy
  * Enforces horizontal access control and patient data isolation.
  * Staff (Dentists, Receptionists) can access clinical records.
- * Customers are strictly restricted to their own linked patient data.
+ * Customers are strictly restricted to their own linked patient data per SRS BR-05.
  */
 class CustomerAccessPolicy {
     /**
@@ -23,14 +23,13 @@ class CustomerAccessPolicy {
             };
         }
 
-        // Clinical staff (Dentist, Receptionist, Admin) have access to clinical patient charts
+        // Clinical staff (Dentist, Receptionist) have access to clinical patient charts
         if (user.role === UserRole.DENTIST || user.role === UserRole.RECEPTIONIST) {
             return { allowed: true };
         }
 
-        // If user role is CUSTOMER, enforce data ownership
+        // If user role is CUSTOMER, enforce strict horizontal isolation (SRS BR-05)
         if (user.role === UserRole.CUSTOMER) {
-            // Customer's linked patient ID or user ID matching target patient
             const ownedPatientId = user.linkedPatientId || user.patientId;
 
             if (!targetPatientId || !ownedPatientId || String(ownedPatientId).trim() !== String(targetPatientId).trim()) {
@@ -38,7 +37,8 @@ class CustomerAccessPolicy {
                     allowed: false,
                     statusCode: 403,
                     code: "FORBIDDEN",
-                    message: "You do not have permission to view another patient's data.",
+                    errorCode: "ERR-NOT-FOUND-OR-FORBIDDEN",
+                    message: "That record could not be found.",
                 };
             }
 
@@ -49,10 +49,17 @@ class CustomerAccessPolicy {
             allowed: false,
             statusCode: 403,
             code: "FORBIDDEN",
-            message: "Unauthorized role for patient data access.",
+            errorCode: "ERR-FORBIDDEN",
+            message: "You do not have permission to do that.",
         };
+    }
+
+    /**
+     * Helper to verify if an authenticated user is the designated owner of a patient record.
+     */
+    static isCustomerOwner(user, targetPatientId) {
+        return this.canAccessPatient(user, targetPatientId).allowed;
     }
 }
 
 module.exports = CustomerAccessPolicy;
-
