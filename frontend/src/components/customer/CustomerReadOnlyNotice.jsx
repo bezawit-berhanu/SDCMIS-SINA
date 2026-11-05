@@ -23,7 +23,7 @@ export default function CustomerReadOnlyNotice() {
             }}
         >
             <FiLock size={14} />
-            <span>Official SINA Clinical Record • Read-Only Self-Service View (FR-CUS-03)</span>
+            <span>Official SINA Clinical Record • Read-Only Self-Service View</span>
         </div>
     );
 }
