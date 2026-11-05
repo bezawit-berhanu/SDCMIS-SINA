@@ -22,7 +22,12 @@ export const authStorage = {
      */
     getToken() {
         if (typeof window === "undefined") return null;
-        return sessionStorage.getItem(TOKEN_KEY);
+        return (
+            sessionStorage.getItem(TOKEN_KEY) ||
+            localStorage.getItem(TOKEN_KEY) ||
+            localStorage.getItem("auth_token") ||
+            localStorage.getItem("token")
+        );
     },
 
     /**

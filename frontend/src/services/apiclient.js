@@ -16,7 +16,7 @@ apiClient.interceptors.request.use(
     (config) => {
         const token = authStorage.getToken();
 
-        if (token) {
+        if (token && !config.headers.Authorization) {
             config.headers.Authorization = `Bearer ${token}`;
         }
 
@@ -35,13 +35,19 @@ apiClient.interceptors.response.use(
         const requestUrl = error.config?.url || "";
         const isAuthAttempt =
             requestUrl.includes("/auth/login") ||
-            requestUrl.includes("/auth/register");
+            requestUrl.includes("/auth/register") ||
+            requestUrl.includes("/auth/signup");
 
         // Only handle unauthorized for protected routes to avoid looping on login/register failures
         if (error.response?.status === 401 && !isAuthAttempt) {
             authStorage.clear();
             if (typeof window !== "undefined") {
-                window.dispatchEvent(new CustomEvent("auth:unauthorized"));
+                window.dispatchEvent(new CustomEvent("auth:unauthorized", {
+                    detail: {
+                        code: error.response?.data?.code || "ERR-UNAUTHORIZED",
+                        message: error.response?.data?.message || "Session expired."
+                    }
+                }));
             }
         }
 
