@@ -2,7 +2,7 @@ import { Outlet } from "react-router-dom";
 
 /**
  * Minimalist Auth Layout for Sina Dental Clinic
- * Displays exclusively the centered authentication card container with a soft greenish tint.
+ * Displays exclusively the centered authentication card container with a clean creamish/white palette.
  */
 export default function AuthLayout() {
     return (
@@ -22,12 +22,12 @@ export default function AuthLayout() {
                 className="auth-card"
                 style={{
                     width: "100%",
-                    maxWidth: "460px",
+                    maxWidth: "440px",
                     backgroundColor: "var(--bg-surface)",
                     border: "1px solid var(--border)",
-                    borderRadius: "14px",
-                    padding: "2.25rem 2rem",
-                    boxShadow: "0 4px 20px rgba(27, 77, 46, 0.08)",
+                    borderRadius: "8px",
+                    padding: "2rem",
+                    boxShadow: "0 4px 16px rgba(0, 0, 0, 0.04)",
                 }}
             >
                 <Outlet />
