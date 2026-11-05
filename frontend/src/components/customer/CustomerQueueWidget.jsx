@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { FiBell } from "react-icons/fi";
 import customerService from "../../services/customer.service";
 import { signalRService } from "../../services/signalr.service";
 
@@ -135,8 +136,8 @@ export default function CustomerQueueWidget({ initialQueue = null, patientId = n
                         gap: "8px",
                     }}
                 >
-                    <span>📢</span>
-                    <span>It is your turn! Please proceed to Chairside Operatory.</span>
+                    <FiBell />
+                    <span>It is your turn. Please proceed to the treatment room.</span>
                 </div>
             )}
 
