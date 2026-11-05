@@ -318,7 +318,7 @@ export default function PatientDetailModal() {
                                     type="button"
                                     className="btn-sm"
                                     style={{
-                                        backgroundColor: "#059669",
+                                        backgroundColor: "var(--primary)",
                                         color: "white",
                                         padding: "8px 14px",
                                         borderRadius: "6px",
