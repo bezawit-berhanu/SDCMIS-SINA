@@ -2,6 +2,8 @@
  * Presentation Controller for Appointment APIs
  * Handles CRUD, Cancellation, Rescheduling, Missed appointment detection and retrieval.
  */
+const CacheInvalidator = require("../../Infrastructure/cache/cache.invalidator");
+
 class AppointmentController {
     constructor(container) {
         this.container = container;
@@ -125,6 +127,7 @@ class AppointmentController {
     async reschedule(req, res) {
         try {
             const data = await this.container.rescheduleAppointment.execute(req.params.id, req.body, req.user);
+            CacheInvalidator.invalidateDashboardCaches();
             return res.status(200).json({
                 status: "success",
                 message: "Appointment rescheduled successfully. Status updated to UPCOMING.",
