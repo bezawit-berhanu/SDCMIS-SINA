@@ -37,6 +37,8 @@ const errorHandler = (err, req, res, next) => {
 
     res.status(statusCode).json({
         success: false,
+        code: clientCode,
+        message: clientMessage,
         error: {
             code: clientCode,
             srsCode: SRS_ERROR_MAP[clientCode] || clientCode,
