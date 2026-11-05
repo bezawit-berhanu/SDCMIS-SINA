@@ -263,7 +263,7 @@ export default function DentistPage() {
                         fontSize: "0.75rem",
                         fontWeight: 600,
                         color: "var(--primary)",
-                        backgroundColor: "rgba(27, 77, 46, 0.08)",
+                        backgroundColor: "var(--primary-light)",
                         border: "1px solid var(--border)",
                         borderRadius: "9999px",
                         padding: "4px 10px",
