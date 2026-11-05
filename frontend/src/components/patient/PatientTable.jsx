@@ -91,7 +91,7 @@ export default function PatientTable() {
                                             <button
                                                 type="button"
                                                 className="btn-action btn-view"
-                                                title="View Clinical Details (SCR-06)"
+                                                title="View Clinical Details"
                                             >
                                                 View
                                             </button>
