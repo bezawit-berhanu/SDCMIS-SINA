@@ -13,12 +13,24 @@ export const patientService = {
 
         const url = `/api/v1/patients${queryParams.toString() ? `?${queryParams.toString()}` : ""}`;
         const response = await apiClient.get(url);
-        return response.data;
+        const data = response.data;
+        const list = data?.data || data?.patients || (Array.isArray(data) ? data : []);
+        return {
+            ...data,
+            data: list,
+            patients: list,
+        };
     },
 
     async getPatientById(id) {
         const response = await apiClient.get(`/api/v1/patients/${id}`);
-        return response.data;
+        const data = response.data;
+        const item = data?.data || data?.patient || data;
+        return {
+            ...data,
+            data: item,
+            patient: item,
+        };
     },
 
     async createPatient(data) {
@@ -43,3 +55,4 @@ export const patientService = {
 };
 
 export default patientService;
+
