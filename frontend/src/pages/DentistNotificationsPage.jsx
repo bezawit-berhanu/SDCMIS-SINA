@@ -5,7 +5,17 @@ import PageContainer from "../components/layout/PageContainer";
 import Button from "../components/common/Button";
 import { realtimeService } from "../services/realtime.service";
 import { signalRService } from "../services/signalr.service";
-import { apiClient } from "../lib/api-client";
+import apiClient from "../services/apiclient";
+import {
+    FiBell,
+    FiBellOff,
+    FiCheck,
+    FiArrowLeft,
+    FiActivity,
+    FiClock,
+    FiCheckCircle,
+    FiInfo,
+} from "react-icons/fi";
 
 export default function DentistNotificationsPage() {
     const { user } = useAuth();
@@ -59,7 +69,7 @@ export default function DentistNotificationsPage() {
             };
 
             setNotifications((prev) => [newNotif, ...prev]);
-            setActionMsg(`🔔 Live Notification: ${message}`);
+            setActionMsg(`Live Notification: ${message}`);
             setTimeout(() => setActionMsg(""), 5000);
         });
 
@@ -74,7 +84,7 @@ export default function DentistNotificationsPage() {
             };
 
             setNotifications((prev) => [newNotif, ...prev]);
-            setActionMsg(`🔔 Alert: ${newNotif.message}`);
+            setActionMsg(`Alert: ${newNotif.message}`);
             setTimeout(() => setActionMsg(""), 4000);
         });
 
@@ -114,7 +124,7 @@ export default function DentistNotificationsPage() {
     // Mark all as read
     const markAllRead = async () => {
         setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
-        setActionMsg("✓ All notifications marked as read.");
+        setActionMsg("All notifications marked as read.");
         setTimeout(() => setActionMsg(""), 3000);
 
         try {
@@ -132,19 +142,19 @@ export default function DentistNotificationsPage() {
         return true;
     });
 
-    const getTypeIcon = (type) => {
+    const renderTypeIcon = (type) => {
         switch (type) {
             case "PATIENT_READY":
-                return "🦷";
+                return <FiActivity style={{ color: "var(--primary)" }} />;
             case "PROCEDURE_UPDATE":
-                return "⚕️";
+                return <FiClock style={{ color: "var(--primary)" }} />;
             case "VISIT_COMPLETED":
-                return "✅";
+                return <FiCheckCircle style={{ color: "var(--primary)" }} />;
             case "SYSTEM_ALERT":
             case "SIGNALR_ALERT":
-                return "📢";
+                return <FiInfo style={{ color: "var(--primary)" }} />;
             default:
-                return "🔔";
+                return <FiBell style={{ color: "var(--primary)" }} />;
         }
     };
 
@@ -155,8 +165,8 @@ export default function DentistNotificationsPage() {
             actions={
                 <div style={{ display: "flex", gap: "8px" }}>
                     <Link to="/dentist">
-                        <Button variant="secondary" size="sm">
-                            ← Return to Operatory
+                        <Button variant="secondary" size="sm" icon={<FiArrowLeft />}>
+                            Return to Operatory
                         </Button>
                     </Link>
                     <Button
@@ -164,6 +174,7 @@ export default function DentistNotificationsPage() {
                         size="sm"
                         onClick={markAllRead}
                         disabled={unreadCount === 0}
+                        icon={<FiCheck />}
                     >
                         Mark All as Read
                     </Button>
@@ -186,7 +197,7 @@ export default function DentistNotificationsPage() {
                         fontWeight: 600,
                     }}
                 >
-                    <span>⚡</span>
+                    <FiBell />
                     <span>{actionMsg}</span>
                 </div>
             )}
@@ -283,10 +294,10 @@ export default function DentistNotificationsPage() {
             <div className="card" style={{ padding: 0, overflow: "hidden", backgroundColor: "var(--bg-surface)", border: "1px solid var(--border)" }}>
                 {filteredNotifications.length === 0 ? (
                     <div style={{ padding: "3rem", textAlign: "center", color: "var(--text-muted)" }}>
-                        <span style={{ fontSize: "2rem", display: "block", marginBottom: "0.5rem" }}>📭</span>
+                        <FiBellOff style={{ fontSize: "2rem", display: "block", margin: "0 auto 0.5rem", color: "var(--text-light)" }} />
                         <p style={{ fontWeight: 600, fontSize: "1rem", margin: 0 }}>No notifications found</p>
                         <p style={{ fontSize: "0.875rem", marginTop: "4px" }}>
-                            {filter === "UNREAD" ? "You're all caught up! No unread notifications." : "There are no notifications in this category."}
+                            {filter === "UNREAD" ? "You are all caught up. No unread notifications." : "There are no notifications in this category."}
                         </p>
                     </div>
                 ) : (
@@ -305,8 +316,8 @@ export default function DentistNotificationsPage() {
                                 }}
                             >
                                 <div style={{ display: "flex", alignItems: "flex-start", gap: "14px" }}>
-                                    <span style={{ fontSize: "1.5rem", marginTop: "2px" }}>
-                                        {getTypeIcon(n.type)}
+                                    <span style={{ fontSize: "1.25rem", marginTop: "2px" }}>
+                                        {renderTypeIcon(n.type)}
                                     </span>
                                     <div>
                                         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
