@@ -7,6 +7,7 @@ import CustomerPaymentHistory from "../components/customer/CustomerPaymentHistor
 import customerService from "../services/customer.service";
 import { realtimeService } from "../services/realtime.service";
 import CustomerReadOnlyNotice from "../components/customer/CustomerReadOnlyNotice";
+import { FiRefreshCw, FiPhone, FiClipboard, FiActivity } from "react-icons/fi";
 
 /**
  * Customer Dashboard UI (SCR-13)
@@ -101,8 +102,8 @@ export default function CustomerPage() {
             title={user ? `Patient Portal — Welcome, ${user.fullName}` : "Patient Customer Portal"}
             subtitle="Your personal clinical chart, treatment timeline, scheduled visits, and account summary"
             actions={
-                <Button variant="secondary" size="sm" onClick={handleRefresh} disabled={refreshing}>
-                    {refreshing ? "Refreshing..." : "🔄 Refresh"}
+                <Button variant="secondary" size="sm" onClick={handleRefresh} disabled={refreshing} icon={<FiRefreshCw />}>
+                    {refreshing ? "Refreshing..." : "Refresh"}
                 </Button>
             }
         >
@@ -158,8 +159,8 @@ export default function CustomerPage() {
                 </div>
                 <div style={{ display: "flex", gap: "8px" }}>
                     <a href="tel:+251116612233" style={{ textDecoration: "none" }}>
-                        <Button variant="outline" size="sm">
-                            📞 Call Reception (+251 11 661 2233)
+                        <Button variant="outline" size="sm" icon={<FiPhone />}>
+                            Call Reception (+251 11 661 2233)
                         </Button>
                     </a>
                 </div>
@@ -274,7 +275,7 @@ export default function CustomerPage() {
                     </div>
                 ) : (
                     <div style={{ padding: "2rem", textAlign: "center", color: "var(--text-muted)", backgroundColor: "var(--bg-page)", borderRadius: "var(--radius-md)", border: "1px dashed var(--border)" }}>
-                        <span style={{ fontSize: "1.75rem", display: "block", marginBottom: "0.5rem" }}>📋</span>
+                        <FiClipboard style={{ fontSize: "1.75rem", display: "block", margin: "0 auto 0.5rem", color: "var(--text-light)" }} />
                         <p style={{ fontWeight: 600, margin: 0 }}>No treatment procedures logged yet</p>
                         <p style={{ fontSize: "0.8125rem", margin: "4px 0 0 0" }}>Procedures performed by your dentist will be recorded here</p>
                     </div>
@@ -297,7 +298,7 @@ export default function CustomerPage() {
             >
                 <div className="card__header">
                     <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                        <span style={{ fontSize: "1.25rem" }}>🦷</span>
+                        <FiActivity style={{ fontSize: "1.25rem", color: "var(--primary)" }} />
                         <div>
                             <h2 className="card__title" style={{ color: "var(--primary)" }}>3. Next Procedure</h2>
                             <p className="card__subtitle">Your upcoming planned clinical operation</p>
