@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
-import { FiBell } from "react-icons/fi";
+import { FiBell, FiCheck } from "react-icons/fi";
 import { realtimeService } from "../../services/realtime.service.js";
 import { signalRService } from "../../services/signalr.service.js";
 import { apiClient } from "../../lib/api-client.js";
@@ -8,7 +8,7 @@ import { apiClient } from "../../lib/api-client.js";
 /**
  * Task 8: Dentist Notification UI
  * Create:
- * - Notification icon (🔔)
+ * - Notification icon (FiBell)
  * - Notification count badge
  * - Notification dropdown/page
  * - Read/unread state & Mark all read
@@ -314,9 +314,11 @@ export default function DentistNotificationDropdown({ userId = "usr-dentist-01" 
                                                     fontSize: "0.75rem",
                                                     cursor: "pointer",
                                                     padding: "2px",
+                                                    display: "inline-flex",
+                                                    alignItems: "center",
                                                 }}
                                             >
-                                                ✓
+                                                <FiCheck size={12} />
                                             </button>
                                         )}
                                     </div>

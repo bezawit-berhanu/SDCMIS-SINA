@@ -1,3 +1,5 @@
+import { FiLock } from "react-icons/fi";
+
 /**
  * CustomerReadOnlyNotice
  * Accessible to: Customer
@@ -20,9 +22,8 @@ export default function CustomerReadOnlyNotice() {
                 marginBottom: "1rem",
             }}
         >
-            <span>🔒</span>
+            <FiLock size={14} />
             <span>Official SINA Clinical Record • Read-Only Self-Service View (FR-CUS-03)</span>
         </div>
     );
 }
-

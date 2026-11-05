@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
+import { FiAlertTriangle, FiRefreshCw, FiCalendar, FiX, FiClipboard } from "react-icons/fi";
 import PageContainer from "../components/layout/PageContainer";
 import Button from "../components/common/Button";
 import appointmentService from "../services/appointment.service";
@@ -116,15 +117,15 @@ export default function AppointmentsPage() {
             actions={
                 <div style={{ display: "flex", gap: "8px" }}>
                     <Link to="/appointments/missed">
-                        <Button variant="outline" size="sm" style={{ color: "#dc2626", borderColor: "#fca5a5" }}>
-                            ⚠️ Missed Appointments ({missedCount})
+                        <Button variant="outline" size="sm" style={{ color: "#dc2626", borderColor: "#fca5a5", display: "inline-flex", alignItems: "center", gap: 6 }}>
+                            <FiAlertTriangle /> Missed Appointments ({missedCount})
                         </Button>
                     </Link>
                     <Button variant="primary" size="sm" onClick={() => setShowBookModal(true)}>
                         + Book Appointment
                     </Button>
                     <Button variant="secondary" size="sm" onClick={loadData} disabled={loading}>
-                        {loading ? "Refreshing..." : "🔄 Refresh"}
+                        {loading ? "Refreshing..." : <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><FiRefreshCw /> Refresh</span>}
                     </Button>
                 </div>
             }
@@ -172,8 +173,8 @@ export default function AppointmentsPage() {
 
                 <div className="card" onClick={() => setActiveTab("calendar")} style={{ cursor: "pointer" }}>
                     <span style={{ fontSize: "0.8125rem", color: "var(--text-muted)", fontWeight: 500 }}>Calendar View</span>
-                    <p style={{ fontSize: "1.25rem", fontWeight: 700, color: "#059669", margin: "6px 0 0 0" }}>
-                        📅 Day & Month
+                    <p style={{ fontSize: "1.25rem", fontWeight: 700, color: "#059669", margin: "6px 0 0 0", display: "inline-flex", alignItems: "center", gap: 6 }}>
+                        <FiCalendar /> Day & Month
                     </p>
                     <p style={{ fontSize: "0.75rem", color: "var(--text-light)", marginTop: "4px" }}>Interactive date selection</p>
                 </div>
@@ -243,10 +244,13 @@ export default function AppointmentsPage() {
                                         fontWeight: 600,
                                         cursor: "pointer",
                                         backgroundColor: "#fee2e2",
-                                        color: "#991b1b"
+                                        color: "#991b1b",
+                                        display: "inline-flex",
+                                        alignItems: "center",
+                                        gap: 4,
                                     }}
                                 >
-                                    ✕ Clear Date
+                                    <FiX /> Clear Date
                                 </button>
                             )}
                         </div>
@@ -255,7 +259,7 @@ export default function AppointmentsPage() {
                     {/* Task 3 & 4: Upcoming Tasks Dashboard / Appointment List */}
                     {displayedAppointments.length === 0 ? (
                         <div style={{ padding: "3rem 1rem", textAlign: "center", color: "#64748b" }}>
-                            <span style={{ fontSize: "2rem" }}>📋</span>
+                            <FiClipboard size={32} color="#94a3b8" />
                             <p style={{ margin: "8px 0 0 0", fontWeight: 600 }}>No appointments found for the selected view.</p>
                             <p style={{ fontSize: "0.8125rem", color: "#94a3b8" }}>Try selecting another date or click "+ Book Appointment".</p>
                         </div>

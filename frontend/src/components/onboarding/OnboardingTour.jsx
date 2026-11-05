@@ -1,4 +1,14 @@
 import { useState, useEffect } from "react";
+import {
+    FiActivity,
+    FiBell,
+    FiClipboard,
+    FiCalendar,
+    FiUserCheck,
+    FiVolume2,
+    FiTag,
+    FiDollarSign,
+} from "react-icons/fi";
 import Button from "../common/Button";
 
 /**
@@ -29,25 +39,25 @@ export default function OnboardingTour({ role = "DENTIST", onComplete }) {
             title: "Welcome to SINA Dentist Workspace (SCR-04)",
             description:
                 "Your dashboard provides an at-a-glance view of clinic patients, service breakdowns, and total outstanding balances without manual calculations.",
-            icon: "🩺",
+            icon: <FiActivity size={28} color="#0284c7" />,
         },
         {
             title: "Live Patient Queue & Alerts (BR-27)",
             description:
                 "The notification bell in the top header alerts you in real time the moment a Receptionist calls a patient forward. No manual page refresh needed.",
-            icon: "🔔",
+            icon: <FiBell size={28} color="#0284c7" />,
         },
         {
             title: "Single Next Procedure & History (BR-11, BR-14)",
             description:
                 "Plan one Next procedure per patient, move it to Ongoing when starting treatment, and archive to permanent history when ticked Done.",
-            icon: "📋",
+            icon: <FiClipboard size={28} color="#0284c7" />,
         },
         {
             title: "Missed Appointments & Rescheduling (FR-DEN-12)",
             description:
                 "Any patient who missed their booked appointment date is automatically listed under Missed Appointments with one-click rescheduling.",
-            icon: "📅",
+            icon: <FiCalendar size={28} color="#0284c7" />,
         },
     ];
 
@@ -56,25 +66,25 @@ export default function OnboardingTour({ role = "DENTIST", onComplete }) {
             title: "Welcome to SINA Reception Desk (SCR-10)",
             description:
                 "Manage walk-in and scheduled traffic through your live 3-column front desk queue (Waiting, Serving, Done).",
-            icon: "🛎️",
+            icon: <FiUserCheck size={28} color="#0284c7" />,
         },
         {
             title: "One-Tap Call & Instant Dentist Push (BR-27)",
             description:
                 "Clicking 'Call' moves a waiting patient to Serving and instantly alerts the dentist chair. Complete visit automatically prompts auto-advance.",
-            icon: "📢",
+            icon: <FiVolume2 size={28} color="#0284c7" />,
         },
         {
             title: "Quick Ticket Check-In (SCR-15)",
             description:
                 "Issue sequential daily tickets (#001, #002..) using '+ Check In' for walk-in arrivals or scheduled visits in seconds.",
-            icon: "🎟️",
+            icon: <FiTag size={28} color="#0284c7" />,
         },
         {
             title: "Customers & Fee Balances (SCR-11, SCR-16)",
             description:
                 "Record patient payments with fixed-point accuracy and monitor remaining balances clinic-wide without paper spreadsheets.",
-            icon: "💰",
+            icon: <FiDollarSign size={28} color="#0284c7" />,
         },
     ];
 

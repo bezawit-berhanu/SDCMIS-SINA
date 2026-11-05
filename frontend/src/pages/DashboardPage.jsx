@@ -1,4 +1,14 @@
 import { useState } from "react";
+import {
+    FiDatabase,
+    FiFileText,
+    FiZap,
+    FiActivity,
+    FiRefreshCw,
+    FiFolder,
+    FiLayers,
+    FiSettings,
+} from "react-icons/fi";
 import { useAuth } from "../features/auth/AuthContext";
 import PageContainer from "../components/layout/PageContainer";
 import Button from "../components/common/Button";
@@ -17,10 +27,10 @@ export default function DashboardPage() {
     };
 
     const stats = [
-        { label: "Active Datasets", value: "24", change: "+3 this week", icon: "🗺️" },
-        { label: "Synced Records", value: "1,428", change: "99.8% accurate", icon: "📑" },
-        { label: "Operational Tasks", value: "8", change: "2 pending review", icon: "⚡" },
-        { label: "System Health", value: "Optimal", change: "Lat: 28ms", icon: "🟢" },
+        { label: "Active Datasets", value: "24", change: "+3 this week", icon: <FiDatabase size={24} color="#0284c7" /> },
+        { label: "Synced Records", value: "1,428", change: "99.8% accurate", icon: <FiFileText size={24} color="#16a34a" /> },
+        { label: "Operational Tasks", value: "8", change: "2 pending review", icon: <FiZap size={24} color="#ca8a04" /> },
+        { label: "System Health", value: "Optimal", change: "Lat: 28ms", icon: <FiActivity size={24} color="#059669" /> },
     ];
 
     const recentActivities = [
@@ -39,7 +49,7 @@ export default function DashboardPage() {
             }
             actions={
                 <Button variant="secondary" size="sm" onClick={handleRefresh} disabled={refreshing}>
-                    {refreshing ? "Refreshing..." : "🔄 Refresh"}
+                    {refreshing ? "Refreshing..." : <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><FiRefreshCw /> Refresh</span>}
                 </Button>
             }
         >
@@ -55,7 +65,7 @@ export default function DashboardPage() {
                                     {stat.value}
                                 </p>
                             </div>
-                            <span style={{ fontSize: "1.5rem" }}>{stat.icon}</span>
+                            <span>{stat.icon}</span>
                         </div>
                         <p style={{ fontSize: "0.75rem", color: "var(--text-light)", marginTop: "0.5rem" }}>
                             {stat.change}
@@ -111,13 +121,13 @@ export default function DashboardPage() {
                     </div>
                     <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
                         <Button variant="outline" fullWidth style={{ justifyContent: "flex-start" }}>
-                            📁 Manage Datasets
+                            <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}><FiFolder /> Manage Datasets</span>
                         </Button>
                         <Button variant="outline" fullWidth style={{ justifyContent: "flex-start" }}>
-                            🛰️ Inspect Spatial Layers
+                            <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}><FiLayers /> Inspect Clinical Records</span>
                         </Button>
                         <Button variant="outline" fullWidth style={{ justifyContent: "flex-start" }}>
-                            ⚙️ System Configuration
+                            <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}><FiSettings /> System Configuration</span>
                         </Button>
                     </div>
                 </div>

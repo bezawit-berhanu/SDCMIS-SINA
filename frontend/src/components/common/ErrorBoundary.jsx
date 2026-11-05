@@ -1,4 +1,5 @@
 import { Component } from "react";
+import { FiAlertTriangle } from "react-icons/fi";
 import Button from "./Button";
 
 /**
@@ -69,7 +70,7 @@ export default class ErrorBoundary extends Component {
                                 fontSize: "2rem",
                             }}
                         >
-                            ⚠️
+                            <FiAlertTriangle size={32} />
                         </div>
 
                         <h1

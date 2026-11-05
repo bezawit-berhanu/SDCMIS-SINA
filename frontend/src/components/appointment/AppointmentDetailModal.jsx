@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { FiX, FiCheck, FiCalendar, FiAlertCircle } from "react-icons/fi";
 import appointmentService from "../../services/appointment.service";
 
 export default function AppointmentDetailModal({ appointment, onClose, onRefresh }) {
@@ -124,22 +125,22 @@ export default function AppointmentDetailModal({ appointment, onClose, onRefresh
                     <button
                         type="button"
                         onClick={onClose}
-                        style={{ border: "none", background: "none", fontSize: "1.25rem", cursor: "pointer", color: "#64748b" }}
+                        style={{ border: "none", background: "none", fontSize: "1.25rem", cursor: "pointer", color: "#64748b", display: "inline-flex", alignItems: "center" }}
                     >
-                        ✕
+                        <FiX />
                     </button>
                 </div>
 
                 {/* Body */}
                 <div style={{ padding: "1.5rem" }}>
                     {actionSuccess && (
-                        <div style={{ padding: "10px 14px", marginBottom: "1rem", borderRadius: "6px", backgroundColor: "#ecfdf5", color: "#065f46", border: "1px solid #a7f3d0", fontSize: "0.875rem", fontWeight: 500 }}>
-                            ✓ {actionSuccess}
+                        <div style={{ padding: "10px 14px", marginBottom: "1rem", borderRadius: "6px", backgroundColor: "#ecfdf5", color: "#065f46", border: "1px solid #a7f3d0", fontSize: "0.875rem", fontWeight: 500, display: "flex", alignItems: "center", gap: 6 }}>
+                            <FiCheck /> {actionSuccess}
                         </div>
                     )}
                     {actionError && (
-                        <div style={{ padding: "10px 14px", marginBottom: "1rem", borderRadius: "6px", backgroundColor: "#fee2e2", color: "#991b1b", border: "1px solid #fca5a5", fontSize: "0.875rem", fontWeight: 500 }}>
-                            ✕ {actionError}
+                        <div style={{ padding: "10px 14px", marginBottom: "1rem", borderRadius: "6px", backgroundColor: "#fee2e2", color: "#991b1b", border: "1px solid #fca5a5", fontSize: "0.875rem", fontWeight: 500, display: "flex", alignItems: "center", gap: 6 }}>
+                            <FiAlertCircle /> {actionError}
                         </div>
                     )}
 
@@ -167,7 +168,9 @@ export default function AppointmentDetailModal({ appointment, onClose, onRefresh
 
                         <div style={{ padding: "10px", backgroundColor: "#f8fafc", borderRadius: "8px", border: "1px solid #f1f5f9", gridColumn: "span 2" }}>
                             <span style={{ display: "block", fontSize: "0.75rem", color: "#64748b", fontWeight: 600 }}>Scheduled Date & Time</span>
-                            <strong style={{ fontSize: "1rem", color: "#1d4ed8" }}>📅 {formattedDate}</strong>
+                            <strong style={{ fontSize: "1rem", color: "#1d4ed8", display: "inline-flex", alignItems: "center", gap: 6 }}>
+                                <FiCalendar /> {formattedDate}
+                            </strong>
                         </div>
                     </div>
 
@@ -306,10 +309,13 @@ export default function AppointmentDetailModal({ appointment, onClose, onRefresh
                                         border: "none",
                                         fontWeight: 600,
                                         fontSize: "0.8125rem",
-                                        cursor: "pointer"
+                                        cursor: "pointer",
+                                        display: "inline-flex",
+                                        alignItems: "center",
+                                        gap: 6,
                                     }}
                                 >
-                                    📅 Reschedule
+                                    <FiCalendar /> Reschedule
                                 </button>
                             )}
 
@@ -328,10 +334,13 @@ export default function AppointmentDetailModal({ appointment, onClose, onRefresh
                                         border: "1px solid #fca5a5",
                                         fontWeight: 600,
                                         fontSize: "0.8125rem",
-                                        cursor: "pointer"
+                                        cursor: "pointer",
+                                        display: "inline-flex",
+                                        alignItems: "center",
+                                        gap: 6,
                                     }}
                                 >
-                                    ✕ Cancel
+                                    <FiX /> Cancel
                                 </button>
                             )}
                         </div>
