@@ -116,7 +116,7 @@ export default function LogNextProcedureModal({ patient, onClose, onSaved }) {
                             color: "#92400e",
                         }}
                     >
-                        <strong>BR-11 / BR-13 Note:</strong> A patient may have exactly one Next procedure. Saving will update the existing planned procedure '{existingNext.name}'.
+                        A patient may have exactly one Next procedure. Saving will update the existing planned procedure '{existingNext.name}'.
                     </div>
                 )}
 
