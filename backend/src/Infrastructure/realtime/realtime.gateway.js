@@ -13,6 +13,31 @@ class RealtimeGateway extends EventEmitter {
         this.clients = new Set();
         this.eventsHistory = [];
         this.setMaxListeners(100);
+
+        // Periodic heartbeat ping to detect dead sockets (NFR-REL-02)
+        this.pingInterval = setInterval(() => {
+            for (const ws of this.clients) {
+                if (ws.isAlive === false) {
+                    this.clients.delete(ws);
+                    try { ws.terminate(); } catch (_) {}
+                    continue;
+                }
+                ws.isAlive = false;
+                try {
+                    if (ws.isSignalR) {
+                        ws.send('{"type":6}\x1e');
+                    } else if (ws.ping) {
+                        ws.ping();
+                    }
+                } catch (_) {
+                    this.clients.delete(ws);
+                }
+            }
+        }, 30000);
+
+        if (this.pingInterval.unref) {
+            this.pingInterval.unref();
+        }
     }
 
     /**
