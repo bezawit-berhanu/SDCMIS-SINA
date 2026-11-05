@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Button from "../common/Button";
 import apiClient from "../../services/apiclient";
+import { FiX, FiCreditCard } from "react-icons/fi";
 
 /**
  * SCR-16: Record Payment Modal
@@ -103,22 +104,26 @@ export default function RecordPaymentModal({ patient, onClose, onSuccess }) {
                 }}
             >
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.25rem" }}>
-                    <h2 id="record-payment-title" style={{ fontSize: "1.25rem", fontWeight: "700", color: "#1e293b", margin: 0 }}>
-                        Record Payment (SCR-16)
-                    </h2>
+                    <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                        <FiCreditCard style={{ color: "var(--primary)", fontSize: "1.25rem" }} />
+                        <h2 id="record-payment-title" style={{ fontSize: "1.25rem", fontWeight: "700", color: "var(--text-main)", margin: 0 }}>
+                            Record Payment (SCR-16)
+                        </h2>
+                    </div>
                     <button
                         type="button"
                         onClick={onClose}
                         style={{
                             background: "none",
                             border: "none",
-                            fontSize: "1.5rem",
+                            fontSize: "1.25rem",
                             cursor: "pointer",
-                            color: "#64748b",
-                            lineHeight: 1,
+                            color: "var(--text-muted)",
+                            display: "flex",
+                            alignItems: "center",
                         }}
                     >
-                        &times;
+                        <FiX />
                     </button>
                 </div>
 
