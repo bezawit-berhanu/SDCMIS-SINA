@@ -9,6 +9,15 @@ import EditPatientModal from "../components/patient/EditPatientModal";
 import DeletePatientModal from "../components/patient/DeletePatientModal";
 import PaymentHistoryModal from "../components/patient/PaymentHistoryModal";
 import apiClient from "../services/apiclient";
+import {
+    FiArrowLeft,
+    FiEdit2,
+    FiTrash2,
+    FiCheck,
+    FiPlay,
+    FiCreditCard,
+    FiFileText
+} from "react-icons/fi";
 
 /**
  * SCR-06: Patient Detail Screen
@@ -96,8 +105,9 @@ export default function PatientDetailPage({ readOnly = false }) {
             {/* Top Breadcrumb & Action Header */}
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem", flexWrap: "wrap", gap: "1rem" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                    <Link to="/patients" style={{ color: "#64748b", textDecoration: "none", fontSize: "0.9rem" }}>
-                        ← Patients Directory
+                    <Link to="/patients" style={{ color: "#64748b", textDecoration: "none", fontSize: "0.9rem", display: "inline-flex", alignItems: "center", gap: "0.25rem" }}>
+                        <FiArrowLeft />
+                        <span>Patients Directory</span>
                     </Link>
                     <span style={{ color: "#cbd5e1" }}>/</span>
                     <span style={{ fontWeight: "700", color: "#1e293b", fontSize: "0.9rem" }}>{patient.name}</span>
@@ -105,11 +115,11 @@ export default function PatientDetailPage({ readOnly = false }) {
 
                 {!readOnly && (
                     <div style={{ display: "flex", gap: "0.5rem" }}>
-                        <Button variant="secondary" size="sm" onClick={() => setShowEditModal(true)}>
-                            ✏️ Edit Identity
+                        <Button variant="secondary" size="sm" onClick={() => setShowEditModal(true)} icon={<FiEdit2 />}>
+                            Edit Identity
                         </Button>
-                        <Button variant="danger" size="sm" onClick={() => setShowDeleteModal(true)}>
-                            🗑️ Delete
+                        <Button variant="danger" size="sm" onClick={() => setShowDeleteModal(true)} icon={<FiTrash2 />}>
+                            Delete
                         </Button>
                     </div>
                 )}
@@ -126,9 +136,13 @@ export default function PatientDetailPage({ readOnly = false }) {
                         marginBottom: "1.25rem",
                         fontWeight: "600",
                         border: "1px solid #a7f3d0",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "0.5rem"
                     }}
                 >
-                    ✓ {feedback}
+                    <FiCheck />
+                    <span>{feedback}</span>
                 </div>
             )}
 
@@ -203,8 +217,9 @@ export default function PatientDetailPage({ readOnly = false }) {
                                         variant="primary"
                                         size="sm"
                                         onClick={() => setShowStartModal(true)}
+                                        icon={<FiPlay />}
                                     >
-                                        ▶ Start Treatment (Move to Ongoing)
+                                        Start Treatment
                                     </Button>
                                 )}
                             </div>
@@ -242,8 +257,9 @@ export default function PatientDetailPage({ readOnly = false }) {
                                         variant="primary"
                                         size="sm"
                                         onClick={() => setShowCompleteModal(true)}
+                                        icon={<FiCheck />}
                                     >
-                                        ✓ Tick Done (Mark Complete)
+                                        Mark Complete
                                     </Button>
                                 )}
                             </div>
@@ -333,16 +349,18 @@ export default function PatientDetailPage({ readOnly = false }) {
                                     variant="primary"
                                     onClick={() => setShowPaymentModal(true)}
                                     style={{ width: "100%" }}
+                                    icon={<FiCreditCard />}
                                 >
-                                    💳 Record New Payment (SCR-16)
+                                    Record New Payment
                                 </Button>
                             )}
                             <Button
                                 variant="secondary"
                                 onClick={() => setShowPaymentHistoryModal(true)}
                                 style={{ width: "100%" }}
+                                icon={<FiFileText />}
                             >
-                                📜 View Payment Audit History ({patient.payments?.length || 0})
+                                View Payment History ({patient.payments?.length || 0})
                             </Button>
                         </div>
                     </div>
