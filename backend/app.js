@@ -16,6 +16,7 @@ const paymentRoutes = require("./src/Presentation/routes/payment.routes");
 const createAppointmentRoutes = require("./src/Presentation/routes/appointment.routes");
 const createQueueRoutes = require("./src/Presentation/routes/queue.routes");
 const createNotificationRoutes = require("./src/Presentation/routes/notification.routes");
+const dashboardRoutes = require("./src/Presentation/routes/dashboard.routes");
 const container = require("./src/container/container");
 const { createRateLimiter } = require("./src/Presentation/middleware/rateLimiter");
 
@@ -134,6 +135,11 @@ app.post(["/hub/queue/negotiate", "/api/v1/queue/negotiate"], (req, res) => {
 app.use("/api/v1/notifications", notificationRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/notifications", notificationRoutes);
+
+// Dashboards & Worklists (SRS Section 8.5.3: /dentist/dashboard, /dentist/tasks, /dentist/missed-appointments, /receptionist/dashboard, /receptionist/customers)
+app.use("/api/v1", dashboardRoutes);
+app.use("/api", dashboardRoutes);
+app.use("/", dashboardRoutes);
 
 // Fallback & centralized error handlers
 app.use(notFound);

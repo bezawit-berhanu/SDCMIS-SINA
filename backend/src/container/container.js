@@ -157,6 +157,19 @@ const markAllNotificationsRead = new MarkAllNotificationsRead({ notificationRepo
 
 const GetCustomerDashboard = require("../application/patient/GetCustomerDashboard");
 const GetCustomerQueuePosition = require("../application/queue/GetCustomerQueuePosition");
+const GetDentistDashboard = require("../application/dashboard/GetDentistDashboard");
+const GetReceptionistDashboard = require("../application/dashboard/GetReceptionistDashboard");
+
+const getDentistDashboard = new GetDentistDashboard({
+    patientRepository,
+    procedureRepository,
+    paymentRepository,
+});
+
+const getReceptionistDashboard = new GetReceptionistDashboard({
+    appointmentRepository,
+    queueRepository,
+});
 
 const getCustomerDashboard = new GetCustomerDashboard({
     patientRepository,
@@ -221,6 +234,8 @@ const container = {
     markAllNotificationsRead,
     getCustomerDashboard,
     getCustomerQueuePosition,
+    getDentistDashboard,
+    getReceptionistDashboard,
 };
 
 module.exports = container;
