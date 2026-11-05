@@ -49,11 +49,15 @@ class RecordPayment {
             throw new Error(`Patient with ID ${patientId} does not exist.`);
         }
 
-        // 4. Validate: Payment does not exceed permitted balance if required (Task 7)
+        // 4. Validate: Payment does not exceed permitted balance if required (SRS BR-20, ERR-OVERPAYMENT)
         const currentBalance = Number(patient.remainingFee ?? patient.balance ?? 0);
         const enforceBalance = input.enforcePermittedBalance === true || input.overpaymentPolicy === "REJECT";
-        if (enforceBalance && currentBalance > 0 && amount > currentBalance) {
-            throw new Error(`Payment amount ($${amount.toFixed(2)}) exceeds permitted outstanding balance ($${currentBalance.toFixed(2)}).`);
+        if (enforceBalance && currentBalance >= 0 && amount > currentBalance) {
+            const error = new Error("This payment is more than the remaining balance. Record as credit or adjust the amount.");
+            error.statusCode = 422;
+            error.code = "OVERPAYMENT_REJECTED";
+            error.errorCode = "ERR-OVERPAYMENT";
+            throw error;
         }
 
         const recordedBy = actor.id || actor.fullName || input.RecordedBy || input.recordedBy || "usr-receptionist-01";
