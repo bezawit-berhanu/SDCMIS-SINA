@@ -90,7 +90,7 @@ export default function DeletePatientModal({ patient, onClose, onDeleted }) {
                         marginBottom: "1.5rem",
                     }}
                 >
-                    <strong>BR-15 Policy:</strong> In compliance with dental clinic record rules, this patient will be soft-deleted. Historical completed procedures and payments are safely archived and retained for clinical audits.
+                    In compliance with dental clinic record standards, this patient will be archived. Historical completed procedures and payments are retained for clinical audit.
                 </div>
 
                 {error && (
