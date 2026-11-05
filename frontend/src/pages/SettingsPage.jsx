@@ -3,6 +3,7 @@ import { useAuth, UserRole } from "../features/auth/auth-context";
 import PageContainer from "../components/layout/PageContainer";
 import Button from "../components/common/Button";
 import ErrorMessage from "../components/common/ErrorMessage";
+import { FiUser, FiEdit2, FiPhone, FiLock, FiCheck, FiInfo, FiRefreshCw } from "react-icons/fi";
 
 // Form 1: Name Update Component
 function NameSettingsForm({ user, updateName }) {
@@ -63,9 +64,13 @@ function NameSettingsForm({ user, updateName }) {
                             padding: "0.75rem 1rem",
                             fontSize: "0.875rem",
                             marginBottom: "1rem",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "0.5rem",
                         }}
                     >
-                        ✓ {success}
+                        <FiCheck />
+                        <span>{success}</span>
                     </div>
                 )}
                 {error && (
@@ -178,9 +183,13 @@ function ContactSettingsForm({ user, updateContact }) {
                             padding: "0.75rem 1rem",
                             fontSize: "0.875rem",
                             marginBottom: "1rem",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "0.5rem",
                         }}
                     >
-                        ✓ {success}
+                        <FiCheck />
+                        <span>{success}</span>
                     </div>
                 )}
                 {error && (
@@ -229,9 +238,13 @@ function ContactSettingsForm({ user, updateContact }) {
                             borderRadius: "var(--radius-sm)",
                             fontSize: "0.8125rem",
                             color: "var(--text-muted)",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "0.5rem",
                         }}
                     >
-                        ℹ️ <strong>Policy requirement:</strong> At least one contact method (email or phone) must remain active on your account.
+                        <FiInfo />
+                        <span><strong>Policy requirement:</strong> At least one contact method (email or phone) must remain active on your account.</span>
                     </div>
 
                     <div>
@@ -316,9 +329,13 @@ function PasswordSettingsForm({ changePassword }) {
                             padding: "0.75rem 1rem",
                             fontSize: "0.875rem",
                             marginBottom: "1rem",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "0.5rem",
                         }}
                     >
-                        ✓ {success}
+                        <FiCheck />
+                        <span>{success}</span>
                     </div>
                 )}
                 {error && (
@@ -515,9 +532,13 @@ function ProfileSettingsForm({ user, updateProfile }) {
                             padding: "0.75rem 1rem",
                             fontSize: "0.875rem",
                             marginBottom: "1rem",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "0.5rem",
                         }}
                     >
-                        ✓ {success}
+                        <FiCheck />
+                        <span>{success}</span>
                     </div>
                 )}
                 {error && (
@@ -584,8 +605,8 @@ function ProfileSettingsForm({ user, updateProfile }) {
                             onChange={(e) => setProfileTheme(e.target.value)}
                             disabled={loading}
                         >
-                            <option value="LIGHT">☀️ Light Theme (Default)</option>
-                            <option value="DARK">🌙 Dark Theme</option>
+                            <option value="LIGHT">Light Theme (Default)</option>
+                            <option value="DARK">Dark Theme</option>
                         </select>
                     </div>
 
@@ -637,8 +658,8 @@ export default function SettingsPage() {
             title="Personal Settings"
             subtitle="Manage your personal information, contact methods, security credentials, and preferences"
             actions={
-                <Button variant="secondary" size="sm" onClick={handleRefresh} disabled={refreshing}>
-                    {refreshing ? "Refreshing..." : "🔄 Refresh"}
+                <Button variant="secondary" size="sm" onClick={handleRefresh} disabled={refreshing} icon={<FiRefreshCw />}>
+                    {refreshing ? "Refreshing..." : "Refresh"}
                 </Button>
             }
         >
@@ -653,9 +674,13 @@ export default function SettingsPage() {
                         padding: "0.75rem 1rem",
                         fontSize: "0.875rem",
                         marginBottom: "1rem",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "0.5rem",
                     }}
                 >
-                    ✓ {globalSuccess}
+                    <FiCheck />
+                    <span>{globalSuccess}</span>
                 </div>
             )}
             {globalError && (
@@ -692,9 +717,13 @@ export default function SettingsPage() {
                         backgroundColor: activeTab === "profile" ? "var(--primary)" : "transparent",
                         color: activeTab === "profile" ? "#ffffff" : "var(--text-muted)",
                         transition: "all 0.15s ease",
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "0.5rem",
                     }}
                 >
-                    👤 Profile Information
+                    <FiUser />
+                    <span>Profile Information</span>
                 </button>
                 <button
                     type="button"
@@ -711,9 +740,13 @@ export default function SettingsPage() {
                         backgroundColor: activeTab === "name" ? "var(--primary)" : "transparent",
                         color: activeTab === "name" ? "#ffffff" : "var(--text-muted)",
                         transition: "all 0.15s ease",
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "0.5rem",
                     }}
                 >
-                    ✏️ Update Name
+                    <FiEdit2 />
+                    <span>Update Name</span>
                 </button>
                 <button
                     type="button"
@@ -730,9 +763,13 @@ export default function SettingsPage() {
                         backgroundColor: activeTab === "contact" ? "var(--primary)" : "transparent",
                         color: activeTab === "contact" ? "#ffffff" : "var(--text-muted)",
                         transition: "all 0.15s ease",
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "0.5rem",
                     }}
                 >
-                    📞 Update Contact
+                    <FiPhone />
+                    <span>Update Contact</span>
                 </button>
                 <button
                     type="button"
@@ -749,9 +786,13 @@ export default function SettingsPage() {
                         backgroundColor: activeTab === "password" ? "var(--primary)" : "transparent",
                         color: activeTab === "password" ? "#ffffff" : "var(--text-muted)",
                         transition: "all 0.15s ease",
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "0.5rem",
                     }}
                 >
-                    🔒 Change Password
+                    <FiLock />
+                    <span>Change Password</span>
                 </button>
             </div>
 
