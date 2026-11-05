@@ -16,7 +16,7 @@ export default function StartProcedureModal({ patient, onClose, onStarted }) {
     const handleConfirmStart = async () => {
         if (existingOngoing) {
             setError(
-                `BR-12 Constraint: An ongoing procedure ('${existingOngoing.name}') is already active for this patient. Please complete or conclude it before starting a new procedure.`
+                `An ongoing procedure ('${existingOngoing.name}') is already active for this patient. Please complete or conclude it before starting a new procedure.`
             );
             return;
         }
@@ -99,7 +99,7 @@ export default function StartProcedureModal({ patient, onClose, onStarted }) {
                             marginBottom: "1.25rem",
                         }}
                     >
-                        <strong>BR-12 Active Procedure Conflict:</strong> Patient already has '{existingOngoing.name}' in ONGOING state. A patient may have at most one active procedure at a time.
+                        <strong>Active Procedure Conflict:</strong> Patient already has '{existingOngoing.name}' in progress. A patient may have at most one active procedure at a time.
                     </div>
                 )}
 
