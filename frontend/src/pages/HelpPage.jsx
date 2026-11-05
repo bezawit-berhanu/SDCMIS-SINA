@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth, getDefaultDashboardForRole } from "../features/auth/auth-context";
 import Button from "../components/common/Button";
+import { FiArrowLeft, FiHelpCircle } from "react-icons/fi";
 
 /**
  * SCR-17: Help / FAQ Page
@@ -78,16 +79,19 @@ export default function HelpPage() {
         <div style={{ maxWidth: "900px", margin: "0 auto", padding: "2.5rem 1.5rem" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem", flexWrap: "wrap", gap: "1rem" }}>
                 <div>
-                    <h1 style={{ fontSize: "2rem", fontWeight: "800", color: "var(--text-main)", marginBottom: "0.5rem" }}>
-                        SDCIMP Knowledge Base & FAQs
-                    </h1>
-                    <p style={{ color: "var(--text-muted)", fontSize: "1rem" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.25rem" }}>
+                        <FiHelpCircle style={{ color: "var(--primary)", fontSize: "1.5rem" }} />
+                        <h1 style={{ fontSize: "2rem", fontWeight: "800", color: "var(--primary)", margin: 0 }}>
+                            SDCIMP Knowledge Base & FAQs
+                        </h1>
+                    </div>
+                    <p style={{ color: "var(--text-muted)", fontSize: "1rem", margin: 0 }}>
                         System guidelines, clinical procedures, queue mechanics, and account help (SCR-17).
                     </p>
                 </div>
                 <Link to={returnPath}>
-                    <Button variant="secondary" size="md">
-                        ← Back to {user ? "Dashboard" : "Home"}
+                    <Button variant="secondary" size="md" icon={<FiArrowLeft />}>
+                        Back to {user ? "Dashboard" : "Home"}
                     </Button>
                 </Link>
             </div>
@@ -127,12 +131,12 @@ export default function HelpPage() {
                         style={{
                             padding: "0.5rem 1rem",
                             borderRadius: "9999px",
-                            border: "none",
+                            border: "1px solid var(--border)",
                             cursor: "pointer",
                             fontSize: "0.875rem",
                             fontWeight: 600,
-                            backgroundColor: activeTab === tab.id ? "var(--primary-color, #0284c7)" : "var(--bg-card, #f1f5f9)",
-                            color: activeTab === tab.id ? "#ffffff" : "var(--text-main, #334155)",
+                            backgroundColor: activeTab === tab.id ? "var(--primary)" : "var(--bg-surface)",
+                            color: activeTab === tab.id ? "#ffffff" : "var(--text-main)",
                             transition: "all 0.2s ease",
                         }}
                     >
@@ -144,7 +148,7 @@ export default function HelpPage() {
             {/* FAQ List */}
             <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
                 {filteredFaqs.length === 0 ? (
-                    <div className="card" style={{ textAlign: "center", padding: "3rem 1.5rem" }}>
+                    <div className="card" style={{ textAlign: "center", padding: "3rem 1.5rem", backgroundColor: "var(--bg-surface)", border: "1px solid var(--border)" }}>
                         <p style={{ color: "var(--text-muted)", fontSize: "1.1rem" }}>No help articles match your search.</p>
                         <Button variant="outline" size="sm" onClick={() => { setSearchQuery(""); setActiveTab("all"); }} style={{ marginTop: "1rem" }}>
                             Reset Filters
@@ -152,7 +156,7 @@ export default function HelpPage() {
                     </div>
                 ) : (
                     filteredFaqs.map((faq) => (
-                        <div key={faq.id} className="card" style={{ padding: "1.5rem" }}>
+                        <div key={faq.id} className="card" style={{ padding: "1.5rem", backgroundColor: "var(--bg-surface)", border: "1px solid var(--border)" }}>
                             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "1rem", marginBottom: "0.75rem" }}>
                                 <h2 style={{ fontSize: "1.15rem", fontWeight: "700", color: "var(--text-main)", margin: 0 }}>
                                     {faq.question}
@@ -164,8 +168,9 @@ export default function HelpPage() {
                                         textTransform: "uppercase",
                                         padding: "0.2rem 0.5rem",
                                         borderRadius: "4px",
-                                        backgroundColor: "#e0f2fe",
-                                        color: "#0369a1",
+                                        backgroundColor: "rgba(27, 77, 46, 0.1)",
+                                        color: "var(--primary)",
+                                        border: "1px solid var(--border)",
                                     }}
                                 >
                                     {faq.role}
