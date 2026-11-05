@@ -102,10 +102,10 @@ export default function CustomerFeesPage() {
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem", flexWrap: "wrap", gap: "1rem" }}>
                 <div>
                     <h1 style={{ fontSize: "1.75rem", fontWeight: "800", color: "var(--primary)", marginBottom: "0.25rem" }}>
-                        Customers & Fee Balances (SCR-11)
+                        Customers & Fee Balances
                     </h1>
                     <p style={{ color: "var(--text-muted)", fontSize: "0.95rem" }}>
-                        Monitor outstanding patient fees, review balances, and record payments directly per FR-REC-02.
+                        Monitor outstanding patient fees, review balances, and record payments.
                     </p>
                 </div>
 
@@ -132,7 +132,7 @@ export default function CustomerFeesPage() {
                     role="alert"
                     style={{
                         padding: "0.75rem 1rem",
-                        backgroundColor: "rgba(27, 77, 46, 0.08)",
+                        backgroundColor: "var(--primary-light)",
                         color: "var(--primary)",
                         border: "1px solid var(--border)",
                         borderRadius: "8px",
