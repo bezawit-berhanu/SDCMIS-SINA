@@ -24,11 +24,45 @@ const tokenService = {
         return this.signAccessToken(user);
     },
     verifyAccessToken(token) {
-        return jwt.verify(token, env.JWT_ACCESS_SECRET, {
-            algorithms: ["HS256"],
-            issuer: ISSUER,
-            audience: AUDIENCE,
-        });
+        if (!token || typeof token !== "string") {
+            const error = new Error("Token missing or invalid.");
+            error.statusCode = 401;
+            error.code = "INVALID_TOKEN";
+            throw error;
+        }
+
+        try {
+            return jwt.verify(token, env.JWT_ACCESS_SECRET, {
+                algorithms: ["HS256"],
+                issuer: ISSUER,
+                audience: AUDIENCE,
+            });
+        } catch (err) {
+            if (err.name === "TokenExpiredError") {
+                const expiredError = new Error("For your security, please log in again.");
+                expiredError.statusCode = 401;
+                expiredError.code = "ERR-SESSION-EXPIRED";
+                throw expiredError;
+            }
+            const authError = new Error("Authentication token is invalid or corrupt.");
+            authError.statusCode = 401;
+            authError.code = "INVALID_TOKEN";
+            throw authError;
+        }
+    },
+    extractBearerToken(authorizationHeader) {
+        if (!authorizationHeader || typeof authorizationHeader !== "string") {
+            return null;
+        }
+        const match = authorizationHeader.trim().match(/^Bearer\s+(.+)$/i);
+        return match ? match[1].trim() : null;
+    },
+    decodeToken(token) {
+        try {
+            return jwt.decode(token, { complete: true });
+        } catch {
+            return null;
+        }
     },
 };
 
