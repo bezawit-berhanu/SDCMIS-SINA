@@ -107,7 +107,7 @@ export default function RecordPaymentModal({ patient, onClose, onSuccess }) {
                     <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
                         <FiCreditCard style={{ color: "var(--primary)", fontSize: "1.25rem" }} />
                         <h2 id="record-payment-title" style={{ fontSize: "1.25rem", fontWeight: "700", color: "var(--text-main)", margin: 0 }}>
-                            Record Payment (SCR-16)
+                            Record Payment
                         </h2>
                     </div>
                     <button
