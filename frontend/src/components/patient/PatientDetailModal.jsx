@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
+import { FiCheck, FiX } from "react-icons/fi";
 import { usePatientContext } from "../../features/patient/patient-context";
 import patientService from "../../services/patient.service";
 import procedureService from "../../services/procedure.service";
@@ -209,8 +210,9 @@ export default function PatientDetailModal() {
                             type="button"
                             className="modal-close-btn"
                             onClick={() => setIsDetailOpen(false)}
+                            aria-label="Close"
                         >
-                            ✕
+                            <FiX />
                         </button>
                     </div>
                 </div>
@@ -330,7 +332,7 @@ export default function PatientDetailModal() {
                                     disabled={actionLoading}
                                     onClick={() => handleCompleteProcedure(currentProc.id)}
                                 >
-                                    ✓ Complete Procedure (Ongoing → Done)
+                                    <FiCheck /> Complete Procedure
                                 </button>
                             )}
                         </div>
@@ -555,7 +557,7 @@ export default function PatientDetailModal() {
                             <div className="procedure-history-list">
                                 {procHistory.map((item, idx) => (
                                     <div key={item.id || idx} className="history-item-row">
-                                        <div className="history-check-circle">✓</div>
+                                        <div className="history-check-circle"><FiCheck size={14} /></div>
                                         <div className="history-details">
                                             <div style={{ fontWeight: "600", color: "#111827" }}>
                                                 {item.name || item.description}
