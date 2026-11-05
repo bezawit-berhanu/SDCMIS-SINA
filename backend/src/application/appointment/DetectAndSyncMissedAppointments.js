@@ -1,8 +1,10 @@
+const CacheInvalidator = require("../../Infrastructure/cache/cache.invalidator");
+
 /**
  * Application Use Case: DetectAndSyncMissedAppointments
- * Implements Task 5 & 6:
- * - Scheduler background process to periodically check appointments
- * - Missed appointment detection logic (Appointment Date Passed + No completed visit -> Missed)
+ * Implements SRS FR-DEN-12, BR-21, BR-22:
+ * "The system shall automatically identify patients whose scheduled appointment date has passed
+ * without a corresponding check-in/queue completion, and list them on a dedicated Missed Appointments page."
  */
 class DetectAndSyncMissedAppointments {
     constructor({ appointmentRepository } = {}) {
@@ -14,6 +16,10 @@ class DetectAndSyncMissedAppointments {
     async execute(options = {}) {
         const currentDate = options.currentDate ? new Date(options.currentDate) : new Date();
         const result = await this.appointmentRepository.detectAndMarkMissed(currentDate);
+
+        if (result && result.updatedCount > 0) {
+            CacheInvalidator.invalidateDashboardCaches();
+        }
 
         return {
             ...result,
@@ -37,8 +43,8 @@ class DetectAndSyncMissedAppointments {
             }
         }, this.intervalMs);
 
-        // Don't prevent process from exiting in test environments
-        if (this.timer.unref) {
+        // Don't prevent process from exiting in test or development environments
+        if (this.timer && this.timer.unref) {
             this.timer.unref();
         }
 
