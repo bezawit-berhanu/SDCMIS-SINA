@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { FiTrash2 } from "react-icons/fi";
 import Button from "../common/Button";
 import apiClient from "../../services/apiclient";
 
@@ -68,7 +69,7 @@ export default function DeletePatientModal({ patient, onClose, onDeleted }) {
                         marginBottom: "1rem",
                     }}
                 >
-                    🗑️
+                    <FiTrash2 size={24} />
                 </div>
 
                 <h2 id="delete-patient-title" style={{ fontSize: "1.25rem", fontWeight: "700", color: "#1e293b", marginBottom: "0.5rem" }}>

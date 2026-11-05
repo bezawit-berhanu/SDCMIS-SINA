@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { FiCheck } from "react-icons/fi";
 import Button from "../common/Button";
 import apiClient from "../../services/apiclient";
 
@@ -185,11 +186,11 @@ export default function CompleteProcedureModal({ patient, onClose, onCompleted }
                         </Button>
                         <Button
                             type="submit"
-                            variant="success"
+                            variant="primary"
                             disabled={submitting}
-                            style={{ backgroundColor: "#16a34a", color: "#ffffff", border: "none" }}
+                            icon={<FiCheck />}
                         >
-                            {submitting ? "Archiving..." : "✓ Confirm Done & Archive"}
+                            {submitting ? "Saving..." : "Confirm Done"}
                         </Button>
                     </div>
                 </form>
