@@ -12,16 +12,18 @@ class CustomerService {
      * My Information -> Treatment -> Next Procedure -> Appointment -> Balance
      */
     async getCustomerDashboard() {
-        try {
-            const response = await apiClient.get("/api/v1/customers/me");
-            if (response && response.data) {
-                return response.data.data || response.data;
-            }
-        } catch (_) {
+        const endpoints = [
+            "/api/v1/customers/me",
+            "/api/v1/customers/dashboard",
+            "/api/customers/me",
+            "/api/patients/me"
+        ];
+
+        for (const ep of endpoints) {
             try {
-                const alt = await apiClient.get("/api/patients/me");
-                if (alt && alt.data) {
-                    return alt.data.data || alt.data;
+                const response = await apiClient.get(ep);
+                if (response && response.data) {
+                    return response.data.data || response.data;
                 }
             } catch (_) {}
         }
@@ -34,13 +36,21 @@ class CustomerService {
      * Retrieve live queue position for patient
      */
     async getMyQueuePosition(patientId) {
-        try {
-            const query = patientId ? `?patientId=${encodeURIComponent(patientId)}` : "";
-            const response = await apiClient.get(`/api/v1/queue/my-position${query}`);
-            if (response && response.data) {
-                return response.data;
-            }
-        } catch (_) {}
+        const query = patientId ? `?patientId=${encodeURIComponent(patientId)}` : "";
+        const endpoints = [
+            `/api/v1/queue/my-position${query}`,
+            `/api/v1/queue/mine${query}`,
+            `/api/queue/mine${query}`
+        ];
+
+        for (const ep of endpoints) {
+            try {
+                const response = await apiClient.get(ep);
+                if (response && response.data) {
+                    return response.data;
+                }
+            } catch (_) {}
+        }
 
         return {
             inQueue: false,
