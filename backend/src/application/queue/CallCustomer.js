@@ -31,11 +31,11 @@ class CallCustomer {
             }
         }
 
-        if (entry.status === QueueStatus.DONE) {
-            const error = new Error(
-                `Cannot call patient ${entry.formattedQueueNumber} because visit is already marked DONE.`
-            );
+        if (entry.status === QueueStatus.DONE || entry.status === QueueStatus.SERVING) {
+            const error = new Error("This patient's status can't be changed that way.");
             error.statusCode = 400;
+            error.code = "INVALID_QUEUE_TRANSITION";
+            error.errorCode = "ERR-INVALID-QUEUE-TRANSITION";
             throw error;
         }
 
@@ -79,9 +79,11 @@ class CallCustomer {
             calledTime: new Date(),
         });
 
-        // Step 3: Create notification for the identified dentist
-        // "Patient #003 is ready."
-        const notificationMessage = `Patient ${updatedEntry.formattedQueueNumber} is ready.`;
+        // Step 3: Create notification for the identified dentist (SRS FR-DEN-02 & Appendix F)
+        // Format: "Upcoming customer: {Customer Name} — {Next Procedure}"
+        const patientName = updatedEntry.patientName || updatedEntry.customerName || "Patient";
+        const nextProcedure = updatedEntry.serviceType || updatedEntry.procedureName || "(no procedure logged yet)";
+        const notificationMessage = `Upcoming customer: ${patientName} — ${nextProcedure}`;
         let notification = null;
         if (this.notificationRepository) {
             try {
