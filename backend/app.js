@@ -30,6 +30,10 @@ if (process.env.NODE_ENV !== "test") {
 
 const app = express();
 
+// Load balancer & reverse proxy readiness (NFR-SCA-02)
+app.set("trust proxy", 1);
+app.disable("x-powered-by");
+
 // Standard CORS handling for local frontend integration
 app.use((req, res, next) => {
     res.header("Access-Control-Allow-Origin", "*");
