@@ -66,6 +66,9 @@ app.use("/api/auth", authRoutes);
 // User personal settings endpoints
 app.use("/api/v1/users", userRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/v1/me", userRoutes);
+app.use("/api/me", userRoutes);
+app.use("/me", userRoutes);
 
 // Procedure management endpoints (Tasks 1, 2, 3, 4, 5)
 app.use("/api/v1/procedures", procedureRoutes);

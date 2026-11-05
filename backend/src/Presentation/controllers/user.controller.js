@@ -54,11 +54,11 @@ const userController = {
 
     async changePassword(req, res, next) {
         try {
-            const { currentPassword, newPassword } = req.body ?? {};
+            const { currentPassword, newPassword, password } = req.body ?? {};
             const result = await container.changeUserPassword.execute({
                 userId: req.user.id,
                 currentPassword,
-                newPassword,
+                newPassword: newPassword || password,
             });
 
             return res.status(200).json({
@@ -73,20 +73,43 @@ const userController = {
     async updateProfile(req, res, next) {
         try {
             const fullName = req.body.fullName !== undefined ? req.body.fullName : req.body.fullname;
-            const { email, phone, themePreference } = req.body ?? {};
+            const { email, phone, themePreference, theme } = req.body ?? {};
 
             const result = await container.updateUserProfile.execute({
                 userId: req.user.id,
                 fullName,
                 email,
                 phone,
-                themePreference,
+                themePreference: themePreference || theme,
             });
 
             return res.status(200).json({
                 success: true,
                 message: "Profile updated successfully.",
                 data: result,
+            });
+        } catch (error) {
+            next(error);
+        }
+    },
+
+    async updateTheme(req, res, next) {
+        try {
+            const theme = (req.body.theme || req.body.themePreference || "LIGHT").toUpperCase();
+            const validThemes = ["LIGHT", "DARK"];
+            const selectedTheme = validThemes.includes(theme) ? theme : "LIGHT";
+
+            const result = await container.updateUserProfile.execute({
+                userId: req.user.id,
+                themePreference: selectedTheme,
+            });
+
+            return res.status(200).json({
+                success: true,
+                message: "Theme preference updated successfully.",
+                data: {
+                    themePreference: selectedTheme,
+                },
             });
         } catch (error) {
             next(error);
