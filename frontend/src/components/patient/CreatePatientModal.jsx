@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { usePatientContext } from "../../features/patient/patient-context";
+import { FiX } from "react-icons/fi";
 
 export default function CreatePatientModal() {
     const {
@@ -135,7 +136,7 @@ export default function CreatePatientModal() {
                         className="modal-close-btn"
                         onClick={() => setIsCreateOpen(false)}
                     >
-                        ✕
+                        <FiX />
                     </button>
                 </div>
 

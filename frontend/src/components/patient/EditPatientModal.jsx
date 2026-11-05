@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Button from "../common/Button";
 import apiClient from "../../services/apiclient";
+import { FiX } from "react-icons/fi";
 
 /**
  * SCR-06b: Edit Patient Identity Modal
@@ -83,12 +84,14 @@ export default function EditPatientModal({ patient, onClose, onUpdated }) {
                         style={{
                             background: "none",
                             border: "none",
-                            fontSize: "1.5rem",
+                            fontSize: "1.25rem",
                             cursor: "pointer",
                             color: "#64748b",
+                            display: "flex",
+                            alignItems: "center",
                         }}
                     >
-                        &times;
+                        <FiX />
                     </button>
                 </div>
 
