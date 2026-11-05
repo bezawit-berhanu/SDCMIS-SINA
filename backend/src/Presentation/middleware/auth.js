@@ -3,16 +3,7 @@ const container = require("../../container/container");
 
 async function authenticate(req, res, next) {
     try {
-        const authorization = req.headers.authorization;
-
-        if (!authorization || !authorization.startsWith("Bearer ")) {
-            const error = new Error("Authentication is required.");
-            error.statusCode = 401;
-            error.code = "UNAUTHENTICATED";
-            throw error;
-        }
-
-        const token = authorization.slice("Bearer ".length).trim();
+        const token = tokenService.extractBearerToken(req.headers.authorization);
 
         if (!token) {
             const error = new Error("Authentication is required.");
@@ -24,6 +15,13 @@ async function authenticate(req, res, next) {
         const payload = tokenService.verifyAccessToken(token);
 
         const user = await container.getCurrentUser.execute(payload.sub);
+
+        if (!user || user.recordStatus === "DELETED") {
+            const error = new Error("User account not found or deactivated.");
+            error.statusCode = 401;
+            error.code = "ACCOUNT_INACTIVE";
+            throw error;
+        }
 
         req.user = user;
 
@@ -37,8 +35,10 @@ async function authenticate(req, res, next) {
             !error.statusCode
         ) {
             error.statusCode = 401;
-            error.code = "INVALID_OR_EXPIRED_TOKEN";
-            error.message = "Your session is invalid or has expired.";
+            error.code = error.code || "INVALID_OR_EXPIRED_TOKEN";
+            error.message = error.code === "ERR-SESSION-EXPIRED"
+                ? "For your security, please log in again."
+                : "Your session is invalid or has expired.";
         }
 
         next(error);
