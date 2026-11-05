@@ -20,17 +20,33 @@ function createPrismaClient() {
     },
     connectTimeout: 15000,
     acquireTimeout: 15000,
+    idleTimeout: 10000,
   });
 
   const adapter = new PrismaMariaDb(pool);
 
-  return new PrismaClient({
+  const client = new PrismaClient({
     adapter,
     log:
       env.NODE_ENV === "development"
         ? ["error", "warn"]
         : ["error"],
   });
+
+  const originalDisconnect = client.$disconnect.bind(client);
+  client.$disconnect = async function () {
+    try {
+      await originalDisconnect();
+    } catch (_) {}
+    try {
+      if (pool && !pool.isClosed && pool.end) {
+        await pool.end();
+      }
+    } catch (_) {}
+  };
+  client.$pool = pool;
+
+  return client;
 }
 
 const prisma = globalForPrisma.prisma || createPrismaClient();
