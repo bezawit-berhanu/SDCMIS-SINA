@@ -85,8 +85,11 @@ class RealtimeService {
         const wsProtocol = isSecure ? "wss:" : "ws:";
         const httpProtocol = isSecure ? "https:" : "http:";
         const host = typeof window !== "undefined" && window.location?.hostname ? window.location.hostname : "localhost";
-        const wsUrl = `${wsProtocol}//${host}:${port}/ws/queue?role=${encodeURIComponent(role)}${userId ? `&userId=${encodeURIComponent(userId)}` : ""}`;
-        const sseUrl = `${httpProtocol}//${host}:${port}/api/v1/queue/stream?role=${encodeURIComponent(role)}${userId ? `&userId=${encodeURIComponent(userId)}` : ""}`;
+        const currentPort = typeof window !== "undefined" && window.location?.port ? window.location.port : null;
+        const targetPort = currentPort && currentPort !== "80" && currentPort !== "443" && currentPort !== "3000" && currentPort !== "5173" ? currentPort : (port || "5000");
+        const portSuffix = targetPort ? `:${targetPort}` : "";
+        const wsUrl = `${wsProtocol}//${host}${portSuffix}/ws/queue?role=${encodeURIComponent(role)}${userId ? `&userId=${encodeURIComponent(userId)}` : ""}`;
+        const sseUrl = `${httpProtocol}//${host}${portSuffix}/api/v1/queue/stream?role=${encodeURIComponent(role)}${userId ? `&userId=${encodeURIComponent(userId)}` : ""}`;
 
         // Attempt WebSocket first if available
         if (typeof WebSocket !== "undefined") {
