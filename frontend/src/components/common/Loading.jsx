@@ -4,7 +4,7 @@ export default function Loading({
     inline = false,
 }) {
     return (
-        <div className={`loading-wrapper ${inline ? "loading-wrapper--inline" : ""}`} role="status">
+        <div className={`loading-wrapper ${inline ? "loading-wrapper--inline" : ""}`} role="status" aria-live="polite">
             <div className={`loading-spinner loading-spinner--${size}`} aria-hidden="true" />
             {message && <p className="loading-text">{message}</p>}
         </div>
