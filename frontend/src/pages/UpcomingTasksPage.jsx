@@ -88,10 +88,10 @@ export default function UpcomingTasksPage() {
                         <span style={{ fontWeight: 700, color: "var(--primary)", fontSize: "0.9rem" }}>Upcoming Tasks</span>
                     </div>
                     <h1 style={{ fontSize: "1.75rem", fontWeight: 800, color: "var(--primary)", margin: 0 }}>
-                        Upcoming Clinical Tasks (SCR-08)
+                        Upcoming Clinical Tasks
                     </h1>
                     <p style={{ color: "var(--text-muted)", margin: "0.25rem 0 0", fontSize: "0.9rem" }}>
-                        Forward-looking worklist of patients with scheduled treatments (FR-DEN-11)
+                        Forward-looking worklist of patients with scheduled treatments
                     </p>
                 </div>
             </div>
