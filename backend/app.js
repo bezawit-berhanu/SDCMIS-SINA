@@ -17,6 +17,7 @@ const createAppointmentRoutes = require("./src/Presentation/routes/appointment.r
 const createQueueRoutes = require("./src/Presentation/routes/queue.routes");
 const createNotificationRoutes = require("./src/Presentation/routes/notification.routes");
 const container = require("./src/container/container");
+const { createRateLimiter } = require("./src/Presentation/middleware/rateLimiter");
 
 const appointmentRoutes = createAppointmentRoutes(container);
 const queueRoutes = createQueueRoutes(container);
@@ -42,6 +43,14 @@ app.use((req, res, next) => {
 
 app.use(express.json());
 app.use(requestId);
+
+// Global API Rate Limiter (NFR-SEC-05, BR-09): 200 req/min
+const globalApiLimiter = createRateLimiter({
+    windowMs: 60 * 1000,
+    max: 200,
+    prefix: "global_api",
+});
+app.use("/api", globalApiLimiter);
 
 // Health check endpoint
 app.use("/api", healthRoutes);
