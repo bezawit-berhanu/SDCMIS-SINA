@@ -4,6 +4,21 @@ import PageContainer from "../components/layout/PageContainer";
 import Button from "../components/common/Button";
 import { realtimeService } from "../services/realtime.service";
 import { signalRService } from "../services/signalr.service";
+import apiClient from "../services/apiclient";
+import {
+    FiUsers,
+    FiActivity,
+    FiClock,
+    FiCheckCircle,
+    FiRefreshCw,
+    FiBell,
+    FiCheck,
+    FiFastForward,
+    FiCalendar,
+    FiAlertCircle,
+    FiClipboard,
+    FiUserCheck
+} from "react-icons/fi";
 
 export default function DentistPage() {
     const { user, restoreSession } = useAuth();
@@ -18,25 +33,19 @@ export default function DentistPage() {
     const [upcomingTasks, setUpcomingTasks] = useState([]);
     const [actionMsg, setActionMsg] = useState("");
     const [stats, setStats] = useState([
-        { label: "Today's Patients", value: "0", change: "Based on active queue", icon: "🦷" },
-        { label: "In Operatory", value: "0", change: "Currently being served", icon: "⚕️" },
-        { label: "Waiting in Queue", value: "0", change: "Awaiting consultation", icon: "⏳" },
-        { label: "Completed Visits", value: "0", change: "Visits finalized today", icon: "✅" },
+        { label: "Today's Patients", value: "0", change: "Based on active queue", icon: FiUsers },
+        { label: "In Operatory", value: "0", change: "Currently being served", icon: FiActivity },
+        { label: "Waiting in Queue", value: "0", change: "Awaiting consultation", icon: FiClock },
+        { label: "Completed Visits", value: "0", change: "Visits finalized today", icon: FiCheckCircle },
     ]);
 
     const fetchDentistData = useCallback(async () => {
         try {
             setLoading(true);
-            const token = localStorage.getItem("auth_token") || localStorage.getItem("token");
-            const headers = {
-                "Content-Type": "application/json",
-                ...(token ? { Authorization: `Bearer ${token}` } : {})
-            };
-
-            // Fetch live queue
-            const queueRes = await fetch("http://localhost:5000/api/v1/queue", { headers });
-            if (queueRes.ok) {
-                const qData = await queueRes.json();
+            // Fetch live queue via apiClient
+            const queueRes = await apiClient.get("/api/v1/queue").catch(() => null);
+            if (queueRes && queueRes.status === 200) {
+                const qData = queueRes.data;
                 const items = qData.queue || qData.data || (Array.isArray(qData) ? qData : []);
                 setQueueItems(items);
 
@@ -58,17 +67,17 @@ export default function DentistPage() {
                 const doneCount = items.filter((i) => i.status === "DONE" || i.status === "COMPLETED").length;
 
                 setStats([
-                    { label: "Today's Patients", value: String(items.length), change: "Active registrations today", icon: "🦷" },
-                    { label: "In Operatory", value: String(servingCount), change: "Currently in chair", icon: "⚕️" },
-                    { label: "Waiting in Queue", value: String(waitingCount), change: "Ready for call", icon: "⏳" },
-                    { label: "Completed Visits", value: String(doneCount), change: "Finalized today", icon: "✅" },
+                    { label: "Today's Patients", value: String(items.length), change: "Active registrations today", icon: FiUsers },
+                    { label: "In Operatory", value: String(servingCount), change: "Currently in chair", icon: FiActivity },
+                    { label: "Waiting in Queue", value: String(waitingCount), change: "Ready for call", icon: FiClock },
+                    { label: "Completed Visits", value: String(doneCount), change: "Finalized today", icon: FiCheckCircle },
                 ]);
             }
 
             // Fetch live appointments for tasks
-            const apptRes = await fetch("http://localhost:5000/api/v1/appointments", { headers });
-            if (apptRes.ok) {
-                const aData = await apptRes.json();
+            const apptRes = await apiClient.get("/api/v1/appointments").catch(() => null);
+            if (apptRes && apptRes.status === 200) {
+                const aData = apptRes.data;
                 const appts = aData.appointments || aData.data || (Array.isArray(aData) ? aData : []);
                 setUpcomingTasks(appts);
             }
@@ -175,25 +184,17 @@ export default function DentistPage() {
         }
 
         try {
-            const token = localStorage.getItem("auth_token") || localStorage.getItem("token");
-            const res = await fetch("http://localhost:5000/api/v1/queue/complete", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    ...(token ? { Authorization: `Bearer ${token}` } : {})
-                },
-                body: JSON.stringify({
-                    id: currentServing.id,
-                    queueNumber: currentServing.ticket?.replace("#", ""),
-                    notes: "Visit completed by dentist"
-                })
+            await apiClient.post("/api/v1/queue/complete", {
+                id: currentServing.id,
+                queueNumber: currentServing.ticket?.replace("#", ""),
+                notes: "Visit completed by dentist"
             });
 
             const patientName = currentServing.patient;
             const ticket = currentServing.ticket;
 
             setCurrentServing(null);
-            setActionMsg(`✓ Visit completed for ${patientName} (${ticket}). Status transitioned to DONE.`);
+            setActionMsg(`Visit completed for ${patientName} (${ticket}). Status transitioned to DONE.`);
 
             realtimeService.emit("VISIT_COMPLETED", {
                 ticket,
@@ -214,49 +215,37 @@ export default function DentistPage() {
     // Dentist Auto Advance Next Waiting Patient
     const handleDentistAutoAdvance = async () => {
         try {
-            const token = localStorage.getItem("auth_token") || localStorage.getItem("token");
-            const res = await fetch("http://localhost:5000/api/v1/queue/auto-advance", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    ...(token ? { Authorization: `Bearer ${token}` } : {})
-                }
+            const res = await apiClient.post("/api/v1/queue/auto-advance", {});
+            const data = res.data;
+            const advanced = data.serving || data.data || data;
+            const nextTicket = advanced.formattedQueueNumber || `#${String(advanced.queueNumber || 1).padStart(3, "0")}`;
+            const nextPatient = advanced.patientName || advanced.customerName || "Patient";
+
+            setCurrentServing({
+                id: advanced.id,
+                ticket: nextTicket,
+                patient: nextPatient,
+                service: advanced.serviceType || "Clinical Consultation",
+                status: "SERVING",
             });
 
-            if (res.ok) {
-                const data = await res.json();
-                const advanced = data.serving || data.data || data;
-                const nextTicket = advanced.formattedQueueNumber || `#${String(advanced.queueNumber || 1).padStart(3, "0")}`;
-                const nextPatient = advanced.patientName || advanced.customerName || "Patient";
+            setActionMsg(`Auto Advance: Called next waiting patient (${nextTicket} - ${nextPatient}).`);
 
-                setCurrentServing({
-                    id: advanced.id,
-                    ticket: nextTicket,
-                    patient: nextPatient,
-                    service: advanced.serviceType || "Clinical Consultation",
-                    status: "SERVING",
-                });
+            realtimeService.emit("PATIENT_CALLED", {
+                ticket: nextTicket,
+                formattedQueueNumber: nextTicket,
+                patientName: nextPatient,
+                serviceType: advanced.serviceType || "Clinical Consultation",
+                notification: {
+                    message: `Patient ${nextTicket} is ready.`,
+                },
+            });
 
-                setActionMsg(`⚡ Auto Advance: System called next waiting patient (${nextTicket} - ${nextPatient}).`);
-
-                realtimeService.emit("PATIENT_CALLED", {
-                    ticket: nextTicket,
-                    formattedQueueNumber: nextTicket,
-                    patientName: nextPatient,
-                    serviceType: advanced.serviceType || "Clinical Consultation",
-                    notification: {
-                        message: `Patient ${nextTicket} is ready.`,
-                    },
-                });
-
-                await fetchDentistData();
-            } else {
-                const err = await res.json().catch(() => ({}));
-                setActionMsg(err.message || "No waiting patients available in queue.");
-            }
+            await fetchDentistData();
         } catch (err) {
             console.error("Auto advance error:", err);
-            setActionMsg("Failed to auto-advance queue.");
+            const msg = err.response?.data?.message || "No waiting patients available in queue.";
+            setActionMsg(msg);
         }
         setTimeout(() => setActionMsg(""), 4000);
     };
@@ -286,10 +275,10 @@ export default function DentistPage() {
                             backgroundColor: realtimeConnected ? "#10b981" : "#f59e0b",
                             display: "inline-block",
                         }} />
-                        {realtimeConnected ? "SignalR Live" : "Syncing..."}
+                        {realtimeConnected ? "Live Connected" : "Connecting..."}
                     </span>
-                    <Button variant="secondary" size="sm" onClick={handleRefresh} disabled={refreshing}>
-                        {refreshing ? "Refreshing..." : "🔄 Refresh"}
+                    <Button variant="secondary" size="sm" onClick={handleRefresh} disabled={refreshing} icon={<FiRefreshCw />}>
+                        {refreshing ? "Refreshing..." : "Refresh"}
                     </Button>
                 </div>
             }
@@ -313,7 +302,7 @@ export default function DentistPage() {
                     }}
                 >
                     <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                        <span style={{ fontSize: "1.5rem" }}>🔔</span>
+                        <FiBell style={{ fontSize: "1.25rem" }} />
                         <div>
                             <p style={{ fontWeight: 700, fontSize: "0.95rem", margin: 0, color: "var(--primary-hover)" }}>
                                 Live Reception Alert: {liveAlert.message}
@@ -342,32 +331,41 @@ export default function DentistPage() {
                     color: "var(--primary)",
                     border: "1px solid var(--border)",
                     fontWeight: 600,
-                    fontSize: "0.875rem"
+                    fontSize: "0.875rem",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.5rem"
                 }}>
-                    ✓ {actionMsg}
+                    <FiCheck />
+                    <span>{actionMsg}</span>
                 </div>
             )}
 
-            {/* Metric Cards with Greenish Tint */}
+            {/* Metric Cards with Light Green Palette */}
             <div className="grid grid-cols-4" style={{ marginBottom: "1.5rem" }}>
-                {stats.map((stat, i) => (
-                    <div key={i} className="card" style={{ backgroundColor: "var(--bg-surface)", border: "1px solid var(--border)" }}>
-                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-                            <div>
-                                <p style={{ fontSize: "0.8125rem", color: "var(--text-muted)", fontWeight: 500 }}>
-                                    {stat.label}
-                                </p>
-                                <p style={{ fontSize: "1.5rem", fontWeight: 700, marginTop: "0.25rem", color: "var(--primary)" }}>
-                                    {stat.value}
-                                </p>
+                {stats.map((stat, i) => {
+                    const IconComp = stat.icon;
+                    return (
+                        <div key={i} className="card" style={{ backgroundColor: "var(--bg-surface)", border: "1px solid var(--border)" }}>
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                                <div>
+                                    <p style={{ fontSize: "0.8125rem", color: "var(--text-muted)", fontWeight: 500 }}>
+                                        {stat.label}
+                                    </p>
+                                    <p style={{ fontSize: "1.5rem", fontWeight: 700, marginTop: "0.25rem", color: "var(--primary)" }}>
+                                        {stat.value}
+                                    </p>
+                                </div>
+                                <span style={{ fontSize: "1.25rem", color: "var(--primary)" }}>
+                                    <IconComp />
+                                </span>
                             </div>
-                            <span style={{ fontSize: "1.5rem" }}>{stat.icon}</span>
+                            <p style={{ fontSize: "0.75rem", color: "var(--text-light)", marginTop: "0.5rem" }}>
+                                {stat.change}
+                            </p>
                         </div>
-                        <p style={{ fontSize: "0.75rem", color: "var(--text-light)", marginTop: "0.5rem" }}>
-                            {stat.change}
-                        </p>
-                    </div>
-                ))}
+                    );
+                })}
             </div>
 
             {/* Chairside Operatory Queue Management */}
@@ -383,16 +381,18 @@ export default function DentistPage() {
                             size="sm"
                             onClick={handleDentistAutoAdvance}
                             title="Auto Advance to next waiting patient"
+                            icon={<FiFastForward />}
                         >
-                            ⚡ Auto Advance Next Patient
+                            Auto Advance Next Patient
                         </Button>
                         <Button
                             variant="primary"
                             size="sm"
                             onClick={handleDentistCompleteVisit}
                             disabled={!currentServing}
+                            icon={<FiCheckCircle />}
                         >
-                            ✓ Complete Visit
+                            Complete Visit
                         </Button>
                     </div>
                 </div>
@@ -455,7 +455,7 @@ export default function DentistPage() {
                             borderRadius: "var(--radius-md)",
                             border: "1px dashed var(--border)"
                         }}>
-                            <span style={{ fontSize: "2rem", display: "block", marginBottom: "0.5rem" }}>📋</span>
+                            <FiClipboard style={{ fontSize: "2rem", display: "block", margin: "0 auto 0.5rem", color: "var(--text-light)" }} />
                             <p style={{ fontWeight: 600, margin: 0 }}>No active clinical procedures scheduled</p>
                             <p style={{ fontSize: "0.8125rem", margin: "4px 0 0 0", color: "var(--text-light)" }}>Procedures will display dynamically as patients check in</p>
                         </div>
@@ -525,23 +525,23 @@ export default function DentistPage() {
                     </div>
                     <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
                         <a href="/appointments" style={{ textDecoration: "none" }}>
-                            <Button variant="outline" fullWidth style={{ justifyContent: "flex-start" }}>
-                                📅 View & Manage All Appointments
+                            <Button variant="outline" fullWidth style={{ justifyContent: "flex-start" }} icon={<FiCalendar />}>
+                                View & Manage All Appointments
                             </Button>
                         </a>
                         <a href="/appointments/missed" style={{ textDecoration: "none" }}>
-                            <Button variant="outline" fullWidth style={{ justifyContent: "flex-start", color: "#b91c1c", borderColor: "#fecaca" }}>
-                                ⚠️ Review & Reschedule Missed Visits
+                            <Button variant="outline" fullWidth style={{ justifyContent: "flex-start", color: "#b91c1c", borderColor: "#fecaca" }} icon={<FiAlertCircle />}>
+                                Review & Reschedule Missed Visits
                             </Button>
                         </a>
                         <a href="/patients" style={{ textDecoration: "none" }}>
-                            <Button variant="outline" fullWidth style={{ justifyContent: "flex-start" }}>
-                                📋 View Patient Clinical History
+                            <Button variant="outline" fullWidth style={{ justifyContent: "flex-start" }} icon={<FiUserCheck />}>
+                                View Patient Clinical History
                             </Button>
                         </a>
                         <a href="/tasks/upcoming" style={{ textDecoration: "none" }}>
-                            <Button variant="outline" fullWidth style={{ justifyContent: "flex-start" }}>
-                                🕒 Upcoming Clinical Tasks Dashboard
+                            <Button variant="outline" fullWidth style={{ justifyContent: "flex-start" }} icon={<FiClock />}>
+                                Upcoming Clinical Tasks Dashboard
                             </Button>
                         </a>
                     </div>
@@ -557,7 +557,7 @@ export default function DentistPage() {
                     </div>
                     <a href="/appointments" style={{ textDecoration: "none" }}>
                         <Button variant="outline" size="sm">
-                            Open Full Calendar →
+                            Open Full Calendar
                         </Button>
                     </a>
                 </div>
@@ -572,7 +572,7 @@ export default function DentistPage() {
                             border: "1px dashed var(--border)",
                             margin: "0.5rem"
                         }}>
-                            <span style={{ fontSize: "2rem", display: "block", marginBottom: "0.5rem" }}>📅</span>
+                            <FiCalendar style={{ fontSize: "2rem", display: "block", margin: "0 auto 0.5rem", color: "var(--text-light)" }} />
                             <p style={{ fontWeight: 600, margin: 0 }}>No upcoming appointment tasks found</p>
                             <p style={{ fontSize: "0.8125rem", margin: "4px 0 0 0", color: "var(--text-light)" }}>All appointments scheduled for patients will appear here in real time</p>
                         </div>
