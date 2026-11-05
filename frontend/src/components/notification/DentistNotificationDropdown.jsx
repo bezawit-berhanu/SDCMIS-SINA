@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
+import { FiBell } from "react-icons/fi";
 import { realtimeService } from "../../services/realtime.service.js";
 import { signalRService } from "../../services/signalr.service.js";
 import { apiClient } from "../../lib/api-client.js";
@@ -144,7 +145,7 @@ export default function DentistNotificationDropdown({ userId = "usr-dentist-01" 
                 }}
                 aria-label={`Notifications (${unreadCount} unread)`}
             >
-                <span>🔔</span>
+                <FiBell style={{ color: "var(--text-main)", fontSize: "1.2rem" }} />
                 {unreadCount > 0 && (
                     <span
                         data-testid="notification-count-badge"
