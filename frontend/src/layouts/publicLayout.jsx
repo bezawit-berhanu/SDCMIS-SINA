@@ -12,17 +12,16 @@ export default function PublicLayout() {
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
-                padding: "1rem 2rem",
+                padding: "0.875rem 2rem",
                 backgroundColor: "var(--bg-surface)",
                 borderBottom: "1px solid var(--border)",
                 boxShadow: "var(--shadow-sm)"
             }}>
                 <Link to="/" className="public-brand" style={{
-                    fontSize: "1.25rem",
-                    fontWeight: 800,
-                    color: "var(--primary)",
+                    fontSize: "1.125rem",
+                    fontWeight: 700,
+                    color: "var(--text-main)",
                     textDecoration: "none",
-                    letterSpacing: "-0.02em"
                 }}>
                     Sina Dental Clinic
                 </Link>
@@ -30,8 +29,8 @@ export default function PublicLayout() {
                     <Link to="/" className="public-nav-link" style={{
                         color: "var(--text-muted)",
                         textDecoration: "none",
-                        fontWeight: 600,
-                        fontSize: "0.9rem"
+                        fontWeight: 500,
+                        fontSize: "0.875rem"
                     }}>
                         Home
                     </Link>
@@ -64,13 +63,13 @@ export default function PublicLayout() {
 
             <footer className="public-footer" style={{
                 textAlign: "center",
-                padding: "1.5rem",
+                padding: "1rem",
                 color: "var(--text-muted)",
-                fontSize: "0.85rem",
+                fontSize: "0.8125rem",
                 borderTop: "1px solid var(--border)",
                 backgroundColor: "var(--bg-surface)"
             }}>
-                <p style={{ margin: 0 }}>&copy; {new Date().getFullYear()} Sina Dental Clinic. All rights reserved.</p>
+                <p style={{ margin: 0 }}>&copy; {new Date().getFullYear()} Sina Dental Clinic</p>
             </footer>
         </div>
     );
