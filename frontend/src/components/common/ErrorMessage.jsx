@@ -1,3 +1,5 @@
+import { FiAlertTriangle, FiX } from "react-icons/fi";
+
 export default function ErrorMessage({
     message,
     onDismiss,
@@ -7,7 +9,9 @@ export default function ErrorMessage({
 
     return (
         <div className="error-message" role="alert">
-            <span className="error-message__icon" aria-hidden="true">⚠️</span>
+            <span className="error-message__icon" aria-hidden="true">
+                <FiAlertTriangle />
+            </span>
             <div className="error-message__content">{message}</div>
             {retry && (
                 <button
@@ -25,7 +29,7 @@ export default function ErrorMessage({
                     onClick={onDismiss}
                     aria-label="Dismiss message"
                 >
-                    &times;
+                    <FiX />
                 </button>
             )}
         </div>

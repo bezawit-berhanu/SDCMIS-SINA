@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { FiShieldOff } from "react-icons/fi";
 import { useAuth, getDefaultDashboardForRole } from "../../features/auth/auth-context";
 import Button from "./Button";
 
@@ -9,13 +10,13 @@ export default function AccessDenied({ message, requiredRoles }) {
     return (
         <div style={{ maxWidth: "600px", margin: "3rem auto", padding: "1.5rem" }}>
             <div className="card" style={{ textAlign: "center", padding: "2.5rem 1.5rem" }}>
-                <div style={{ fontSize: "3rem", marginBottom: "1rem" }} role="img" aria-label="Access Denied">
-                    🚫
+                <div style={{ fontSize: "2.5rem", color: "var(--danger)", marginBottom: "1rem", display: "flex", justifyContent: "center" }}>
+                    <FiShieldOff />
                 </div>
-                <h1 style={{ fontSize: "1.75rem", fontWeight: 700, marginBottom: "0.5rem", color: "var(--danger)" }}>
-                    Access Denied (403)
+                <h1 style={{ fontSize: "1.5rem", fontWeight: 700, marginBottom: "0.5rem", color: "var(--text-main)" }}>
+                    Access Denied
                 </h1>
-                <p style={{ color: "var(--text-muted)", marginBottom: "1.5rem", fontSize: "0.9375rem" }}>
+                <p style={{ color: "var(--text-muted)", marginBottom: "1.5rem", fontSize: "0.875rem" }}>
                     {message || "You do not have the required role or permissions to access this page."}
                 </p>
 
