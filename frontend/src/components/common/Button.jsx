@@ -7,9 +7,11 @@ export default function Button({
     className = "",
     size = "md",
     fullWidth = false,
+    icon = null,
+    style = {},
     ...rest
 }) {
-    // Shared button keeping styling and behavior consistent and clean across pages
+    // Shared button: light green primary, clean states, supports React Icons without emojis
     const classes = [
         "button",
         `button--${variant}`,
@@ -26,8 +28,10 @@ export default function Button({
             className={classes}
             disabled={disabled}
             onClick={onClick}
+            style={style}
             {...rest}
         >
+            {icon && <span className="button-icon">{icon}</span>}
             {children}
         </button>
     );
