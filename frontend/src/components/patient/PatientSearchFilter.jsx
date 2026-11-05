@@ -1,5 +1,6 @@
 import React from "react";
 import { usePatientContext } from "../../features/patient/patient-context";
+import { FiX } from "react-icons/fi";
 
 export default function PatientSearchFilter() {
     const {
@@ -58,7 +59,7 @@ export default function PatientSearchFilter() {
                             onClick={() => setSearchTerm("")}
                             title="Clear search"
                         >
-                            ✕
+                            <FiX />
                         </button>
                     )}
                 </div>
