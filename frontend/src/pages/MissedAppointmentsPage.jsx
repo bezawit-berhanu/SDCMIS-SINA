@@ -376,7 +376,7 @@ export default function MissedAppointmentsPage() {
                                         fontWeight: 600
                                     }}
                                 >
-                                    {rescheduleLoading ? "Rescheduling..." : "Confirm Reschedule (Missed → Upcoming)"}
+                                    {rescheduleLoading ? "Rescheduling..." : "Confirm Reschedule"}
                                 </button>
                             </div>
                         </form>
