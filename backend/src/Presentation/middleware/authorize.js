@@ -32,6 +32,7 @@ function authorize(...roles) {
             const error = new Error("You do not have permission to perform this action.");
             error.statusCode = 403;
             error.code = "FORBIDDEN";
+            error.errorCode = "ERR-FORBIDDEN";
             return next(error);
         }
 
@@ -39,4 +40,4 @@ function authorize(...roles) {
     };
 }
 
-module.exports = authorize;
+module.exports = authorize;
