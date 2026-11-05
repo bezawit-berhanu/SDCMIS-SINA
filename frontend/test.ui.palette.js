@@ -7,20 +7,20 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 console.log("=== UI Design & Theme Palette Verification Suite ===");
-console.log("Target Palette: Creamish/white background (#faf8f5 / #ffffff), Light Green buttons (#4caf50), Standard typography");
+console.log("Target Palette: Creamish/white background (#faf8f5 / #ffffff), Normal Blue buttons (#2563eb), Standard typography");
 
 const cssPath = path.join(__dirname, "src", "index.css");
 assert.ok(fs.existsSync(cssPath), "index.css must exist");
 
 const cssContent = fs.readFileSync(cssPath, "utf-8");
 
-// 1. Verify Primary Light Green color variable
+// 1. Verify Primary Normal Blue color variable
 assert.match(
     cssContent,
-    /--primary:\s*#4caf50/i,
-    "Primary button color variable --primary must be light green (#4caf50)"
+    /--primary:\s*#2563eb/i,
+    "Primary button color variable --primary must be normal blue (#2563eb)"
 );
-console.log("✓ Primary light green button color token verified: --primary: #4caf50");
+console.log("✓ Primary normal blue button color token verified: --primary: #2563eb");
 
 // 2. Verify Creamish Page Background variable
 assert.match(
@@ -50,9 +50,9 @@ console.log("✓ Standard typography stack verified: Inter, -apple-system, sans-
 assert.match(
     cssContent,
     /\.button--primary\s*\{[^}]*background-color:\s*var\(--primary\)/s,
-    ".button--primary must use var(--primary) light green background"
+    ".button--primary must use var(--primary) normal blue background"
 );
-console.log("✓ .button--primary class connects directly to light green --primary token");
+console.log("✓ .button--primary class connects directly to normal blue --primary token");
 
 console.log("ALL UI theme palette assertions passed successfully!");
 process.exit(0);
