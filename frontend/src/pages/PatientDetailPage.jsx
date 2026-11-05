@@ -225,7 +225,7 @@ export default function PatientDetailPage({ readOnly = false }) {
                             </div>
                         ) : (
                             <p style={{ color: "var(--text-muted)", fontSize: "0.9rem", margin: 0 }}>
-                                No upcoming procedure planned. Click '+ Log Next' to record one (BR-11).
+                                No upcoming procedure planned. Click '+ Log Next' to record one.
                             </p>
                         )}
                     </div>
@@ -237,7 +237,7 @@ export default function PatientDetailPage({ readOnly = false }) {
                                 2. Ongoing Procedure (In Progress)
                             </h3>
                             {patient.ongoingProcedure && (
-                                <span style={{ fontSize: "0.75rem", fontWeight: "700", color: "var(--primary)", backgroundColor: "rgba(27, 77, 46, 0.1)", padding: "0.2rem 0.5rem", borderRadius: "4px" }}>
+                                <span style={{ fontSize: "0.75rem", fontWeight: "700", color: "var(--primary)", backgroundColor: "var(--primary-light)", padding: "0.2rem 0.5rem", borderRadius: "4px" }}>
                                     ACTIVE
                                 </span>
                             )}
@@ -265,7 +265,7 @@ export default function PatientDetailPage({ readOnly = false }) {
                             </div>
                         ) : (
                             <p style={{ color: "var(--text-muted)", fontSize: "0.9rem", margin: 0 }}>
-                                No procedure currently ongoing (BR-12).
+                                No procedure currently ongoing.
                             </p>
                         )}
                     </div>
@@ -311,7 +311,7 @@ export default function PatientDetailPage({ readOnly = false }) {
                 <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
                     <div className="card" style={{ padding: "1.5rem", backgroundColor: "var(--bg-surface)", border: "1px solid var(--border)" }}>
                         <h3 style={{ fontSize: "1.1rem", fontWeight: "700", color: "var(--primary)", marginBottom: "1rem" }}>
-                            Financial Balance & Ledger (BR-17, BR-18)
+                            Financial Balance & Ledger
                         </h3>
 
                         <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem", marginBottom: "1.5rem" }}>
@@ -328,7 +328,7 @@ export default function PatientDetailPage({ readOnly = false }) {
                                     display: "flex",
                                     justifyContent: "space-between",
                                     padding: "0.75rem 1rem",
-                                    backgroundColor: Number(patient.remainingFee || 0) > 0 ? "rgba(220, 38, 38, 0.08)" : "rgba(27, 77, 46, 0.08)",
+                                    backgroundColor: Number(patient.remainingFee || 0) > 0 ? "rgba(220, 38, 38, 0.08)" : "var(--primary-light)",
                                     borderRadius: "8px",
                                     marginTop: "0.5rem",
                                     border: `1px solid ${Number(patient.remainingFee || 0) > 0 ? "#fca5a5" : "var(--border)"}`,
