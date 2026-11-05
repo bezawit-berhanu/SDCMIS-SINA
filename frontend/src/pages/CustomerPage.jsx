@@ -121,7 +121,7 @@ export default function CustomerPage() {
                     }}
                 >
                     <h3 style={{ margin: "0 0 0.25rem", fontSize: "1rem", fontWeight: "700" }}>
-                        Account Pending Front-Desk Linking (FR-CUS-01 Alt 1)
+                        Account Pending Front-Desk Linking
                     </h3>
                     <p style={{ margin: 0, fontSize: "0.875rem", lineHeight: 1.5 }}>
                         Your self-service account is active. To synchronize your past treatment history, ongoing procedures, and live queue position, please check in at the reception desk with your phone number.
