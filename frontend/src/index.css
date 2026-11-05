@@ -1,26 +1,26 @@
-/* SDCMIS-SINA Clean Creamish/White & Light Green Palette */
+/* SDCMIS-SINA Clean Creamish/White & Normal Blue Palette */
 :root {
-  --primary: #4caf50;
-  --primary-hover: #43a047;
-  --primary-active: #388e3c;
-  --primary-light: #e8f5e9;
-  --primary-tint: #f1f8f3;
-  --secondary: #607d8b;
-  --secondary-hover: #455a64;
-  --secondary-light: #f5f7f8;
+  --primary: #2563eb;
+  --primary-hover: #1d4ed8;
+  --primary-active: #1e40af;
+  --primary-light: #eff6ff;
+  --primary-tint: #dbeafe;
+  --secondary: #64748b;
+  --secondary-hover: #475569;
+  --secondary-light: #f8fafc;
   --bg-page: #faf8f5;
   --bg-surface: #ffffff;
   --bg-card: #ffffff;
-  --text-main: #2d3748;
-  --text-muted: #718096;
-  --text-light: #a0aec0;
-  --border: #e8e4dc;
-  --border-focus: #4caf50;
+  --text-main: #1e293b;
+  --text-muted: #64748b;
+  --text-light: #94a3b8;
+  --border: #e2e8f0;
+  --border-focus: #2563eb;
   --danger: #dc2626;
   --danger-bg: #fef2f2;
   --danger-border: #fecaca;
-  --success: #4caf50;
-  --success-bg: #e8f5e9;
+  --success: #16a34a;
+  --success-bg: #f0fdf4;
   --radius-sm: 4px;
   --radius-md: 6px;
   --radius-lg: 8px;
@@ -32,27 +32,27 @@
 }
 
 [data-theme="dark"] {
-  --primary: #2d7a49;
-  --primary-hover: #3da163;
-  --primary-active: #225e37;
-  --primary-light: #163320;
-  --primary-tint: #112819;
-  --secondary: #8fa696;
-  --secondary-hover: #b4c7bb;
-  --secondary-light: #16291c;
-  --bg-page: #0d1a12;
-  --bg-surface: #142419;
-  --bg-card: #142419;
-  --text-main: #f0f7f2;
-  --text-muted: #8fa696;
-  --text-light: #607968;
-  --border: #1e3827;
-  --border-focus: #2d7a49;
+  --primary: #3b82f6;
+  --primary-hover: #60a5fa;
+  --primary-active: #2563eb;
+  --primary-light: #1e293b;
+  --primary-tint: #0f172a;
+  --secondary: #94a3b8;
+  --secondary-hover: #cbd5e1;
+  --secondary-light: #1e293b;
+  --bg-page: #0f172a;
+  --bg-surface: #1e293b;
+  --bg-card: #1e293b;
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --text-light: #64748b;
+  --border: #334155;
+  --border-focus: #3b82f6;
   --danger: #ef4444;
   --danger-bg: #450a0a;
   --danger-border: #7f1d1d;
-  --success: #2d7a49;
-  --success-bg: #163320;
+  --success: #22c55e;
+  --success-bg: #14532d;
 }
 
 * {
@@ -142,7 +142,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .button--secondary:hover:not(:disabled) {
-  background-color: #dbebe0;
+  background-color: var(--primary-tint);
   color: var(--primary-hover);
 }
 
