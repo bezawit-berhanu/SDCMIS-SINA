@@ -173,7 +173,7 @@ export default function AppointmentsPage() {
 
                 <div className="card" onClick={() => setActiveTab("calendar")} style={{ cursor: "pointer" }}>
                     <span style={{ fontSize: "0.8125rem", color: "var(--text-muted)", fontWeight: 500 }}>Calendar View</span>
-                    <p style={{ fontSize: "1.25rem", fontWeight: 700, color: "#059669", margin: "6px 0 0 0", display: "inline-flex", alignItems: "center", gap: 6 }}>
+                    <p style={{ fontSize: "1.25rem", fontWeight: 700, color: "var(--primary)", margin: "6px 0 0 0", display: "inline-flex", alignItems: "center", gap: 6 }}>
                         <FiCalendar /> Day & Month
                     </p>
                     <p style={{ fontSize: "0.75rem", color: "var(--text-light)", marginTop: "4px" }}>Interactive date selection</p>
