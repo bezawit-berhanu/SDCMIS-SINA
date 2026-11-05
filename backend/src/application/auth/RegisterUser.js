@@ -122,8 +122,10 @@ class RegisterUser {
         const passwordHash = await this.passwordService.hash(password);
 
         // 6. Role classification: Support staff (Dentist vs Receptionist) and patient (Customer)
+        // Sanitizes role input against allowed UserRole enums and prevents privilege escalation to arbitrary roles
+        const normalizedRole = typeof role === "string" ? role.trim().toUpperCase() : null;
         const validRoles = [UserRole.CUSTOMER, UserRole.DENTIST, UserRole.RECEPTIONIST];
-        const assignedRole = (role && validRoles.includes(role)) ? role : UserRole.CUSTOMER;
+        const assignedRole = (normalizedRole && validRoles.includes(normalizedRole)) ? normalizedRole : UserRole.CUSTOMER;
 
         // 7. Domain entity validation
         const userEntity = new User({
