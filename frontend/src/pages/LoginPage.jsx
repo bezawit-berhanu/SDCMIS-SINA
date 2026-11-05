@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { FiLogIn } from "react-icons/fi";
 import { useAuth, getDefaultDashboardForRole } from "../features/auth/auth-context";
 import Button from "../components/common/Button";
 import ErrorMessage from "../components/common/ErrorMessage";
@@ -19,7 +20,6 @@ export default function LoginPage() {
         ? fromPath
         : null;
 
-    // If already authenticated, redirect directly to intended destination or role dashboard
     useEffect(() => {
         if (user) {
             navigate(returnTarget || getDefaultDashboardForRole(user.role), { replace: true });
@@ -30,7 +30,7 @@ export default function LoginPage() {
         e.preventDefault();
 
         if (!username.trim() || !password.trim()) {
-            setError("Please provide both email/username and password.");
+            setError("Email or phone number and password are required.");
             return;
         }
 
@@ -50,8 +50,8 @@ export default function LoginPage() {
                 err.response?.data?.error?.message ||
                 err.response?.data?.message ||
                 (err.response?.status === 401
-                    ? "Invalid email or password."
-                    : err.message || "Failed to sign in. Please check your credentials and server connection.");
+                    ? "Email/phone or password is incorrect."
+                    : err.message || "Failed to sign in. Please try again.");
             setError(errorMessage);
         } finally {
             setLoading(false);
@@ -60,22 +60,22 @@ export default function LoginPage() {
 
     return (
         <div>
-            <h1 style={{ fontSize: "1.75rem", fontWeight: 800, color: "var(--text-main)", textAlign: "center", marginBottom: "1.5rem", letterSpacing: "-0.01em" }}>
-                Sina Dental Clinic
+            <h1 style={{ fontSize: "1.5rem", fontWeight: 700, color: "var(--text-main)", textAlign: "center", marginBottom: "1.5rem" }}>
+                Sign In
             </h1>
 
             <ErrorMessage message={error} onDismiss={() => setError("")} />
 
-            <form onSubmit={handleSubmit} style={{ marginTop: "1rem" }}>
-                <div className="form-group">
-                    <label className="form-label" htmlFor="username">
-                        Username / Email
+            <form onSubmit={handleSubmit}>
+                <div className="form-group" style={{ marginBottom: "1rem" }}>
+                    <label className="form-label" htmlFor="username" style={{ display: "block", marginBottom: "0.375rem" }}>
+                        Email or Phone
                     </label>
                     <input
                         id="username"
                         type="text"
                         className="form-input"
-                        placeholder="Enter your email or username"
+                        placeholder="Enter email or phone"
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
                         disabled={loading}
@@ -84,15 +84,15 @@ export default function LoginPage() {
                     />
                 </div>
 
-                <div className="form-group">
-                    <label className="form-label" htmlFor="password">
+                <div className="form-group" style={{ marginBottom: "1.25rem" }}>
+                    <label className="form-label" htmlFor="password" style={{ display: "block", marginBottom: "0.375rem" }}>
                         Password
                     </label>
                     <input
                         id="password"
                         type="password"
                         className="form-input"
-                        placeholder="••••••••"
+                        placeholder="Enter password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         disabled={loading}
@@ -101,18 +101,17 @@ export default function LoginPage() {
                     />
                 </div>
 
-                <div style={{ marginTop: "1.5rem" }}>
-                    <Button
-                        type="submit"
-                        variant="primary"
-                        fullWidth
-                        disabled={loading}
-                    >
-                        {loading ? <Loading inline size="sm" message="Signing in..." /> : "Sign In"}
-                    </Button>
-                </div>
+                <Button
+                    type="submit"
+                    variant="primary"
+                    fullWidth
+                    disabled={loading}
+                    icon={<FiLogIn />}
+                >
+                    {loading ? <Loading inline size="sm" message="Signing in..." /> : "Sign In"}
+                </Button>
 
-                <div style={{ marginTop: "1.25rem", textAlign: "center", fontSize: "0.875rem" }}>
+                <div style={{ marginTop: "1rem", textAlign: "center", fontSize: "0.875rem" }}>
                     <span style={{ color: "var(--text-muted)" }}>Don't have an account? </span>
                     <Link to="/register" style={{ color: "var(--primary)", fontWeight: 600 }}>
                         Sign Up
