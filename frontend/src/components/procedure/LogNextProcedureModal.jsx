@@ -78,7 +78,7 @@ export default function LogNextProcedureModal({ patient, onClose, onSaved }) {
             <div
                 style={{
                     backgroundColor: "#ffffff",
-                    borderRadius: "12px",
+                    borderRadius: 0,
                     maxWidth: "480px",
                     width: "100%",
                     padding: "2rem",
@@ -109,7 +109,7 @@ export default function LogNextProcedureModal({ patient, onClose, onSaved }) {
                         style={{
                             padding: "0.75rem 1rem",
                             backgroundColor: "#fef3c7",
-                            borderRadius: "6px",
+                            borderRadius: 0,
                             borderLeft: "4px solid #f59e0b",
                             marginBottom: "1rem",
                             fontSize: "0.85rem",
@@ -127,7 +127,7 @@ export default function LogNextProcedureModal({ patient, onClose, onSaved }) {
                             padding: "0.75rem",
                             backgroundColor: "#fee2e2",
                             color: "#b91c1c",
-                            borderRadius: "6px",
+                            borderRadius: 0,
                             marginBottom: "1rem",
                             fontSize: "0.875rem",
                         }}
@@ -154,7 +154,7 @@ export default function LogNextProcedureModal({ patient, onClose, onSaved }) {
                             style={{
                                 width: "100%",
                                 padding: "0.65rem 0.75rem",
-                                borderRadius: "6px",
+                                borderRadius: 0,
                                 border: "1px solid #cbd5e1",
                                 fontSize: "1rem",
                             }}
@@ -181,7 +181,7 @@ export default function LogNextProcedureModal({ patient, onClose, onSaved }) {
                                 style={{
                                     width: "100%",
                                     padding: "0.65rem 0.75rem",
-                                    borderRadius: "6px",
+                                    borderRadius: 0,
                                     border: "1px solid #cbd5e1",
                                 }}
                             />
@@ -201,7 +201,7 @@ export default function LogNextProcedureModal({ patient, onClose, onSaved }) {
                                 style={{
                                     width: "100%",
                                     padding: "0.65rem 0.75rem",
-                                    borderRadius: "6px",
+                                    borderRadius: 0,
                                     border: "1px solid #cbd5e1",
                                 }}
                             />
@@ -224,7 +224,7 @@ export default function LogNextProcedureModal({ patient, onClose, onSaved }) {
                             style={{
                                 width: "100%",
                                 padding: "0.65rem 0.75rem",
-                                borderRadius: "6px",
+                                borderRadius: 0,
                                 border: "1px solid #cbd5e1",
                                 fontSize: "0.95rem",
                             }}
