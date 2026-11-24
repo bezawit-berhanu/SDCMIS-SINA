@@ -88,7 +88,7 @@ export default function StatusBadge({ status, text, size = "md" }) {
                 color: config.color,
                 backgroundColor: config.bg,
                 border: `1px solid ${config.border}`,
-                borderRadius: "4px",
+                borderRadius: 0,
                 lineHeight: 1.2,
                 whiteSpace: "nowrap",
             }}
@@ -97,7 +97,7 @@ export default function StatusBadge({ status, text, size = "md" }) {
                 style={{
                     width: "6px",
                     height: "6px",
-                    borderRadius: "50%",
+                    borderRadius: 0,
                     backgroundColor: config.color,
                     display: "inline-block",
                 }}
