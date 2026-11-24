@@ -36,24 +36,24 @@ function PatientsContent() {
 
             {/* Quick Metrics Bar */}
             <div className="metrics-summary-grid">
-                <div className="metric-card">
+                <div className="metric-card" style={{ borderRadius: 0 }}>
                     <span className="metric-label">Total Patients</span>
                     <span className="metric-value">{patients.length}</span>
                     <span className="metric-sub">Registered across all locations</span>
                 </div>
-                <div className="metric-card">
+                <div className="metric-card" style={{ borderRadius: 0 }}>
                     <span className="metric-label">Outstanding Balances</span>
                     <span className={`metric-value ${patientsWithBalance > 0 ? "text-amber" : "text-success"}`}>
                         {patientsWithBalance}
                     </span>
                     <span className="metric-sub">Patients with pending fees</span>
                 </div>
-                <div className="metric-card">
+                <div className="metric-card" style={{ borderRadius: 0 }}>
                     <span className="metric-label">Active Branches</span>
                     <span className="metric-value">{branches.length}</span>
                     <span className="metric-sub">Operational dental clinics</span>
                 </div>
-                <div className="metric-card">
+                <div className="metric-card" style={{ borderRadius: 0 }}>
                     <span className="metric-label">Treating Dentists</span>
                     <span className="metric-value">{dentists.length}</span>
                     <span className="metric-sub">Specialist clinical practitioners</span>
@@ -74,8 +74,8 @@ function PatientsContent() {
 
                 {/* Empty State: Display "No patients found" (Task 11) */}
                 {!loading && filteredPatients.length === 0 && (
-                    <div className="empty-state-card" id="no-patients-found-state">
-                        <div className="empty-icon-wrap">
+                    <div className="empty-state-card" id="no-patients-found-state" style={{ borderRadius: 0 }}>
+                        <div className="empty-icon-wrap" style={{ borderRadius: 0 }}>
                             <svg className="empty-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
@@ -88,6 +88,7 @@ function PatientsContent() {
                             <button
                                 type="button"
                                 className="btn-secondary"
+                                style={{ borderRadius: 0 }}
                                 onClick={resetFilters}
                             >
                                 Clear All Filters
@@ -95,6 +96,7 @@ function PatientsContent() {
                             <button
                                 type="button"
                                 className="btn-primary"
+                                style={{ borderRadius: 0 }}
                                 onClick={() => setIsCreateOpen(true)}
                             >
                                 Register New Patient
