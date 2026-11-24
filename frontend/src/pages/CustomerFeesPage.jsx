@@ -202,7 +202,7 @@ export default function CustomerFeesPage() {
             </div>
 
             {/* Customers Table */}
-            <div className="card" style={{ padding: 0, overflowX: "auto", backgroundColor: "var(--bg-surface)", border: "1px solid var(--border)" }}>
+            <div className="card" style={{ padding: 0, overflowX: "auto", backgroundColor: "var(--bg-surface)", border: "1px solid var(--border)", borderRadius: 0 }}>
                 {loading ? (
                     <div style={{ padding: "3rem", textAlign: "center", color: "var(--text-muted)" }}>
                         Loading customer records...
