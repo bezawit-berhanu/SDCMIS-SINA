@@ -10,16 +10,23 @@ const __dirname = path.dirname(__filename);
 describe('Zero Dummy Data Audit Test Suite', () => {
     const srcDir = path.join(__dirname, 'src');
 
+    test('patient-context.jsx starts with zero hardcoded dummy patients', () => {
+        const content = fs.readFileSync(path.join(srcDir, 'features', 'patient', 'patient-context.jsx'), 'utf-8');
+        assert.doesNotMatch(content, /fallbackPatients/);
+        assert.doesNotMatch(content, /Abebe Bikila/);
+        assert.doesNotMatch(content, /Fatima Zahra/);
+        assert.doesNotMatch(content, /Chala Tadesse/);
+        assert.match(content, /useState\(\s*\[\s*\]\s*\)/);
+    });
+
     test('DentistPage.jsx contains zero hardcoded mock procedures or patient arrays in state', () => {
         const content = fs.readFileSync(path.join(srcDir, 'pages', 'DentistPage.jsx'), 'utf-8');
-        // Ensure state is not initialized with mock arrays
         assert.doesNotMatch(content, /useState\(\s*\[\s*\{\s*id:\s*["']PROC-101/);
         assert.doesNotMatch(content, /Hana Bekele.*Composite Restoration/);
     });
 
     test('ReceptionistPage.jsx contains zero hardcoded queue or payment records in state', () => {
         const content = fs.readFileSync(path.join(srcDir, 'pages', 'ReceptionistPage.jsx'), 'utf-8');
-        // Ensure queueList and paymentHistory states are not hardcoded
         assert.doesNotMatch(content, /useState\(\s*\[\s*\{\s*id:\s*["']que-003/);
         assert.doesNotMatch(content, /useState\(\s*\[\s*\{\s*id:\s*["']RCP-201/);
     });
@@ -45,16 +52,19 @@ describe('Zero Dummy Data Audit Test Suite', () => {
         assert.doesNotMatch(content, /formattedQueueNumber:\s*["']#007["']/);
     });
 
-    test('LoginPage.jsx and RegisterPage.jsx have no FAQ teasers and strictly use Sina Dental Clinic title', () => {
+    test('LoginPage.jsx and RegisterPage.jsx have no FAQ teasers or superfluous marketing copy', () => {
         const loginContent = fs.readFileSync(path.join(srcDir, 'pages', 'LoginPage.jsx'), 'utf-8');
         const regContent = fs.readFileSync(path.join(srcDir, 'pages', 'RegisterPage.jsx'), 'utf-8');
+        const authLayoutContent = fs.readFileSync(path.join(srcDir, 'layouts', 'AuthLayout.jsx'), 'utf-8');
 
         assert.doesNotMatch(loginContent, /FAQ/i);
         assert.doesNotMatch(loginContent, /Frequently Asked Questions/i);
-        assert.match(loginContent, /Sina Dental Clinic/);
+        assert.match(loginContent, /Sign In/);
 
         assert.doesNotMatch(regContent, /FAQ/i);
-        assert.match(regContent, /Sina Dental Clinic/);
+        assert.match(regContent, /Create Account/);
+
+        assert.match(authLayoutContent, /Sina Dental Clinic/);
     });
 
     test('SignalR hub service exists and is integrated into realtime service', () => {
@@ -71,4 +81,3 @@ describe('Zero Dummy Data Audit Test Suite', () => {
         assert.match(realtimeContent, /signalRService/);
     });
 });
-

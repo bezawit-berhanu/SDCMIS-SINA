@@ -1,10 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from "react";
 import patientService from "../../services/patient.service";
 
-const fallbackBranches = [];
-const fallbackDentists = [];
-const fallbackPatients = [];
-
 const PatientContext = createContext(null);
 
 export function PatientProvider({ children }) {
