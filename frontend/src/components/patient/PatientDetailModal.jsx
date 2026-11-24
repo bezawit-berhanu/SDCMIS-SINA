@@ -222,7 +222,7 @@ export default function PatientDetailModal() {
                         <div style={{
                             padding: "10px 16px",
                             marginBottom: "16px",
-                            borderRadius: "8px",
+                            borderRadius: 0,
                             fontWeight: 500,
                             backgroundColor: feedbackType === "success" ? "#d1fae5" : "#fee2e2",
                             color: feedbackType === "success" ? "#065f46" : "#991b1b",
@@ -321,7 +321,7 @@ export default function PatientDetailModal() {
                                         backgroundColor: "var(--primary)",
                                         color: "white",
                                         padding: "8px 14px",
-                                        borderRadius: "6px",
+                                        borderRadius: 0,
                                         fontWeight: "600",
                                         cursor: "pointer",
                                         border: "none",
@@ -393,7 +393,7 @@ export default function PatientDetailModal() {
                                             backgroundColor: "#2563eb",
                                             color: "white",
                                             padding: "8px 14px",
-                                            borderRadius: "6px",
+                                            borderRadius: 0,
                                             fontWeight: "600",
                                             cursor: "pointer",
                                             border: "none",
@@ -414,7 +414,7 @@ export default function PatientDetailModal() {
                                             backgroundColor: showNextProcForm ? "#6b7280" : "#4f46e5",
                                             color: "white",
                                             padding: "8px 14px",
-                                            borderRadius: "6px",
+                                            borderRadius: 0,
                                             fontWeight: "600",
                                             cursor: "pointer",
                                             border: "none"
@@ -432,7 +432,7 @@ export default function PatientDetailModal() {
                             <form onSubmit={handleScheduleNextProcedure} style={{
                                 backgroundColor: "#f8fafc",
                                 border: "1px solid #e2e8f0",
-                                borderRadius: "8px",
+                                borderRadius: 0,
                                 padding: "16px",
                                 marginBottom: "16px"
                             }}>
@@ -448,7 +448,7 @@ export default function PatientDetailModal() {
                                             value={nextProcForm.name}
                                             onChange={(e) => setNextProcForm({ ...nextProcForm, name: e.target.value })}
                                             placeholder="e.g. Composite Restoration"
-                                            style={{ width: "100%", padding: "8px", borderRadius: "6px", border: "1px solid #cbd5e1" }}
+                                            style={{ width: "100%", padding: "8px", borderRadius: 0, border: "1px solid #cbd5e1" }}
                                         />
                                     </div>
                                     <div>
@@ -461,7 +461,7 @@ export default function PatientDetailModal() {
                                             value={nextProcForm.cost}
                                             onChange={(e) => setNextProcForm({ ...nextProcForm, cost: e.target.value })}
                                             placeholder="e.g. 150.00"
-                                            style={{ width: "100%", padding: "8px", borderRadius: "6px", border: "1px solid #cbd5e1" }}
+                                            style={{ width: "100%", padding: "8px", borderRadius: 0, border: "1px solid #cbd5e1" }}
                                         />
                                     </div>
                                 </div>
@@ -474,7 +474,7 @@ export default function PatientDetailModal() {
                                             value={nextProcForm.description}
                                             onChange={(e) => setNextProcForm({ ...nextProcForm, description: e.target.value })}
                                             placeholder="e.g. Tooth #14 composite resin restoration"
-                                            style={{ width: "100%", padding: "8px", borderRadius: "6px", border: "1px solid #cbd5e1" }}
+                                            style={{ width: "100%", padding: "8px", borderRadius: 0, border: "1px solid #cbd5e1" }}
                                         />
                                     </div>
                                     <div>
@@ -484,7 +484,7 @@ export default function PatientDetailModal() {
                                             required
                                             value={nextProcForm.targetDate}
                                             onChange={(e) => setNextProcForm({ ...nextProcForm, targetDate: e.target.value })}
-                                            style={{ width: "100%", padding: "8px", borderRadius: "6px", border: "1px solid #cbd5e1" }}
+                                            style={{ width: "100%", padding: "8px", borderRadius: 0, border: "1px solid #cbd5e1" }}
                                         />
                                     </div>
                                 </div>
@@ -492,14 +492,14 @@ export default function PatientDetailModal() {
                                     <button
                                         type="button"
                                         onClick={() => setShowNextProcForm(false)}
-                                        style={{ padding: "8px 14px", borderRadius: "6px", border: "1px solid #cbd5e1", background: "white", cursor: "pointer" }}
+                                        style={{ padding: "8px 14px", borderRadius: 0, border: "1px solid #cbd5e1", background: "white", cursor: "pointer" }}
                                     >
                                         Cancel
                                     </button>
                                     <button
                                         type="submit"
                                         disabled={actionLoading}
-                                        style={{ padding: "8px 16px", borderRadius: "6px", border: "none", background: "#2563eb", color: "white", fontWeight: "600", cursor: "pointer" }}
+                                        style={{ padding: "8px 16px", borderRadius: 0, border: "none", background: "#2563eb", color: "white", fontWeight: "600", cursor: "pointer" }}
                                     >
                                         {actionLoading ? "Saving..." : "Save Next Procedure"}
                                     </button>
@@ -605,7 +605,7 @@ export default function PatientDetailModal() {
                                     backgroundColor: showPaymentForm ? "#6b7280" : "#059669",
                                     color: "white",
                                     padding: "8px 14px",
-                                    borderRadius: "6px",
+                                    borderRadius: 0,
                                     fontWeight: "600",
                                     cursor: "pointer",
                                     border: "none"
@@ -621,7 +621,7 @@ export default function PatientDetailModal() {
                             <form onSubmit={handleRecordPayment} style={{
                                 backgroundColor: "#f0fdf4",
                                 border: "1px solid #bbf7d0",
-                                borderRadius: "8px",
+                                borderRadius: 0,
                                 padding: "16px",
                                 marginBottom: "16px"
                             }}>
@@ -641,7 +641,7 @@ export default function PatientDetailModal() {
                                             value={paymentForm.amount}
                                             onChange={(e) => setPaymentForm({ ...paymentForm, amount: e.target.value })}
                                             placeholder="e.g. 50.00"
-                                            style={{ width: "100%", padding: "8px", borderRadius: "6px", border: "1px solid #cbd5e1" }}
+                                            style={{ width: "100%", padding: "8px", borderRadius: 0, border: "1px solid #cbd5e1" }}
                                         />
                                     </div>
                                     <div>
@@ -653,7 +653,7 @@ export default function PatientDetailModal() {
                                             required
                                             value={paymentForm.paymentDate}
                                             onChange={(e) => setPaymentForm({ ...paymentForm, paymentDate: e.target.value })}
-                                            style={{ width: "100%", padding: "8px", borderRadius: "6px", border: "1px solid #cbd5e1" }}
+                                            style={{ width: "100%", padding: "8px", borderRadius: 0, border: "1px solid #cbd5e1" }}
                                         />
                                     </div>
                                     <div>
@@ -666,7 +666,7 @@ export default function PatientDetailModal() {
                                             value={paymentForm.recordedBy}
                                             onChange={(e) => setPaymentForm({ ...paymentForm, recordedBy: e.target.value })}
                                             placeholder="e.g. Dr. Sara / Receptionist"
-                                            style={{ width: "100%", padding: "8px", borderRadius: "6px", border: "1px solid #cbd5e1" }}
+                                            style={{ width: "100%", padding: "8px", borderRadius: 0, border: "1px solid #cbd5e1" }}
                                         />
                                     </div>
                                 </div>
@@ -674,14 +674,14 @@ export default function PatientDetailModal() {
                                     <button
                                         type="button"
                                         onClick={() => setShowPaymentForm(false)}
-                                        style={{ padding: "8px 14px", borderRadius: "6px", border: "1px solid #cbd5e1", background: "white", cursor: "pointer" }}
+                                        style={{ padding: "8px 14px", borderRadius: 0, border: "1px solid #cbd5e1", background: "white", cursor: "pointer" }}
                                     >
                                         Cancel
                                     </button>
                                     <button
                                         type="submit"
                                         disabled={actionLoading}
-                                        style={{ padding: "8px 16px", borderRadius: "6px", border: "none", background: "#059669", color: "white", fontWeight: "600", cursor: "pointer" }}
+                                        style={{ padding: "8px 16px", borderRadius: 0, border: "none", background: "#059669", color: "white", fontWeight: "600", cursor: "pointer" }}
                                     >
                                         {actionLoading ? "Processing..." : "Confirm & Record Payment"}
                                     </button>
