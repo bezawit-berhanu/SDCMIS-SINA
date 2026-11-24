@@ -18,10 +18,10 @@ export default function PatientCards() {
                 const status = patient.status || patient.recordStatus || "ACTIVE";
 
                 return (
-                    <div key={patient.id} className="patient-card">
+                    <div key={patient.id} className="patient-card" style={{ borderRadius: 0 }}>
                         <div className="patient-card-header">
                             <div className="card-avatar-wrap">
-                                <div className="card-avatar">
+                                <div className="card-avatar" style={{ borderRadius: 0 }}>
                                     {(patient.name || patient.fullName || "P")[0].toUpperCase()}
                                 </div>
                                 <div>
@@ -29,7 +29,7 @@ export default function PatientCards() {
                                     <span className="card-patient-id">{patient.id}</span>
                                 </div>
                             </div>
-                            <span className={`status-pill ${status.toLowerCase()}`}>
+                            <span className={`status-pill ${status.toLowerCase()}`} style={{ borderRadius: 0 }}>
                                 {status}
                             </span>
                         </div>
@@ -42,7 +42,7 @@ export default function PatientCards() {
 
                             <div className="card-info-row">
                                 <span className="info-label">Service</span>
-                                <span className="service-pill">{serviceName}</span>
+                                <span className="service-pill" style={{ borderRadius: 0 }}>{serviceName}</span>
                             </div>
 
                             <div className="card-info-row">
@@ -65,7 +65,7 @@ export default function PatientCards() {
                                 </div>
                             </div>
 
-                            <div className="card-balance-box">
+                            <div className="card-balance-box" style={{ borderRadius: 0 }}>
                                 <span className="balance-label">Outstanding Balance:</span>
                                 <span className={`card-balance-value ${balance > 0 ? "balance-unpaid" : "balance-paid"}`}>
                                     ${balance.toFixed(2)}
@@ -77,6 +77,7 @@ export default function PatientCards() {
                             <button
                                 type="button"
                                 className="btn-card-action btn-view"
+                                style={{ borderRadius: 0 }}
                                 onClick={() => openDetail(patient)}
                             >
                                 Details
@@ -84,6 +85,7 @@ export default function PatientCards() {
                             <button
                                 type="button"
                                 className="btn-card-action btn-edit"
+                                style={{ borderRadius: 0 }}
                                 onClick={() => openEdit(patient)}
                             >
                                 Edit
@@ -91,6 +93,7 @@ export default function PatientCards() {
                             <button
                                 type="button"
                                 className="btn-card-action btn-delete"
+                                style={{ borderRadius: 0 }}
                                 onClick={() => openDelete(patient)}
                             >
                                 Delete
