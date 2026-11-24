@@ -112,6 +112,21 @@ All five core task directives have been fulfilled:
   - **Views & Pages**: `PatientTable`, `PatientCards`, `PatientSearchFilter`, `QueueBoard`, `CustomerQueueWidget`, `CustomerPaymentHistory`, `CustomerReadOnlyNotice`, `DentistNotificationDropdown`, `OnboardingTour`, `HomePage`, `PatientsPage`, `DentistPage`, `ReceptionistPage`, `CustomerPage`, `CustomerFeesPage`, `UpcomingTasksPage`, `AppointmentsPage`, `MissedAppointmentsPage`, `DentistNotificationsPage`, `PatientDetailPage`, `SettingsPage`, `HelpPage`, `DashboardPage`
 - **Automated Verification**: Verified via `frontend/test.ui.zero.radius.js` which parses all 60 React UI files in `frontend/src` using AST and regex scanning, asserting 0 non-zero border radiuses.
 
+### 4.4 Injected Dummy Data Elimination & True Cold-Boot Zero-State
+- **Clean Slate Guarantee**: In accordance with user directives, all synthetic developer mock records (including pre-seeded patients such as Abebe Bikila and Fatima Zahra, fake queue tickets `#007`, and pre-populated procedure ledgers) have been completely purged from both frontend and backend state.
+- **Frontend Contexts & Pages Initialized to Zero**:
+  - `patient-context.jsx`: Removed `fallbackPatients`, `fallbackBranches`, and `fallbackDentists`. All states initialize strictly to empty arrays `[]`.
+  - `QueueBoard.jsx` & `CustomerQueueWidget.jsx`: Initial queue state starts strictly at empty `[]` with no mock active ticket numbers.
+  - `DentistPage.jsx`, `ReceptionistPage.jsx`, `CustomerPage.jsx`, `CustomerFeesPage.jsx`: Render genuine, clean zero-state empty views with explicit prompts to register the first patient or book an appointment.
+- **Backend In-Memory Repositories Initialized to Zero**:
+  - `patient.repository.js`: Cold-boot `patients = []` and `initialSeedPatients = []`.
+  - `queue.repository.js`: Cold-boot `queue = []`.
+  - `appointment.repository.js`: Cold-boot `appointments = []`.
+  - `notification.repository.js`: Cold-boot `notifications = []`.
+- **Automated Regression Auditing**:
+  - `frontend/test.zero.dummy.data.js`: Scans frontend contexts, pages, and widgets to assert zero hardcoded mock patients, tickets, or procedures.
+  - `backend/test.repo.coldboot.zero.js`: Verifies that all repositories cold boot to an array length of exactly 0.
+
 ---
 
 ## 5. Verification Matrix & Test Results
