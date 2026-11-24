@@ -8,18 +8,16 @@ class NotificationRepository extends INotificationRepository {
         super();
         this.prisma = prisma;
 
-        // Seed initial notification
-        const initialNotif = new Notification({
-            notificationId: "notif-001",
-            userId: "usr-dentist-01",
-            message: "Patient #002 (Hana Bekele) is ready in Operatory 1.",
-            relatedQueueEntryId: "que-002",
-            isRead: true,
-            type: NotificationType.PATIENT_READY,
-            createdAt: new Date(Date.now() - 40 * 60000),
-        });
+        this.notifications = [];
+    }
 
-        this.notifications = [initialNotif];
+    seedNotification(notif) {
+        this.notifications.push(notif);
+        return notif;
+    }
+
+    clearNotifications() {
+        this.notifications = [];
     }
 
     async create(notificationData) {
