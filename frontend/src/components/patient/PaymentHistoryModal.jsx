@@ -31,7 +31,7 @@ export default function PaymentHistoryModal({ patient, onClose }) {
             <div
                 style={{
                     backgroundColor: "#ffffff",
-                    borderRadius: "12px",
+                    borderRadius: 0,
                     maxWidth: "560px",
                     width: "100%",
                     padding: "2rem",
@@ -67,7 +67,7 @@ export default function PaymentHistoryModal({ patient, onClose }) {
                         gap: "0.5rem",
                         padding: "0.85rem",
                         backgroundColor: "#f8fafc",
-                        borderRadius: "8px",
+                        borderRadius: 0,
                         marginBottom: "1.25rem",
                         textAlign: "center",
                         border: "1px solid #e2e8f0",
@@ -120,7 +120,7 @@ export default function PaymentHistoryModal({ patient, onClose }) {
                                                     fontSize: "0.75rem",
                                                     fontWeight: "600",
                                                     padding: "0.15rem 0.45rem",
-                                                    borderRadius: "4px",
+                                                    borderRadius: 0,
                                                     backgroundColor: "#e0f2fe",
                                                     color: "#0369a1",
                                                 }}
