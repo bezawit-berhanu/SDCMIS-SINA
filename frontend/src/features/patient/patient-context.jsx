@@ -1,75 +1,16 @@
 import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from "react";
 import patientService from "../../services/patient.service";
 
-// Fallback seed data for instant offline rendering & testing
-const fallbackBranches = [
-    {
-        id: "br-001",
-        name: "Main Dental Clinic - Bole",
-        address: "Bole Medhanialem, Suite 402, Addis Ababa",
-        phone: "+251911223344",
-    },
-    {
-        id: "br-002",
-        name: "Kazanchis Executive Dental Center",
-        address: "Kazanchis Business Center, 3rd Floor, Addis Ababa",
-        phone: "+251922334455",
-    },
-    {
-        id: "br-003",
-        name: "Sarbet Family Dental Practice",
-        address: "Sarbet Old Airport Road, Addis Ababa",
-        phone: "+251933445566",
-    },
-];
-
-const fallbackDentists = [
-    {
-        id: "dent-001",
-        fullName: "Dr. Aster Worku",
-        name: "Dr. Aster Worku",
-        email: "aster.worku@dentalclinic.com",
-        phone: "+251911001122",
-        branchId: "br-001",
-        branchName: "Main Dental Clinic - Bole",
-    },
-    {
-        id: "dent-002",
-        fullName: "Dr. Dawit Tadesse",
-        name: "Dr. Dawit Tadesse",
-        email: "dawit.tadesse@dentalclinic.com",
-        phone: "+251922112233",
-        branchId: "br-001",
-        branchName: "Main Dental Clinic - Bole",
-    },
-    {
-        id: "dent-003",
-        fullName: "Dr. Selamawit Alemu",
-        name: "Dr. Selamawit Alemu",
-        email: "selamawit.alemu@dentalclinic.com",
-        phone: "+251933223344",
-        branchId: "br-002",
-        branchName: "Kazanchis Executive Dental Center",
-    },
-    {
-        id: "dent-004",
-        fullName: "Dr. Michael Bekele",
-        name: "Dr. Michael Bekele",
-        email: "michael.bekele@dentalclinic.com",
-        phone: "+251944334455",
-        branchId: "br-003",
-        branchName: "Sarbet Family Dental Practice",
-    },
-];
-
+const fallbackBranches = [];
+const fallbackDentists = [];
 const fallbackPatients = [];
 
 const PatientContext = createContext(null);
 
 export function PatientProvider({ children }) {
     const [patients, setPatients] = useState([]);
-    const [branches, setBranches] = useState(fallbackBranches);
-    const [dentists, setDentists] = useState(fallbackDentists);
+    const [branches, setBranches] = useState([]);
+    const [dentists, setDentists] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
