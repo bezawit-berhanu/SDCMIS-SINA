@@ -61,7 +61,7 @@ export default function AppointmentCalendar({ selectedDate, onDateSelect, appoin
     return (
         <div style={{
             backgroundColor: "white",
-            borderRadius: "var(--radius-lg, 12px)",
+            borderRadius: 0,
             border: "1px solid var(--border, #e2e8f0)",
             padding: "1.25rem",
             boxShadow: "0 1px 3px rgba(0, 0, 0, 0.05)"
@@ -82,7 +82,7 @@ export default function AppointmentCalendar({ selectedDate, onDateSelect, appoin
                         onClick={prevMonth}
                         style={{
                             padding: "6px 10px",
-                            borderRadius: "6px",
+                            borderRadius: 0,
                             border: "1px solid var(--border, #cbd5e1)",
                             backgroundColor: "white",
                             cursor: "pointer",
@@ -101,7 +101,7 @@ export default function AppointmentCalendar({ selectedDate, onDateSelect, appoin
                         }}
                         style={{
                             padding: "6px 12px",
-                            borderRadius: "6px",
+                            borderRadius: 0,
                             border: "1px solid var(--border, #cbd5e1)",
                             backgroundColor: "#f8fafc",
                             cursor: "pointer",
@@ -116,7 +116,7 @@ export default function AppointmentCalendar({ selectedDate, onDateSelect, appoin
                         onClick={nextMonth}
                         style={{
                             padding: "6px 10px",
-                            borderRadius: "6px",
+                            borderRadius: 0,
                             border: "1px solid var(--border, #cbd5e1)",
                             backgroundColor: "white",
                             cursor: "pointer",
@@ -165,7 +165,7 @@ export default function AppointmentCalendar({ selectedDate, onDateSelect, appoin
                             style={{
                                 minHeight: "48px",
                                 padding: "4px",
-                                borderRadius: "8px",
+                                borderRadius: 0,
                                 border: selected ? "2px solid #2563eb" : (today ? "1px solid #3b82f6" : "1px solid #f1f5f9"),
                                 backgroundColor: selected ? "#eff6ff" : (today ? "#f8fafc" : "white"),
                                 cursor: "pointer",
@@ -189,10 +189,10 @@ export default function AppointmentCalendar({ selectedDate, onDateSelect, appoin
                             {dayApts.length > 0 && (
                                 <div style={{ display: "flex", gap: "3px", marginTop: "4px", flexWrap: "wrap", justifyContent: "center" }}>
                                     {hasMissed && (
-                                        <span title="Missed appointment" style={{ width: "6px", height: "6px", borderRadius: "50%", backgroundColor: "#ef4444" }} />
+                                        <span title="Missed appointment" style={{ width: "6px", height: "6px", borderRadius: 0, backgroundColor: "#ef4444" }} />
                                     )}
                                     {hasUpcoming && (
-                                        <span title="Upcoming appointment" style={{ width: "6px", height: "6px", borderRadius: "50%", backgroundColor: "#3b82f6" }} />
+                                        <span title="Upcoming appointment" style={{ width: "6px", height: "6px", borderRadius: 0, backgroundColor: "#3b82f6" }} />
                                     )}
                                     {dayApts.length > 2 && (
                                         <span style={{ fontSize: "0.625rem", color: "#64748b", fontWeight: 700, lineHeight: 1 }}>
@@ -209,15 +209,15 @@ export default function AppointmentCalendar({ selectedDate, onDateSelect, appoin
             {/* Legend */}
             <div style={{ display: "flex", gap: "16px", marginTop: "1rem", paddingTop: "0.75rem", borderTop: "1px solid #f1f5f9", fontSize: "0.75rem", color: "#64748b" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                    <span style={{ width: "8px", height: "8px", borderRadius: "50%", backgroundColor: "#3b82f6" }} />
+                    <span style={{ width: "8px", height: "8px", borderRadius: 0, backgroundColor: "#3b82f6" }} />
                     Upcoming
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                    <span style={{ width: "8px", height: "8px", borderRadius: "50%", backgroundColor: "#ef4444" }} />
+                    <span style={{ width: "8px", height: "8px", borderRadius: 0, backgroundColor: "#ef4444" }} />
                     Missed
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                    <span style={{ width: "8px", height: "8px", borderRadius: "2px", border: "2px solid #2563eb" }} />
+                    <span style={{ width: "8px", height: "8px", borderRadius: 0, border: "2px solid #2563eb" }} />
                     Selected
                 </div>
             </div>
