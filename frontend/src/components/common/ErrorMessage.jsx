@@ -8,7 +8,7 @@ export default function ErrorMessage({
     if (!message) return null;
 
     return (
-        <div className="error-message" role="alert">
+        <div className="error-message" role="alert" style={{ borderRadius: 0 }}>
             <span className="error-message__icon" aria-hidden="true">
                 <FiAlertTriangle />
             </span>
