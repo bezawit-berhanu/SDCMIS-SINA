@@ -10,6 +10,9 @@
     "react-router-dom": "^7.18.4"
   },
   "scripts": {
+    "test": "npm --prefix backend test && npm --prefix frontend test",
+    "test:ui": "npm --prefix frontend run test:ui",
+    "test:coldboot": "npm --prefix backend run test:coldboot",
     "postinstall": "prisma skills sync || exit 0"
   },
   "devDependencies": {
