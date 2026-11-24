@@ -63,7 +63,7 @@ export default function StartProcedureModal({ patient, onClose, onStarted }) {
             <div
                 style={{
                     backgroundColor: "#ffffff",
-                    borderRadius: "12px",
+                    borderRadius: 0,
                     maxWidth: "460px",
                     width: "100%",
                     padding: "2rem",
@@ -110,7 +110,7 @@ export default function StartProcedureModal({ patient, onClose, onStarted }) {
                             padding: "0.75rem",
                             backgroundColor: "#fee2e2",
                             color: "#b91c1c",
-                            borderRadius: "6px",
+                            borderRadius: 0,
                             marginBottom: "1rem",
                             fontSize: "0.875rem",
                         }}
