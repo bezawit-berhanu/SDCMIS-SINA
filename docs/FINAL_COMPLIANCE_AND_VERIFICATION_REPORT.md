@@ -102,6 +102,16 @@ All five core task directives have been fulfilled:
 - **Elimination of Fluff & Dummy Copy**: Completely purged placeholder GIS datasets, spatial management labels, and internal requirement codes (`(SCR-*)`, `(BR-*)`, `(FR-*)`) from user-facing screens and modals. All headers and cards present clean, production dental clinical practice wording.
 - **Zero Emojis Mandate**: Maintained 100% zero emojis across all 72 frontend source files with full `react-icons` iconography.
 
+### 4.3 Zero Border-Radius Rectangular Geometry Architecture
+- **Strict 0px Geometry**: Eradicated all curved corners, rounded borders, and pill-shaped components throughout the entire application. Every component strictly renders crisp, modern rectangular geometry (`borderRadius: 0`).
+- **CSS Design System Tokens**: Set `--radius-sm: 0px`, `--radius-md: 0px`, `--radius-lg: 0px` globally in `:root` and `[data-theme="dark"]`.
+- **Exhaustive Component Scope**: Refactored 37 distinct UI components, modals, and views:
+  - **Auth**: `AuthLayout`, `LoginPage`, `RegisterPage`
+  - **Layout & Common**: `Header`, `Sidebar`, `PageContainer`, `Button`, `ErrorMessage`, `Loading`, `StatusBadge`, `ErrorBoundary`, `AccessDenied`
+  - **Modals**: `CreatePatientModal`, `EditPatientModal`, `DeletePatientModal`, `PatientDetailModal`, `PaymentHistoryModal`, `RecordPaymentModal`, `StartProcedureModal`, `CompleteProcedureModal`, `LogNextProcedureModal`, `AddToQueueModal`, `AppointmentDetailModal`
+  - **Views & Pages**: `PatientTable`, `PatientCards`, `PatientSearchFilter`, `QueueBoard`, `CustomerQueueWidget`, `CustomerPaymentHistory`, `CustomerReadOnlyNotice`, `DentistNotificationDropdown`, `OnboardingTour`, `HomePage`, `PatientsPage`, `DentistPage`, `ReceptionistPage`, `CustomerPage`, `CustomerFeesPage`, `UpcomingTasksPage`, `AppointmentsPage`, `MissedAppointmentsPage`, `DentistNotificationsPage`, `PatientDetailPage`, `SettingsPage`, `HelpPage`, `DashboardPage`
+- **Automated Verification**: Verified via `frontend/test.ui.zero.radius.js` which parses all 60 React UI files in `frontend/src` using AST and regex scanning, asserting 0 non-zero border radiuses.
+
 ---
 
 ## 5. Verification Matrix & Test Results
