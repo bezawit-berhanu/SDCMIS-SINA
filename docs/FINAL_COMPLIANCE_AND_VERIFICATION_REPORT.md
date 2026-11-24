@@ -93,9 +93,10 @@ All five core task directives have been fulfilled:
 ## 4. Frontend Minimalist Clean UI/UX
 
 ### 4.1 Palette & Typography Specifications
-- **Page Background**: Clean creamish/white tone (`--bg-page: #FAF8F5`).
-- **Card & Surface Background**: Clean white (`--bg-surface: #FFFFFF`, `--bg-card: #FFFFFF`).
-- **Button Styling**: Primary buttons feature the standard vibrant normal blue theme (`--primary: #2563EB`, `--primary-hover: #1D4ED8`, `--primary-active: #1E40AF`, `--primary-light: #EFF6FF`).
+- **Page Background**: Clean warm creamish tone (`--bg-page: #FAF8F5`).
+- **Card & Surface Background**: Clean crisp white surfaces (`--bg-surface: #FFFFFF`, `--bg-card: #FFFFFF`).
+- **Primary Aesthetic & Button Styling**: Grounded in neutral charcoal and deep slate/black (`--primary: #0F172A`, `--primary-hover: #1E293B`, `--primary-active: #020617`, `--primary-light: #F1F5F9`, `--primary-tint: #E2E8F0`), replacing vibe-coded bluish gradients with an understated, professional medical portal appearance.
+- **Borders & Dividers**: Crisp, subtle slate dividers (`--border: #E2E8F0`, `--border-focus: #0F172A`).
 - **Typography**: Clean system stack featuring `Inter`, `-apple-system`, `BlinkMacSystemFont`, `Segoe UI`, `Roboto`, `sans-serif`.
 
 ### 4.2 Production Copy & Zero Dummy Text
