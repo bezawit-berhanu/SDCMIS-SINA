@@ -136,7 +136,7 @@ export default function DentistNotificationDropdown({ userId = "usr-dentist-01" 
                     border: "none",
                     cursor: "pointer",
                     padding: "8px",
-                    borderRadius: "50%",
+                    borderRadius: 0,
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
@@ -158,7 +158,7 @@ export default function DentistNotificationDropdown({ userId = "usr-dentist-01" 
                             fontSize: "0.6875rem",
                             fontWeight: 800,
                             padding: "2px 6px",
-                            borderRadius: "9999px",
+                            borderRadius: 0,
                             minWidth: "18px",
                             height: "18px",
                             display: "flex",
@@ -185,7 +185,7 @@ export default function DentistNotificationDropdown({ userId = "usr-dentist-01" 
                         maxHeight: "440px",
                         overflowY: "auto",
                         backgroundColor: "white",
-                        borderRadius: "8px",
+                        borderRadius: 0,
                         boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1)",
                         border: "1px solid #e2e8f0",
                         zIndex: 1000,
@@ -266,7 +266,7 @@ export default function DentistNotificationDropdown({ userId = "usr-dentist-01" 
                                             style={{
                                                 width: "8px",
                                                 height: "8px",
-                                                borderRadius: "50%",
+                                                borderRadius: 0,
                                                 backgroundColor: isUnread ? "#2563eb" : "transparent",
                                                 marginTop: "6px",
                                                 flexShrink: 0,
@@ -292,7 +292,7 @@ export default function DentistNotificationDropdown({ userId = "usr-dentist-01" 
                                                         color: "#0369a1",
                                                         backgroundColor: "#e0f2fe",
                                                         padding: "1px 6px",
-                                                        borderRadius: "4px",
+                                                        borderRadius: 0,
                                                     }}
                                                 >
                                                     {notif.Type || notif.type || "PATIENT_READY"}
