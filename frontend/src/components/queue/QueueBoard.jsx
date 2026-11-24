@@ -198,7 +198,7 @@ export default function QueueBoard({ readOnly = false }) {
                         padding: "0.75rem 1rem",
                         backgroundColor: "#e8f5e9",
                         color: "#2e7d32",
-                        borderRadius: "6px",
+                        borderRadius: 0,
                         marginBottom: "1rem",
                         fontWeight: "500",
                         border: "1px solid #c8e6c9",
@@ -226,7 +226,7 @@ export default function QueueBoard({ readOnly = false }) {
                         key={col.id}
                         style={{
                             backgroundColor: "var(--bg-surface)",
-                            borderRadius: "10px",
+                            borderRadius: 0,
                             border: "1px solid var(--border)",
                             overflow: "hidden",
                         }}
@@ -249,7 +249,7 @@ export default function QueueBoard({ readOnly = false }) {
                             <span
                                 style={{
                                     backgroundColor: col.badgeBg,
-                                    borderRadius: "9999px",
+                                    borderRadius: 0,
                                     padding: "0.15rem 0.55rem",
                                     fontSize: "0.8rem",
                                     fontWeight: 700,
@@ -273,7 +273,7 @@ export default function QueueBoard({ readOnly = false }) {
                                         color: "var(--text-muted)",
                                         fontSize: "0.875rem",
                                         border: "1px dashed var(--border)",
-                                        borderRadius: "8px",
+                                        borderRadius: 0,
                                         backgroundColor: "var(--bg-page)",
                                     }}
                                 >
@@ -285,7 +285,7 @@ export default function QueueBoard({ readOnly = false }) {
                                         key={entry.id}
                                         style={{
                                             backgroundColor: "var(--bg-card)",
-                                            borderRadius: "8px",
+                                            borderRadius: 0,
                                             padding: "1rem",
                                             border: "1px solid var(--border)",
                                             boxShadow: "var(--shadow-sm)",
@@ -376,7 +376,7 @@ export default function QueueBoard({ readOnly = false }) {
                                                     fontWeight: "600",
                                                     padding: "0.25rem",
                                                     backgroundColor: "rgba(27, 77, 46, 0.08)",
-                                                    borderRadius: "4px",
+                                                    borderRadius: 0,
                                                     border: "1px solid var(--border)",
                                                 }}
                                             >
