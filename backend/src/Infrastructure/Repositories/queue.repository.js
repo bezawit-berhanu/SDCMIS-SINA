@@ -9,68 +9,16 @@ class QueueRepository extends IQueueRepository {
         this.prisma = prisma;
         this.patientRepository = patientRepository;
 
-        const today = new Date();
-        const baseTime = new Date(today);
-        baseTime.setHours(9, 0, 0, 0);
+        this.queue = [];
+    }
 
-        // Seed data reflecting the required specifications:
-        // #001 Abebe - DONE
-        // #002 Hana - SERVING
-        // #003 Sara - WAITING
-        // #004 Meron - WAITING
-        this.queue = [
-            new QueueEntry({
-                queueEntryId: "que-001",
-                patientId: "pat-1001",
-                patientName: "Abebe Kebede",
-                queueNumber: 1,
-                status: QueueStatus.DONE,
-                queueDate: today,
-                checkInTime: new Date(baseTime.getTime()),
-                calledTime: new Date(baseTime.getTime() + 15 * 60000),
-                completedTime: new Date(baseTime.getTime() + 45 * 60000),
-                serviceType: "Routine Dental Cleaning",
-                dentistId: "usr-dentist-01",
-                dentistName: "Dr. Sara",
-            }),
-            new QueueEntry({
-                queueEntryId: "que-002",
-                patientId: "pat-1002",
-                patientName: "Hana Bekele",
-                queueNumber: 2,
-                status: QueueStatus.SERVING,
-                queueDate: today,
-                checkInTime: new Date(baseTime.getTime() + 20 * 60000),
-                calledTime: new Date(baseTime.getTime() + 45 * 60000),
-                serviceType: "Root Canal Therapy (Molar)",
-                dentistId: "usr-dentist-01",
-                dentistName: "Dr. Sara",
-            }),
-            new QueueEntry({
-                queueEntryId: "que-003",
-                patientId: "pat-1003",
-                patientName: "Sara Tadesse",
-                queueNumber: 3,
-                status: QueueStatus.WAITING,
-                queueDate: today,
-                checkInTime: new Date(baseTime.getTime() + 40 * 60000),
-                serviceType: "Composite Filling & Polish",
-                dentistId: "usr-dentist-01",
-                dentistName: "Dr. Sara",
-            }),
-            new QueueEntry({
-                queueEntryId: "que-004",
-                patientId: "pat-1004",
-                patientName: "Meron Haile",
-                queueNumber: 4,
-                status: QueueStatus.WAITING,
-                queueDate: today,
-                checkInTime: new Date(baseTime.getTime() + 55 * 60000),
-                serviceType: "Orthodontic Consultation",
-                dentistId: "usr-dentist-01",
-                dentistName: "Dr. Sara",
-            }),
-        ];
+    seedQueue(entry) {
+        this.queue.push(entry);
+        return entry;
+    }
+
+    clearQueue() {
+        this.queue = [];
     }
 
     _isSameDay(d1, d2) {
