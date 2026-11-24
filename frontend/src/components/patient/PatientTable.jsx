@@ -37,11 +37,11 @@ export default function PatientTable() {
                         return (
                             <tr key={patient.id} className="patient-table-row">
                                 <td className="patient-id-cell">
-                                    <span className="id-badge">{patient.id}</span>
+                                    <span className="id-badge" style={{ borderRadius: 0 }}>{patient.id}</span>
                                 </td>
                                 <td className="patient-name-cell">
                                     <div className="name-container">
-                                        <div className="avatar-circle">
+                                        <div className="avatar-circle" style={{ borderRadius: 0 }}>
                                             {(patient.name || patient.fullName || "P")[0].toUpperCase()}
                                         </div>
                                         <div>
@@ -57,10 +57,10 @@ export default function PatientTable() {
                                     <span className="contact-text">{patient.contact || patient.contact_info}</span>
                                 </td>
                                 <td>
-                                    <span className="service-pill">{serviceName}</span>
+                                    <span className="service-pill" style={{ borderRadius: 0 }}>{serviceName}</span>
                                 </td>
                                 <td>
-                                    <div className="branch-tag">
+                                    <div className="branch-tag" style={{ borderRadius: 0 }}>
                                         <svg className="icon-tiny" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                                         </svg>
@@ -68,7 +68,7 @@ export default function PatientTable() {
                                     </div>
                                 </td>
                                 <td>
-                                    <div className="dentist-tag">
+                                    <div className="dentist-tag" style={{ borderRadius: 0 }}>
                                         <svg className="icon-tiny" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                                         </svg>
@@ -76,12 +76,12 @@ export default function PatientTable() {
                                     </div>
                                 </td>
                                 <td>
-                                    <span className={`balance-badge ${balance > 0 ? "balance-unpaid" : "balance-paid"}`}>
+                                    <span className={`balance-badge ${balance > 0 ? "balance-unpaid" : "balance-paid"}`} style={{ borderRadius: 0 }}>
                                         ${balance.toFixed(2)}
                                     </span>
                                 </td>
                                 <td>
-                                    <span className={`status-indicator ${status.toLowerCase()}`}>
+                                    <span className={`status-indicator ${status.toLowerCase()}`} style={{ borderRadius: 0 }}>
                                         {status}
                                     </span>
                                 </td>
@@ -91,6 +91,7 @@ export default function PatientTable() {
                                             <button
                                                 type="button"
                                                 className="btn-action btn-view"
+                                                style={{ borderRadius: 0 }}
                                                 title="View Clinical Details"
                                             >
                                                 View
@@ -99,6 +100,7 @@ export default function PatientTable() {
                                         <button
                                             type="button"
                                             className="btn-action btn-edit"
+                                            style={{ borderRadius: 0 }}
                                             title="Edit Patient"
                                             onClick={() => openEdit(patient)}
                                         >
@@ -107,6 +109,7 @@ export default function PatientTable() {
                                         <button
                                             type="button"
                                             className="btn-action btn-delete"
+                                            style={{ borderRadius: 0 }}
                                             title="Delete Patient"
                                             onClick={() => openDelete(patient)}
                                         >
