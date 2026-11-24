@@ -107,7 +107,7 @@ export default function UpcomingTasksPage() {
                         flex: 1,
                         minWidth: "240px",
                         padding: "0.5rem 0.75rem",
-                        borderRadius: "6px",
+                        borderRadius: 0,
                         border: "1px solid var(--border)",
                         fontSize: "0.9rem",
                         backgroundColor: "var(--bg-card)",
@@ -118,7 +118,7 @@ export default function UpcomingTasksPage() {
                     onChange={(e) => setFilterService(e.target.value)}
                     style={{
                         padding: "0.5rem 0.75rem",
-                        borderRadius: "6px",
+                        borderRadius: 0,
                         border: "1px solid var(--border)",
                         fontSize: "0.9rem",
                         backgroundColor: "var(--bg-card)",
@@ -170,7 +170,7 @@ export default function UpcomingTasksPage() {
                                             fontSize: "0.75rem",
                                             fontWeight: 700,
                                             padding: "0.2rem 0.5rem",
-                                            borderRadius: "9999px",
+                                            borderRadius: 0,
                                             backgroundColor: "rgba(27, 77, 46, 0.1)",
                                             color: "var(--primary)",
                                             border: "1px solid var(--border)",
