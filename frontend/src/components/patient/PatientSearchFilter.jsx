@@ -37,7 +37,7 @@ export default function PatientSearchFilter() {
     const activeFilterCount = Object.values(filters).filter(Boolean).length + (searchTerm ? 1 : 0);
 
     return (
-        <div className="search-filter-card">
+        <div className="search-filter-card" style={{ borderRadius: 0 }}>
             {/* Top Toolbar: Search + Register Button + View Mode Switcher */}
             <div className="search-toolbar-row">
                 <div className="search-input-wrapper">
@@ -48,6 +48,7 @@ export default function PatientSearchFilter() {
                         id="patient-search-input"
                         type="text"
                         className="search-input"
+                        style={{ borderRadius: 0 }}
                         placeholder="Search by Name, Patient ID (e.g. pat-1001), or Service..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
@@ -56,6 +57,7 @@ export default function PatientSearchFilter() {
                         <button
                             type="button"
                             className="clear-search-btn"
+                            style={{ borderRadius: 0 }}
                             onClick={() => setSearchTerm("")}
                             title="Clear search"
                         >
@@ -65,10 +67,11 @@ export default function PatientSearchFilter() {
                 </div>
 
                 <div className="toolbar-actions">
-                    <div className="view-mode-toggle" role="group" aria-label="View layout toggle">
+                    <div className="view-mode-toggle" role="group" aria-label="View layout toggle" style={{ borderRadius: 0 }}>
                         <button
                             type="button"
                             className={`toggle-btn ${viewMode === "table" ? "active" : ""}`}
+                            style={{ borderRadius: 0 }}
                             onClick={() => setViewMode("table")}
                             title="Table View"
                             id="view-mode-table-btn"
@@ -81,6 +84,7 @@ export default function PatientSearchFilter() {
                         <button
                             type="button"
                             className={`toggle-btn ${viewMode === "cards" ? "active" : ""}`}
+                            style={{ borderRadius: 0 }}
                             onClick={() => setViewMode("cards")}
                             title="Cards View"
                             id="view-mode-cards-btn"
@@ -96,6 +100,7 @@ export default function PatientSearchFilter() {
                         type="button"
                         className="btn-primary btn-register-patient"
                         id="register-patient-btn"
+                        style={{ borderRadius: 0 }}
                         onClick={() => setIsCreateOpen(true)}
                     >
                         <svg className="icon-small" fill="none" stroke="currentColor" viewBox="0 0 24 24">
