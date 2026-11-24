@@ -60,7 +60,7 @@ function NameSettingsForm({ user, updateName }) {
                             backgroundColor: "var(--success-bg)",
                             color: "var(--success)",
                             border: "1px solid var(--border)",
-                            borderRadius: "var(--radius-md)",
+                            borderRadius: 0,
                             padding: "0.75rem 1rem",
                             fontSize: "0.875rem",
                             marginBottom: "1rem",
@@ -87,7 +87,7 @@ function NameSettingsForm({ user, updateName }) {
                         <input
                             id="settingsFullNameInput"
                             type="text"
-                            className="form-input"
+                            className="form-input" style={{ borderRadius: 0 }}
                             value={nameVal}
                             onChange={(e) => setNameVal(e.target.value)}
                             placeholder="Enter your updated full name"
@@ -179,7 +179,7 @@ function ContactSettingsForm({ user, updateContact }) {
                             backgroundColor: "var(--success-bg)",
                             color: "var(--success)",
                             border: "1px solid var(--border)",
-                            borderRadius: "var(--radius-md)",
+                            borderRadius: 0,
                             padding: "0.75rem 1rem",
                             fontSize: "0.875rem",
                             marginBottom: "1rem",
@@ -206,7 +206,7 @@ function ContactSettingsForm({ user, updateContact }) {
                         <input
                             id="settingsEmailInput"
                             type="email"
-                            className="form-input"
+                            className="form-input" style={{ borderRadius: 0 }}
                             value={emailVal}
                             onChange={(e) => setEmailVal(e.target.value)}
                             placeholder="example@domain.com"
@@ -222,7 +222,7 @@ function ContactSettingsForm({ user, updateContact }) {
                         <input
                             id="settingsPhoneInput"
                             type="tel"
-                            className="form-input"
+                            className="form-input" style={{ borderRadius: 0 }}
                             value={phoneVal}
                             onChange={(e) => setPhoneVal(e.target.value)}
                             placeholder="+251911223344"
@@ -235,7 +235,7 @@ function ContactSettingsForm({ user, updateContact }) {
                         style={{
                             backgroundColor: "var(--secondary-light)",
                             padding: "0.75rem",
-                            borderRadius: "var(--radius-sm)",
+                            borderRadius: 0,
                             fontSize: "0.8125rem",
                             color: "var(--text-muted)",
                             display: "flex",
@@ -325,7 +325,7 @@ function PasswordSettingsForm({ changePassword }) {
                             backgroundColor: "var(--success-bg)",
                             color: "var(--success)",
                             border: "1px solid var(--border)",
-                            borderRadius: "var(--radius-md)",
+                            borderRadius: 0,
                             padding: "0.75rem 1rem",
                             fontSize: "0.875rem",
                             marginBottom: "1rem",
@@ -352,7 +352,7 @@ function PasswordSettingsForm({ changePassword }) {
                         <input
                             id="currentPasswordInput"
                             type="password"
-                            className="form-input"
+                            className="form-input" style={{ borderRadius: 0 }}
                             value={currentPassword}
                             onChange={(e) => setCurrentPassword(e.target.value)}
                             placeholder="Enter your current password"
@@ -368,7 +368,7 @@ function PasswordSettingsForm({ changePassword }) {
                         <input
                             id="newPasswordInput"
                             type="password"
-                            className="form-input"
+                            className="form-input" style={{ borderRadius: 0 }}
                             value={newPassword}
                             onChange={(e) => setNewPassword(e.target.value)}
                             placeholder="Enter your new secure password"
@@ -387,7 +387,7 @@ function PasswordSettingsForm({ changePassword }) {
                         <input
                             id="confirmPasswordInput"
                             type="password"
-                            className="form-input"
+                            className="form-input" style={{ borderRadius: 0 }}
                             value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}
                             placeholder="Re-enter your new password"
@@ -474,7 +474,7 @@ function ProfileSettingsForm({ user, updateProfile }) {
                                 padding: "0.4rem 0.75rem",
                                 backgroundColor: "var(--primary-light)",
                                 color: "var(--primary)",
-                                borderRadius: "var(--radius-sm)",
+                                borderRadius: 0,
                                 fontWeight: 600,
                                 fontSize: "0.875rem",
                                 width: "fit-content",
@@ -488,7 +488,7 @@ function ProfileSettingsForm({ user, updateProfile }) {
                         <label className="form-label">Current Full Name</label>
                         <input
                             type="text"
-                            className="form-input"
+                            className="form-input" style={{ borderRadius: 0 }}
                             value={user?.fullName || ""}
                             disabled
                         />
@@ -498,7 +498,7 @@ function ProfileSettingsForm({ user, updateProfile }) {
                         <label className="form-label">Registered Email</label>
                         <input
                             type="text"
-                            className="form-input"
+                            className="form-input" style={{ borderRadius: 0 }}
                             value={user?.email || "Not specified"}
                             disabled
                         />
@@ -508,7 +508,7 @@ function ProfileSettingsForm({ user, updateProfile }) {
                         <label className="form-label">Registered Phone</label>
                         <input
                             type="text"
-                            className="form-input"
+                            className="form-input" style={{ borderRadius: 0 }}
                             value={user?.phone || "Not specified"}
                             disabled
                         />
@@ -528,7 +528,7 @@ function ProfileSettingsForm({ user, updateProfile }) {
                             backgroundColor: "var(--success-bg)",
                             color: "var(--success)",
                             border: "1px solid var(--border)",
-                            borderRadius: "var(--radius-md)",
+                            borderRadius: 0,
                             padding: "0.75rem 1rem",
                             fontSize: "0.875rem",
                             marginBottom: "1rem",
@@ -555,7 +555,7 @@ function ProfileSettingsForm({ user, updateProfile }) {
                         <input
                             id="profileFullName"
                             type="text"
-                            className="form-input"
+                            className="form-input" style={{ borderRadius: 0 }}
                             value={profileName}
                             onChange={(e) => setProfileName(e.target.value)}
                             placeholder="Enter your full name"
@@ -571,7 +571,7 @@ function ProfileSettingsForm({ user, updateProfile }) {
                         <input
                             id="profileEmail"
                             type="email"
-                            className="form-input"
+                            className="form-input" style={{ borderRadius: 0 }}
                             value={profileEmail}
                             onChange={(e) => setProfileEmail(e.target.value)}
                             placeholder="example@domain.com"
@@ -586,7 +586,7 @@ function ProfileSettingsForm({ user, updateProfile }) {
                         <input
                             id="profilePhone"
                             type="tel"
-                            className="form-input"
+                            className="form-input" style={{ borderRadius: 0 }}
                             value={profilePhone}
                             onChange={(e) => setProfilePhone(e.target.value)}
                             placeholder="+251911223344"
@@ -600,7 +600,7 @@ function ProfileSettingsForm({ user, updateProfile }) {
                         </label>
                         <select
                             id="profileThemeSelect"
-                            className="form-input"
+                            className="form-input" style={{ borderRadius: 0 }}
                             value={profileTheme}
                             onChange={(e) => setProfileTheme(e.target.value)}
                             disabled={loading}
@@ -670,7 +670,7 @@ export default function SettingsPage() {
                         backgroundColor: "var(--success-bg)",
                         color: "var(--success)",
                         border: "1px solid var(--border)",
-                        borderRadius: "var(--radius-md)",
+                        borderRadius: 0,
                         padding: "0.75rem 1rem",
                         fontSize: "0.875rem",
                         marginBottom: "1rem",
@@ -712,7 +712,7 @@ export default function SettingsPage() {
                         fontSize: "0.875rem",
                         fontWeight: 600,
                         border: "none",
-                        borderRadius: "var(--radius-md)",
+                        borderRadius: 0,
                         cursor: "pointer",
                         backgroundColor: activeTab === "profile" ? "var(--primary)" : "transparent",
                         color: activeTab === "profile" ? "#ffffff" : "var(--text-muted)",
@@ -735,7 +735,7 @@ export default function SettingsPage() {
                         fontSize: "0.875rem",
                         fontWeight: 600,
                         border: "none",
-                        borderRadius: "var(--radius-md)",
+                        borderRadius: 0,
                         cursor: "pointer",
                         backgroundColor: activeTab === "name" ? "var(--primary)" : "transparent",
                         color: activeTab === "name" ? "#ffffff" : "var(--text-muted)",
@@ -758,7 +758,7 @@ export default function SettingsPage() {
                         fontSize: "0.875rem",
                         fontWeight: 600,
                         border: "none",
-                        borderRadius: "var(--radius-md)",
+                        borderRadius: 0,
                         cursor: "pointer",
                         backgroundColor: activeTab === "contact" ? "var(--primary)" : "transparent",
                         color: activeTab === "contact" ? "#ffffff" : "var(--text-muted)",
@@ -781,7 +781,7 @@ export default function SettingsPage() {
                         fontSize: "0.875rem",
                         fontWeight: 600,
                         border: "none",
-                        borderRadius: "var(--radius-md)",
+                        borderRadius: 0,
                         cursor: "pointer",
                         backgroundColor: activeTab === "password" ? "var(--primary)" : "transparent",
                         color: activeTab === "password" ? "#ffffff" : "var(--text-muted)",
@@ -843,7 +843,7 @@ export default function SettingsPage() {
                             <label className="form-label">Clinic Facility Name</label>
                             <input
                                 type="text"
-                                className="form-input"
+                                className="form-input" style={{ borderRadius: 0 }}
                                 defaultValue="Sina Dental Specialty Clinic"
                                 disabled
                             />
@@ -853,7 +853,7 @@ export default function SettingsPage() {
                             <label className="form-label">Operational Timezone</label>
                             <input
                                 type="text"
-                                className="form-input"
+                                className="form-input" style={{ borderRadius: 0 }}
                                 defaultValue="Africa/Addis_Ababa (UTC+3)"
                                 disabled
                             />
@@ -863,7 +863,7 @@ export default function SettingsPage() {
                             <label className="form-label">Currency Code</label>
                             <input
                                 type="text"
-                                className="form-input"
+                                className="form-input" style={{ borderRadius: 0 }}
                                 defaultValue="ETB / USD"
                                 disabled
                             />
