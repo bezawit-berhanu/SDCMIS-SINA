@@ -112,7 +112,7 @@ export default function OnboardingTour({ role = "DENTIST", onComplete }) {
             <div
                 style={{
                     backgroundColor: "#ffffff",
-                    borderRadius: "16px",
+                    borderRadius: 0,
                     maxWidth: "500px",
                     width: "100%",
                     padding: "2.5rem 2rem",
@@ -125,7 +125,7 @@ export default function OnboardingTour({ role = "DENTIST", onComplete }) {
                         width: "64px",
                         height: "64px",
                         margin: "0 auto 1.25rem",
-                        borderRadius: "50%",
+                        borderRadius: 0,
                         backgroundColor: "#e0f2fe",
                         display: "flex",
                         alignItems: "center",
@@ -181,7 +181,7 @@ export default function OnboardingTour({ role = "DENTIST", onComplete }) {
                             style={{
                                 width: idx === stepIndex ? "24px" : "8px",
                                 height: "8px",
-                                borderRadius: "4px",
+                                borderRadius: 0,
                                 backgroundColor: idx === stepIndex ? "#0284c7" : "#cbd5e1",
                                 transition: "all 0.3s ease",
                             }}
