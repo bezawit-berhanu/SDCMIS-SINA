@@ -61,7 +61,7 @@ export default function CompleteProcedureModal({ patient, onClose, onCompleted }
             <div
                 style={{
                     backgroundColor: "#ffffff",
-                    borderRadius: "12px",
+                    borderRadius: 0,
                     maxWidth: "480px",
                     width: "100%",
                     padding: "2rem",
@@ -85,7 +85,7 @@ export default function CompleteProcedureModal({ patient, onClose, onCompleted }
                     style={{
                         padding: "0.75rem 1rem",
                         backgroundColor: "#f0fdf4",
-                        borderRadius: "6px",
+                        borderRadius: 0,
                         borderLeft: "4px solid #22c55e",
                         marginBottom: "1rem",
                         fontSize: "0.85rem",
@@ -102,7 +102,7 @@ export default function CompleteProcedureModal({ patient, onClose, onCompleted }
                             padding: "0.75rem",
                             backgroundColor: "#fee2e2",
                             color: "#b91c1c",
-                            borderRadius: "6px",
+                            borderRadius: 0,
                             marginBottom: "1rem",
                             fontSize: "0.875rem",
                         }}
@@ -127,7 +127,7 @@ export default function CompleteProcedureModal({ patient, onClose, onCompleted }
                             style={{
                                 width: "100%",
                                 padding: "0.65rem 0.75rem",
-                                borderRadius: "6px",
+                                borderRadius: 0,
                                 border: "1px solid #cbd5e1",
                                 backgroundColor: "#f8fafc",
                                 color: "#64748b",
@@ -151,7 +151,7 @@ export default function CompleteProcedureModal({ patient, onClose, onCompleted }
                             style={{
                                 width: "100%",
                                 padding: "0.65rem 0.75rem",
-                                borderRadius: "6px",
+                                borderRadius: 0,
                                 border: "1px solid #cbd5e1",
                             }}
                         />
@@ -173,7 +173,7 @@ export default function CompleteProcedureModal({ patient, onClose, onCompleted }
                             style={{
                                 width: "100%",
                                 padding: "0.65rem 0.75rem",
-                                borderRadius: "6px",
+                                borderRadius: 0,
                                 border: "1px solid #cbd5e1",
                                 fontSize: "0.95rem",
                             }}
