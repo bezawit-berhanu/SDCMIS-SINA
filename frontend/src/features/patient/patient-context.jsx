@@ -62,127 +62,12 @@ const fallbackDentists = [
     },
 ];
 
-const fallbackPatients = [
-    {
-        id: "pat-1001",
-        name: "Abebe Bikila",
-        fullName: "Abebe Bikila",
-        age: 34,
-        contact: "+251911445566",
-        serviceType: "Orthodontics",
-        service_type: "Orthodontics",
-        remainingFee: 1200.00,
-        balance: 1200.00,
-        status: "ACTIVE",
-        recordStatus: "ACTIVE",
-        createdDate: "2026-08-10T10:00:00.000Z",
-        createdAt: "2026-08-10T10:00:00.000Z",
-        branchId: "br-001",
-        dentistId: "dent-001",
-        branch: { id: "br-001", name: "Main Dental Clinic - Bole" },
-        dentist: { id: "dent-001", fullName: "Dr. Aster Worku" },
-        procedures: [
-            { id: "proc-101", description: "Initial Braces Alignment & Archwire Placement", status: "ONGOING", cost: 2500.00 },
-            { id: "proc-102", description: "Upper Arch Bracket Tightening & Elastic Adjustment", status: "NEXT", cost: 800.00 },
-            { id: "proc-100", description: "Panoramic Dental X-Ray & Cephalometric Scan", status: "DONE", cost: 600.00 },
-        ],
-        appointments: [
-            { id: "app-101", scheduled_date: "2026-11-05T09:00:00.000Z", status: "UPCOMING" },
-        ],
-        payments: [
-            { id: "pay-101", amount: 1900.00, payment_date: "2026-08-10T11:30:00.000Z" },
-        ],
-    },
-    {
-        id: "pat-1002",
-        name: "Fatima Zahra",
-        fullName: "Fatima Zahra",
-        age: 28,
-        contact: "+251922556677",
-        serviceType: "Root Canal Therapy",
-        service_type: "Root Canal Therapy",
-        remainingFee: 0.00,
-        balance: 0.00,
-        status: "ACTIVE",
-        recordStatus: "ACTIVE",
-        createdDate: "2026-09-01T11:00:00.000Z",
-        createdAt: "2026-09-01T11:00:00.000Z",
-        branchId: "br-001",
-        dentistId: "dent-002",
-        branch: { id: "br-001", name: "Main Dental Clinic - Bole" },
-        dentist: { id: "dent-002", fullName: "Dr. Dawit Tadesse" },
-        procedures: [
-            { id: "proc-201", description: "Molar Endodontic Pulp Extirpation & Canal Cleaning", status: "ONGOING", cost: 1500.00 },
-            { id: "proc-202", description: "Permanent Gutta-Percha Canal Obturation & Crown Prep", status: "NEXT", cost: 1200.00 },
-        ],
-        appointments: [
-            { id: "app-201", scheduled_date: "2026-10-30T14:00:00.000Z", status: "UPCOMING" },
-        ],
-        payments: [
-            { id: "pay-201", amount: 2700.00, payment_date: "2026-09-01T11:15:00.000Z" },
-        ],
-    },
-    {
-        id: "pat-1003",
-        name: "Yohannes Haile",
-        fullName: "Yohannes Haile",
-        age: 45,
-        contact: "+251933667788",
-        serviceType: "Dental Implant",
-        service_type: "Dental Implant",
-        remainingFee: 3500.00,
-        balance: 3500.00,
-        status: "ACTIVE",
-        recordStatus: "ACTIVE",
-        createdDate: "2026-09-15T14:00:00.000Z",
-        createdAt: "2026-09-15T14:00:00.000Z",
-        branchId: "br-002",
-        dentistId: "dent-003",
-        branch: { id: "br-002", name: "Kazanchis Executive Dental Center" },
-        dentist: { id: "dent-003", fullName: "Dr. Selamawit Alemu" },
-        procedures: [
-            { id: "proc-301", description: "Titanium Fixture Surgical Implantation", status: "ONGOING", cost: 5000.00 },
-            { id: "proc-302", description: "Abutment Screw Placement & Impression", status: "NEXT", cost: 1500.00 },
-        ],
-        appointments: [
-            { id: "app-301", scheduled_date: "2026-11-12T11:30:00.000Z", status: "UPCOMING" },
-        ],
-        payments: [
-            { id: "pay-301", amount: 3000.00, payment_date: "2026-09-15T14:30:00.000Z" },
-        ],
-    },
-    {
-        id: "pat-1004",
-        name: "Tigist Demissie",
-        fullName: "Tigist Demissie",
-        age: 22,
-        contact: "+251944778899",
-        serviceType: "Teeth Whitening",
-        service_type: "Teeth Whitening",
-        remainingFee: 0.00,
-        balance: 0.00,
-        status: "ACTIVE",
-        recordStatus: "ACTIVE",
-        createdDate: "2026-09-28T09:00:00.000Z",
-        createdAt: "2026-09-28T09:00:00.000Z",
-        branchId: "br-003",
-        dentistId: "dent-004",
-        branch: { id: "br-003", name: "Sarbet Family Dental Practice" },
-        dentist: { id: "dent-004", fullName: "Dr. Michael Bekele" },
-        procedures: [
-            { id: "proc-401", description: "Laser In-Office Teeth Whitening & Enamel Fluoride Protection", status: "DONE", cost: 950.00 },
-        ],
-        appointments: [],
-        payments: [
-            { id: "pay-401", amount: 950.00, payment_date: "2026-09-28T11:05:00.000Z" },
-        ],
-    },
-];
+const fallbackPatients = [];
 
 const PatientContext = createContext(null);
 
 export function PatientProvider({ children }) {
-    const [patients, setPatients] = useState(fallbackPatients);
+    const [patients, setPatients] = useState([]);
     const [branches, setBranches] = useState(fallbackBranches);
     const [dentists, setDentists] = useState(fallbackDentists);
     const [loading, setLoading] = useState(false);
