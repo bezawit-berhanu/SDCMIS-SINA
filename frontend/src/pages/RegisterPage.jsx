@@ -117,7 +117,7 @@ export default function RegisterPage() {
                     gap: "0.5rem",
                     backgroundColor: "var(--bg-page)",
                     padding: "4px",
-                    borderRadius: "6px",
+                    borderRadius: 0,
                     marginBottom: "1rem",
                     border: "1px solid var(--border)",
                 }}
@@ -127,7 +127,7 @@ export default function RegisterPage() {
                     onClick={() => setAccountCategory("PATIENT")}
                     style={{
                         padding: "0.5rem",
-                        borderRadius: "4px",
+                        borderRadius: 0,
                         border: "none",
                         fontWeight: 600,
                         fontSize: "0.85rem",
@@ -143,7 +143,7 @@ export default function RegisterPage() {
                     onClick={() => setAccountCategory("STAFF")}
                     style={{
                         padding: "0.5rem",
-                        borderRadius: "4px",
+                        borderRadius: 0,
                         border: "none",
                         fontWeight: 600,
                         fontSize: "0.85rem",
@@ -162,7 +162,7 @@ export default function RegisterPage() {
                     style={{
                         padding: "0.75rem",
                         backgroundColor: "var(--primary-light)",
-                        borderRadius: "6px",
+                        borderRadius: 0,
                         marginBottom: "1rem",
                         border: "1px solid var(--border)",
                     }}
@@ -176,7 +176,7 @@ export default function RegisterPage() {
                             onClick={() => setStaffRole(UserRole.DENTIST)}
                             style={{
                                 padding: "0.5rem",
-                                borderRadius: "4px",
+                                borderRadius: 0,
                                 border: "1px solid",
                                 borderColor: staffRole === UserRole.DENTIST ? "var(--primary)" : "var(--border)",
                                 backgroundColor: staffRole === UserRole.DENTIST ? "#ffffff" : "transparent",
@@ -197,7 +197,7 @@ export default function RegisterPage() {
                             onClick={() => setStaffRole(UserRole.RECEPTIONIST)}
                             style={{
                                 padding: "0.5rem",
-                                borderRadius: "4px",
+                                borderRadius: 0,
                                 border: "1px solid",
                                 borderColor: staffRole === UserRole.RECEPTIONIST ? "var(--primary)" : "var(--border)",
                                 backgroundColor: staffRole === UserRole.RECEPTIONIST ? "#ffffff" : "transparent",
@@ -225,7 +225,7 @@ export default function RegisterPage() {
                         backgroundColor: "var(--primary-light)",
                         color: "#2e7d32",
                         padding: "0.75rem",
-                        borderRadius: "6px",
+                        borderRadius: 0,
                         border: "1px solid #c8e6c9",
                         marginBottom: "1rem",
                         fontSize: "0.85rem",
@@ -243,7 +243,7 @@ export default function RegisterPage() {
                     <input
                         id="fullName"
                         type="text"
-                        className="form-input"
+                        className="form-input" style={{ borderRadius: 0 }}
                         placeholder="Enter full name"
                         value={fullName}
                         onChange={(e) => setFullName(e.target.value)}
@@ -260,7 +260,7 @@ export default function RegisterPage() {
                         <input
                             id="email"
                             type="email"
-                            className="form-input"
+                            className="form-input" style={{ borderRadius: 0 }}
                             placeholder="Email address"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
@@ -274,7 +274,7 @@ export default function RegisterPage() {
                         <input
                             id="phone"
                             type="tel"
-                            className="form-input"
+                            className="form-input" style={{ borderRadius: 0 }}
                             placeholder="Phone number"
                             value={phone}
                             onChange={(e) => setPhone(e.target.value)}
@@ -291,7 +291,7 @@ export default function RegisterPage() {
                         <input
                             id="password"
                             type="password"
-                            className="form-input"
+                            className="form-input" style={{ borderRadius: 0 }}
                             placeholder="••••••••"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
@@ -306,7 +306,7 @@ export default function RegisterPage() {
                         <input
                             id="confirmPassword"
                             type="password"
-                            className="form-input"
+                            className="form-input" style={{ borderRadius: 0 }}
                             placeholder="••••••••"
                             value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}
@@ -324,7 +324,7 @@ export default function RegisterPage() {
                         <input
                             id="specialty"
                             type="text"
-                            className="form-input"
+                            className="form-input" style={{ borderRadius: 0 }}
                             placeholder="e.g. Orthodontics, General"
                             value={specialty}
                             onChange={(e) => setSpecialty(e.target.value)}
