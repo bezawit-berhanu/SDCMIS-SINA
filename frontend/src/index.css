@@ -1,21 +1,21 @@
-/* SDCMIS-SINA Clean Creamish/White & Normal Blue Palette */
+/* SDCMIS-SINA Clean Cream & Neutral Slate/Black Palette (Zero Radiuses) */
 :root {
-  --primary: #2563eb;
-  --primary-hover: #1d4ed8;
-  --primary-active: #1e40af;
-  --primary-light: #eff6ff;
-  --primary-tint: #dbeafe;
-  --secondary: #64748b;
-  --secondary-hover: #475569;
+  --primary: #0f172a;
+  --primary-hover: #1e293b;
+  --primary-active: #020617;
+  --primary-light: #f1f5f9;
+  --primary-tint: #e2e8f0;
+  --secondary: #475569;
+  --secondary-hover: #334155;
   --secondary-light: #f8fafc;
   --bg-page: #faf8f5;
   --bg-surface: #ffffff;
   --bg-card: #ffffff;
-  --text-main: #1e293b;
+  --text-main: #0f172a;
   --text-muted: #64748b;
   --text-light: #94a3b8;
   --border: #e2e8f0;
-  --border-focus: #2563eb;
+  --border-focus: #0f172a;
   --danger: #dc2626;
   --danger-bg: #fef2f2;
   --danger-border: #fecaca;
