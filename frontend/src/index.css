@@ -760,3 +760,15 @@ textarea:focus-visible {
   border: 1px solid #bbf7d0;
 }
 
+/* Sharp Table & Button Outlines */
+table tbody tr:hover {
+  background-color: var(--secondary-light);
+}
+
+.button--secondary {
+  border-radius: 0;
+  border: 1px solid var(--border);
+  background-color: var(--bg-surface);
+  color: var(--text-main);
+}
+
