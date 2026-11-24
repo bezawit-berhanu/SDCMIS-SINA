@@ -166,37 +166,8 @@ export function PatientProvider({ children }) {
             setIsCreateOpen(false);
             return created;
         } catch (err) {
-            // Local fallback simulation
-            const branch = branches.find((b) => b.id === payload.branchId);
-            const dentist = dentists.find((d) => d.id === payload.dentistId);
-            const newPat = {
-                id: `pat-${Date.now()}`,
-                name: payload.name,
-                fullName: payload.name,
-                age: Number(payload.age),
-                contact: payload.contact,
-                serviceType: payload.service || "General Consultation",
-                remainingFee: Number(payload.initialFee || 0),
-                balance: Number(payload.initialFee || 0),
-                status: "ACTIVE",
-                recordStatus: "ACTIVE",
-                createdDate: new Date().toISOString(),
-                createdAt: new Date().toISOString(),
-                branchId: payload.branchId,
-                dentistId: payload.dentistId,
-                branch: branch || null,
-                dentist: dentist || null,
-                procedures: payload.initialProcedure ? [
-                    { id: `proc-${Date.now()}`, description: payload.initialProcedure, status: "ONGOING", cost: Number(payload.initialFee || 0) }
-                ] : [],
-                appointments: [
-                    { id: `app-${Date.now()}`, scheduled_date: new Date(Date.now() + 7 * 86400000).toISOString(), status: "UPCOMING" }
-                ],
-                payments: [],
-            };
-            setPatients((prev) => [newPat, ...prev]);
-            setIsCreateOpen(false);
-            return newPat;
+            setError(err.message || "Failed to create patient");
+            throw err;
         } finally {
             setLoading(false);
         }
@@ -212,24 +183,8 @@ export function PatientProvider({ children }) {
             setEditingPatient(null);
             return updated;
         } catch (err) {
-            // Local update fallback
-            const branch = branches.find((b) => b.id === payload.branchId);
-            const dentist = dentists.find((d) => d.id === payload.dentistId);
-            setPatients((prev) => prev.map((p) => {
-                if (p.id !== id) return p;
-                return {
-                    ...p,
-                    ...payload,
-                    name: payload.name || p.name,
-                    fullName: payload.name || p.fullName,
-                    remainingFee: payload.remainingFee !== undefined ? Number(payload.remainingFee) : p.remainingFee,
-                    balance: payload.remainingFee !== undefined ? Number(payload.remainingFee) : p.balance,
-                    branch: branch || p.branch,
-                    dentist: dentist || p.dentist,
-                };
-            }));
-            setIsEditOpen(false);
-            setEditingPatient(null);
+            setError(err.message || "Failed to update patient");
+            throw err;
         } finally {
             setLoading(false);
         }
