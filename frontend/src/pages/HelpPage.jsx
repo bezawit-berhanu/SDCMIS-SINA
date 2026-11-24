@@ -106,7 +106,7 @@ export default function HelpPage() {
                     style={{
                         width: "100%",
                         padding: "0.75rem 1rem",
-                        borderRadius: "8px",
+                        borderRadius: 0,
                         border: "1px solid var(--border-color, #cbd5e1)",
                         fontSize: "1rem",
                         outline: "none",
@@ -130,7 +130,7 @@ export default function HelpPage() {
                         onClick={() => setActiveTab(tab.id)}
                         style={{
                             padding: "0.5rem 1rem",
-                            borderRadius: "9999px",
+                            borderRadius: 0,
                             border: "1px solid var(--border)",
                             cursor: "pointer",
                             fontSize: "0.875rem",
@@ -167,7 +167,7 @@ export default function HelpPage() {
                                         fontWeight: "700",
                                         textTransform: "uppercase",
                                         padding: "0.2rem 0.5rem",
-                                        borderRadius: "4px",
+                                        borderRadius: 0,
                                         backgroundColor: "rgba(27, 77, 46, 0.1)",
                                         color: "var(--primary)",
                                         border: "1px solid var(--border)",
