@@ -102,7 +102,7 @@ export default function MissedAppointmentsPage() {
                 <div style={{
                     padding: "10px 16px",
                     marginBottom: "1.25rem",
-                    borderRadius: "8px",
+                    borderRadius: 0,
                     fontWeight: 500,
                     fontSize: "0.875rem",
                     backgroundColor: feedbackType === "success" ? "#ecfdf5" : "#fee2e2",
@@ -165,7 +165,7 @@ export default function MissedAppointmentsPage() {
                         padding: "2.5rem",
                         textAlign: "center",
                         backgroundColor: "var(--success-bg)",
-                        borderRadius: "8px",
+                        borderRadius: 0,
                         border: "1px dashed var(--border)",
                         color: "var(--primary)"
                     }}>
@@ -232,7 +232,7 @@ export default function MissedAppointmentsPage() {
                                                 fontSize: "0.75rem",
                                                 fontWeight: 700,
                                                 padding: "4px 8px",
-                                                borderRadius: "9999px",
+                                                borderRadius: 0,
                                                 backgroundColor: "#fee2e2",
                                                 color: "#991b1b",
                                                 border: "1px solid #fca5a5",
@@ -259,7 +259,7 @@ export default function MissedAppointmentsPage() {
                                                     }}
                                                     style={{
                                                         padding: "6px 12px",
-                                                        borderRadius: "6px",
+                                                        borderRadius: 0,
                                                         backgroundColor: "var(--primary)",
                                                         color: "white",
                                                         border: "none",
@@ -279,7 +279,7 @@ export default function MissedAppointmentsPage() {
                                                     onClick={() => setSelectedAppointment(apt)}
                                                     style={{
                                                         padding: "6px 10px",
-                                                        borderRadius: "6px",
+                                                        borderRadius: 0,
                                                         backgroundColor: "var(--bg-page)",
                                                         color: "var(--text-main)",
                                                         border: "1px solid var(--border)",
@@ -315,7 +315,7 @@ export default function MissedAppointmentsPage() {
                 }}>
                     <div className="modal-dialog" onClick={(e) => e.stopPropagation()} style={{
                         backgroundColor: "white",
-                        borderRadius: "12px",
+                        borderRadius: 0,
                         maxWidth: "480px",
                         width: "100%",
                         padding: "1.5rem",
@@ -338,7 +338,7 @@ export default function MissedAppointmentsPage() {
                                     required
                                     value={newAppointmentDate}
                                     onChange={(e) => setNewAppointmentDate(e.target.value)}
-                                    style={{ width: "100%", padding: "8px 10px", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "0.875rem" }}
+                                    style={{ width: "100%", padding: "8px 10px", borderRadius: 0, border: "1px solid #cbd5e1", fontSize: "0.875rem" }}
                                 />
                             </div>
 
@@ -351,7 +351,7 @@ export default function MissedAppointmentsPage() {
                                     placeholder="e.g. Rescheduled after patient phone call. Confirmed attendance."
                                     value={rescheduleNotes}
                                     onChange={(e) => setRescheduleNotes(e.target.value)}
-                                    style={{ width: "100%", padding: "8px 10px", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "0.875rem" }}
+                                    style={{ width: "100%", padding: "8px 10px", borderRadius: 0, border: "1px solid #cbd5e1", fontSize: "0.875rem" }}
                                 />
                             </div>
 
@@ -359,7 +359,7 @@ export default function MissedAppointmentsPage() {
                                 <button
                                     type="button"
                                     onClick={() => setRescheduleTarget(null)}
-                                    style={{ padding: "8px 14px", borderRadius: "6px", border: "1px solid #cbd5e1", backgroundColor: "white", cursor: "pointer", fontWeight: 600 }}
+                                    style={{ padding: "8px 14px", borderRadius: 0, border: "1px solid #cbd5e1", backgroundColor: "white", cursor: "pointer", fontWeight: 600 }}
                                 >
                                     Cancel
                                 </button>
@@ -368,7 +368,7 @@ export default function MissedAppointmentsPage() {
                                     disabled={rescheduleLoading}
                                     style={{
                                         padding: "8px 18px",
-                                        borderRadius: "6px",
+                                        borderRadius: 0,
                                         border: "none",
                                         backgroundColor: "var(--primary)",
                                         color: "white",
