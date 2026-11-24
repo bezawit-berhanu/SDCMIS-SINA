@@ -74,7 +74,7 @@ export default function LoginPage() {
                     <input
                         id="username"
                         type="text"
-                        className="form-input"
+                        className="form-input" style={{ borderRadius: 0 }}
                         placeholder="Enter email or phone"
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
@@ -91,7 +91,7 @@ export default function LoginPage() {
                     <input
                         id="password"
                         type="password"
-                        className="form-input"
+                        className="form-input" style={{ borderRadius: 0 }}
                         placeholder="Enter password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
