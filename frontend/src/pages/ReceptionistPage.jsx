@@ -591,7 +591,7 @@ export default function ReceptionistPage() {
                     zIndex: 1000,
                     padding: "1rem"
                 }}>
-                    <div className="card" style={{ maxWidth: "480px", width: "100%", backgroundColor: "var(--bg-surface)", border: "1px solid var(--border)", boxShadow: "var(--shadow-lg)" }}>
+                    <div className="card" style={{ maxWidth: "480px", width: "100%", backgroundColor: "var(--bg-surface)", border: "1px solid var(--border)", boxShadow: "var(--shadow-lg)", borderRadius: 0 }}>
                         <div className="card__header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                             <h3 className="card__title" style={{ color: "var(--primary)" }}>Record Patient Payment</h3>
                             <button
