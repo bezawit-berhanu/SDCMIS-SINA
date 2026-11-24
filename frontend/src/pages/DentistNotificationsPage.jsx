@@ -187,7 +187,7 @@ export default function DentistNotificationsPage() {
                     style={{
                         padding: "12px 18px",
                         marginBottom: "1.25rem",
-                        borderRadius: "8px",
+                        borderRadius: 0,
                         backgroundColor: "rgba(27, 77, 46, 0.08)",
                         color: "var(--primary)",
                         border: "1px solid var(--border)",
@@ -275,7 +275,7 @@ export default function DentistNotificationsPage() {
                         onClick={() => setFilter(tab.key)}
                         style={{
                             padding: "6px 14px",
-                            borderRadius: "6px",
+                            borderRadius: 0,
                             border: "none",
                             backgroundColor: filter === tab.key ? "var(--primary)" : "transparent",
                             color: filter === tab.key ? "#ffffff" : "var(--text-muted)",
@@ -339,7 +339,7 @@ export default function DentistNotificationsPage() {
                                                         fontWeight: 700,
                                                         backgroundColor: "rgba(27, 77, 46, 0.12)",
                                                         color: "var(--primary)",
-                                                        borderRadius: "4px",
+                                                        borderRadius: 0,
                                                     }}
                                                 >
                                                     NEW
