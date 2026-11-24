@@ -113,7 +113,7 @@ export default function CustomerFeesPage() {
                     style={{
                         padding: "0.75rem 1.25rem",
                         backgroundColor: "var(--bg-surface)",
-                        borderRadius: "8px",
+                        borderRadius: 0,
                         border: "1px solid var(--border)",
                         boxShadow: "var(--shadow-sm)",
                     }}
@@ -135,7 +135,7 @@ export default function CustomerFeesPage() {
                         backgroundColor: "var(--primary-light)",
                         color: "var(--primary)",
                         border: "1px solid var(--border)",
-                        borderRadius: "8px",
+                        borderRadius: 0,
                         marginBottom: "1.25rem",
                         fontWeight: "600",
                         display: "flex",
@@ -166,7 +166,7 @@ export default function CustomerFeesPage() {
                     style={{
                         flex: "1 1 300px",
                         padding: "0.65rem 1rem",
-                        borderRadius: "8px",
+                        borderRadius: 0,
                         border: "1px solid var(--border)",
                         backgroundColor: "var(--bg-card)",
                         fontSize: "0.95rem",
@@ -185,7 +185,7 @@ export default function CustomerFeesPage() {
                             onClick={() => setBalanceFilter(btn.id)}
                             style={{
                                 padding: "0.5rem 0.85rem",
-                                borderRadius: "6px",
+                                borderRadius: 0,
                                 border: "1px solid",
                                 borderColor: balanceFilter === btn.id ? "var(--primary)" : "var(--border)",
                                 backgroundColor: balanceFilter === btn.id ? "var(--primary)" : "var(--bg-card)",
@@ -251,7 +251,7 @@ export default function CustomerFeesPage() {
                                                 style={{
                                                     display: "inline-block",
                                                     padding: "0.2rem 0.5rem",
-                                                    borderRadius: "4px",
+                                                    borderRadius: 0,
                                                     fontWeight: "700",
                                                     fontSize: "0.85rem",
                                                     backgroundColor: fee > 0 ? "rgba(220, 38, 38, 0.1)" : "rgba(27, 77, 46, 0.1)",
