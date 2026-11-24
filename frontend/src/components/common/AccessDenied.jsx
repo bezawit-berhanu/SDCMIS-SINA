@@ -26,7 +26,7 @@ export default function AccessDenied({ message, requiredRoles }) {
                             display: "inline-block",
                             padding: "0.5rem 1rem",
                             backgroundColor: "var(--bg-page)",
-                            borderRadius: "var(--radius-md)",
+                            borderRadius: 0,
                             border: "1px solid var(--border)",
                             marginBottom: "1.5rem",
                             fontSize: "0.8125rem",
