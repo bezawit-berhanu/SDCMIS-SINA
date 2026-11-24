@@ -1,4 +1,4 @@
-const { describe, it, after } = require("node:test");
+const { describe, it, before, after } = require("node:test");
 const assert = require("node:assert");
 
 const Patient = require("./src/domain/entities/patient");
@@ -160,6 +160,77 @@ describe("Patient Management System - Comprehensive Verification Suite", () => {
     // Task 8: Search Patient
     // ----------------------------------------------------
     describe("Task 8: Search Patient Functionality", () => {
+        before(() => {
+            container.patientRepository.seedPatient({
+                id: "pat-1001",
+                full_name: "Abebe Bikila",
+                age: 34,
+                contact_info: "+251911445566",
+                service_type: "Orthodontics",
+                remaining_fee: 1200.00,
+                remainingFee: 1200.00,
+                next_appointment_date: new Date("2026-11-05T09:00:00Z"),
+                created_by_user_id: "usr-admin-01",
+                dentistId: "dent-001",
+                branchId: "br-001",
+                record_status: RecordStatus.ACTIVE,
+                created_at: new Date("2026-08-10T10:00:00Z"),
+                updated_at: new Date("2026-08-10T10:00:00Z"),
+                deletedAt: null,
+                procedures: [
+                    {
+                        procedureId: "proc-101",
+                        patientId: "pat-1001",
+                        name: "Braces Alignment",
+                        description: "Initial Braces Alignment",
+                        status: ProcedureStatus.ONGOING,
+                        cost: 2500.00,
+                        targetDate: new Date("2026-08-15T09:00:00Z"),
+                        recordStatus: RecordStatus.ACTIVE,
+                        createdAt: new Date("2026-08-10T10:00:00Z"),
+                        updatedAt: new Date("2026-08-10T10:00:00Z"),
+                    },
+                ],
+                appointments: [],
+                payments: [],
+            });
+
+            container.patientRepository.seedPatient({
+                id: "pat-1002",
+                full_name: "Sara Tesfaye",
+                age: 28,
+                contact_info: "+251922334455",
+                service_type: "Implant Dentistry",
+                remaining_fee: 0.00,
+                remainingFee: 0.00,
+                next_appointment_date: new Date("2026-11-08T14:00:00Z"),
+                created_by_user_id: "usr-admin-01",
+                dentistId: "dent-002",
+                branchId: "br-001",
+                record_status: RecordStatus.ACTIVE,
+                created_at: new Date("2026-09-01T09:00:00Z"),
+                updated_at: new Date("2026-09-01T09:00:00Z"),
+                deletedAt: null,
+                procedures: [
+                    {
+                        procedureId: "proc-201",
+                        patientId: "pat-1002",
+                        name: "Dental Implant",
+                        description: "Implant Restoration",
+                        status: ProcedureStatus.DONE,
+                        cost: 950.00,
+                        targetDate: new Date("2026-09-05T14:00:00Z"),
+                        completedDate: new Date("2026-09-05T14:45:00Z"),
+                        recordStatus: RecordStatus.ACTIVE,
+                        createdAt: new Date("2026-09-01T09:00:00Z"),
+                        updatedAt: new Date("2026-09-05T14:45:00Z"),
+                    },
+                ],
+                appointments: [],
+                payments: [],
+            });
+        });
+
         it("searches patients by Name", async () => {
             const result = await container.getPatients.execute({ search: "Abebe" });
             assert.ok(result.patients.length > 0);
