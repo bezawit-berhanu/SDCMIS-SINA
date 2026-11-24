@@ -28,7 +28,7 @@ export default function Button({
             className={classes}
             disabled={disabled}
             onClick={onClick}
-            style={style}
+            style={{ borderRadius: 0, ...style }}
             {...rest}
         >
             {icon && <span className="button-icon">{icon}</span>}
