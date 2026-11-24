@@ -25,7 +25,7 @@ export default function AuthLayout() {
                     maxWidth: "440px",
                     backgroundColor: "var(--bg-surface)",
                     border: "1px solid var(--border)",
-                    borderRadius: "8px",
+                    borderRadius: 0,
                     padding: "2rem",
                     boxShadow: "0 4px 16px rgba(0, 0, 0, 0.04)",
                 }}
