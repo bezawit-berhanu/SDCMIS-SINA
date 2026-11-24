@@ -133,7 +133,7 @@ export default function UpcomingTasksPage() {
             </div>
 
             {/* Tasks Table */}
-            <div className="card" style={{ padding: 0, overflow: "hidden", backgroundColor: "var(--bg-surface)", border: "1px solid var(--border)" }}>
+            <div className="card" style={{ padding: 0, overflow: "hidden", backgroundColor: "var(--bg-surface)", border: "1px solid var(--border)", borderRadius: 0 }}>
                 {loading ? (
                     <div style={{ padding: "3rem", textAlign: "center", color: "var(--text-muted)" }}>Loading upcoming tasks...</div>
                 ) : filteredTasks.length === 0 ? (
