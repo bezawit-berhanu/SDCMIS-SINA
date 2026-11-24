@@ -46,6 +46,7 @@ export default function Sidebar({ isOpen = false, onClose }) {
                             key={item.path}
                             to={item.path}
                             onClick={onClose}
+                            style={{ borderRadius: 0 }}
                             className={({ isActive }) =>
                                 `sidebar-link ${isActive ? "sidebar-link--active" : ""}`
                             }
