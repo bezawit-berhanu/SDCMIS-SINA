@@ -87,7 +87,7 @@ export default function AppointmentDetailModal({ appointment, onClose, onRefresh
                 onClick={(e) => e.stopPropagation()}
                 style={{
                     backgroundColor: "white",
-                    borderRadius: "12px",
+                    borderRadius: 0,
                     maxWidth: "580px",
                     width: "100%",
                     boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
@@ -105,14 +105,14 @@ export default function AppointmentDetailModal({ appointment, onClose, onRefresh
                 }}>
                     <div>
                         <div style={{ display: "flex", gap: "8px", alignItems: "center", marginBottom: "4px" }}>
-                            <span style={{ fontSize: "0.75rem", fontFamily: "monospace", padding: "2px 6px", backgroundColor: "#e2e8f0", borderRadius: "4px", fontWeight: 700 }}>
+                            <span style={{ fontSize: "0.75rem", fontFamily: "monospace", padding: "2px 6px", backgroundColor: "#e2e8f0", borderRadius: 0, fontWeight: 700 }}>
                                 {aptId}
                             </span>
                             <span style={{
                                 fontSize: "0.75rem",
                                 fontWeight: 700,
                                 padding: "2px 8px",
-                                borderRadius: "9999px",
+                                borderRadius: 0,
                                 ...getStatusStyle(appointment.status)
                             }}>
                                 {appointment.status}
@@ -134,19 +134,19 @@ export default function AppointmentDetailModal({ appointment, onClose, onRefresh
                 {/* Body */}
                 <div style={{ padding: "1.5rem" }}>
                     {actionSuccess && (
-                        <div style={{ padding: "10px 14px", marginBottom: "1rem", borderRadius: "6px", backgroundColor: "#ecfdf5", color: "#065f46", border: "1px solid #a7f3d0", fontSize: "0.875rem", fontWeight: 500, display: "flex", alignItems: "center", gap: 6 }}>
+                        <div style={{ padding: "10px 14px", marginBottom: "1rem", borderRadius: 0, backgroundColor: "#ecfdf5", color: "#065f46", border: "1px solid #a7f3d0", fontSize: "0.875rem", fontWeight: 500, display: "flex", alignItems: "center", gap: 6 }}>
                             <FiCheck /> {actionSuccess}
                         </div>
                     )}
                     {actionError && (
-                        <div style={{ padding: "10px 14px", marginBottom: "1rem", borderRadius: "6px", backgroundColor: "#fee2e2", color: "#991b1b", border: "1px solid #fca5a5", fontSize: "0.875rem", fontWeight: 500, display: "flex", alignItems: "center", gap: 6 }}>
+                        <div style={{ padding: "10px 14px", marginBottom: "1rem", borderRadius: 0, backgroundColor: "#fee2e2", color: "#991b1b", border: "1px solid #fca5a5", fontSize: "0.875rem", fontWeight: 500, display: "flex", alignItems: "center", gap: 6 }}>
                             <FiAlertCircle /> {actionError}
                         </div>
                     )}
 
                     {/* Metadata Grid */}
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginBottom: "1.25rem" }}>
-                        <div style={{ padding: "10px", backgroundColor: "#f8fafc", borderRadius: "8px", border: "1px solid #f1f5f9" }}>
+                        <div style={{ padding: "10px", backgroundColor: "#f8fafc", borderRadius: 0, border: "1px solid #f1f5f9" }}>
                             <span style={{ display: "block", fontSize: "0.75rem", color: "#64748b", fontWeight: 600 }}>Patient</span>
                             <strong style={{ fontSize: "0.95rem", color: "#0f172a" }}>{appointment.patientName || `Patient ${appointment.patientId}`}</strong>
                             {appointment.patientContact && (
@@ -156,7 +156,7 @@ export default function AppointmentDetailModal({ appointment, onClose, onRefresh
                             )}
                         </div>
 
-                        <div style={{ padding: "10px", backgroundColor: "#f8fafc", borderRadius: "8px", border: "1px solid #f1f5f9" }}>
+                        <div style={{ padding: "10px", backgroundColor: "#f8fafc", borderRadius: 0, border: "1px solid #f1f5f9" }}>
                             <span style={{ display: "block", fontSize: "0.75rem", color: "#64748b", fontWeight: 600 }}>Procedure</span>
                             <strong style={{ fontSize: "0.95rem", color: "#0f172a" }}>{appointment.procedureName || "General Consultation"}</strong>
                             {appointment.procedureCost > 0 && (
@@ -166,7 +166,7 @@ export default function AppointmentDetailModal({ appointment, onClose, onRefresh
                             )}
                         </div>
 
-                        <div style={{ padding: "10px", backgroundColor: "#f8fafc", borderRadius: "8px", border: "1px solid #f1f5f9", gridColumn: "span 2" }}>
+                        <div style={{ padding: "10px", backgroundColor: "#f8fafc", borderRadius: 0, border: "1px solid #f1f5f9", gridColumn: "span 2" }}>
                             <span style={{ display: "block", fontSize: "0.75rem", color: "#64748b", fontWeight: 600 }}>Scheduled Date & Time</span>
                             <strong style={{ fontSize: "1rem", color: "#1d4ed8", display: "inline-flex", alignItems: "center", gap: 6 }}>
                                 <FiCalendar /> {formattedDate}
@@ -183,7 +183,7 @@ export default function AppointmentDetailModal({ appointment, onClose, onRefresh
                             padding: "10px",
                             backgroundColor: "#fdfdfd",
                             border: "1px solid #e2e8f0",
-                            borderRadius: "6px",
+                            borderRadius: 0,
                             fontSize: "0.875rem",
                             color: "#334155",
                             minHeight: "48px"
@@ -197,7 +197,7 @@ export default function AppointmentDetailModal({ appointment, onClose, onRefresh
                         <form onSubmit={handleReschedule} style={{
                             backgroundColor: "#eff6ff",
                             border: "1px solid #bfdbfe",
-                            borderRadius: "8px",
+                            borderRadius: 0,
                             padding: "14px",
                             marginBottom: "1rem"
                         }}>
@@ -213,7 +213,7 @@ export default function AppointmentDetailModal({ appointment, onClose, onRefresh
                                     required
                                     value={newDate}
                                     onChange={(e) => setNewDate(e.target.value)}
-                                    style={{ width: "100%", padding: "6px 8px", borderRadius: "6px", border: "1px solid #93c5fd" }}
+                                    style={{ width: "100%", padding: "6px 8px", borderRadius: 0, border: "1px solid #93c5fd" }}
                                 />
                             </div>
                             <div style={{ marginBottom: "10px" }}>
@@ -225,21 +225,21 @@ export default function AppointmentDetailModal({ appointment, onClose, onRefresh
                                     placeholder="e.g. Patient rescheduled after follow-up phone call"
                                     value={rescheduleNotes}
                                     onChange={(e) => setRescheduleNotes(e.target.value)}
-                                    style={{ width: "100%", padding: "6px 8px", borderRadius: "6px", border: "1px solid #93c5fd" }}
+                                    style={{ width: "100%", padding: "6px 8px", borderRadius: 0, border: "1px solid #93c5fd" }}
                                 />
                             </div>
                             <div style={{ display: "flex", justifyContent: "flex-end", gap: "8px" }}>
                                 <button
                                     type="button"
                                     onClick={() => setShowRescheduleForm(false)}
-                                    style={{ padding: "6px 12px", borderRadius: "6px", border: "1px solid #cbd5e1", background: "white", cursor: "pointer", fontSize: "0.8125rem" }}
+                                    style={{ padding: "6px 12px", borderRadius: 0, border: "1px solid #cbd5e1", background: "white", cursor: "pointer", fontSize: "0.8125rem" }}
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="submit"
                                     disabled={actionLoading}
-                                    style={{ padding: "6px 14px", borderRadius: "6px", border: "none", background: "#2563eb", color: "white", fontWeight: 600, cursor: "pointer", fontSize: "0.8125rem" }}
+                                    style={{ padding: "6px 14px", borderRadius: 0, border: "none", background: "#2563eb", color: "white", fontWeight: 600, cursor: "pointer", fontSize: "0.8125rem" }}
                                 >
                                     {actionLoading ? "Updating..." : "Confirm Reschedule (→ Upcoming)"}
                                 </button>
@@ -252,7 +252,7 @@ export default function AppointmentDetailModal({ appointment, onClose, onRefresh
                         <form onSubmit={handleCancel} style={{
                             backgroundColor: "#fef2f2",
                             border: "1px solid #fecaca",
-                            borderRadius: "8px",
+                            borderRadius: 0,
                             padding: "14px",
                             marginBottom: "1rem"
                         }}>
@@ -269,21 +269,21 @@ export default function AppointmentDetailModal({ appointment, onClose, onRefresh
                                     placeholder="e.g. Patient requested cancellation"
                                     value={cancelReason}
                                     onChange={(e) => setCancelReason(e.target.value)}
-                                    style={{ width: "100%", padding: "6px 8px", borderRadius: "6px", border: "1px solid #fca5a5" }}
+                                    style={{ width: "100%", padding: "6px 8px", borderRadius: 0, border: "1px solid #fca5a5" }}
                                 />
                             </div>
                             <div style={{ display: "flex", justifyContent: "flex-end", gap: "8px" }}>
                                 <button
                                     type="button"
                                     onClick={() => setShowCancelForm(false)}
-                                    style={{ padding: "6px 12px", borderRadius: "6px", border: "1px solid #cbd5e1", background: "white", cursor: "pointer", fontSize: "0.8125rem" }}
+                                    style={{ padding: "6px 12px", borderRadius: 0, border: "1px solid #cbd5e1", background: "white", cursor: "pointer", fontSize: "0.8125rem" }}
                                 >
                                     Back
                                 </button>
                                 <button
                                     type="submit"
                                     disabled={actionLoading}
-                                    style={{ padding: "6px 14px", borderRadius: "6px", border: "none", background: "#dc2626", color: "white", fontWeight: 600, cursor: "pointer", fontSize: "0.8125rem" }}
+                                    style={{ padding: "6px 14px", borderRadius: 0, border: "none", background: "#dc2626", color: "white", fontWeight: 600, cursor: "pointer", fontSize: "0.8125rem" }}
                                 >
                                     {actionLoading ? "Cancelling..." : "Confirm Cancellation"}
                                 </button>
@@ -303,7 +303,7 @@ export default function AppointmentDetailModal({ appointment, onClose, onRefresh
                                     }}
                                     style={{
                                         padding: "8px 14px",
-                                        borderRadius: "6px",
+                                        borderRadius: 0,
                                         backgroundColor: "#2563eb",
                                         color: "white",
                                         border: "none",
@@ -328,7 +328,7 @@ export default function AppointmentDetailModal({ appointment, onClose, onRefresh
                                     }}
                                     style={{
                                         padding: "8px 14px",
-                                        borderRadius: "6px",
+                                        borderRadius: 0,
                                         backgroundColor: "white",
                                         color: "#dc2626",
                                         border: "1px solid #fca5a5",
@@ -350,7 +350,7 @@ export default function AppointmentDetailModal({ appointment, onClose, onRefresh
                             onClick={onClose}
                             style={{
                                 padding: "8px 16px",
-                                borderRadius: "6px",
+                                borderRadius: 0,
                                 backgroundColor: "#f1f5f9",
                                 color: "#334155",
                                 border: "1px solid #cbd5e1",
