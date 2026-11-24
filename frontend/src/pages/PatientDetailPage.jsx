@@ -132,7 +132,7 @@ export default function PatientDetailPage({ readOnly = false }) {
                         padding: "0.75rem 1rem",
                         backgroundColor: "#ecfdf5",
                         color: "#065f46",
-                        borderRadius: "8px",
+                        borderRadius: 0,
                         marginBottom: "1.25rem",
                         fontWeight: "600",
                         border: "1px solid #a7f3d0",
@@ -159,7 +159,7 @@ export default function PatientDetailPage({ readOnly = false }) {
                                     fontSize: "0.8rem",
                                     fontWeight: "700",
                                     padding: "0.2rem 0.6rem",
-                                    borderRadius: "9999px",
+                                    borderRadius: 0,
                                     backgroundColor: "rgba(27, 77, 46, 0.1)",
                                     color: "var(--primary)",
                                     border: "1px solid var(--border)",
@@ -237,7 +237,7 @@ export default function PatientDetailPage({ readOnly = false }) {
                                 2. Ongoing Procedure (In Progress)
                             </h3>
                             {patient.ongoingProcedure && (
-                                <span style={{ fontSize: "0.75rem", fontWeight: "700", color: "var(--primary)", backgroundColor: "var(--primary-light)", padding: "0.2rem 0.5rem", borderRadius: "4px" }}>
+                                <span style={{ fontSize: "0.75rem", fontWeight: "700", color: "var(--primary)", backgroundColor: "var(--primary-light)", padding: "0.2rem 0.5rem", borderRadius: 0 }}>
                                     ACTIVE
                                 </span>
                             )}
@@ -287,7 +287,7 @@ export default function PatientDetailPage({ readOnly = false }) {
                                         style={{
                                             padding: "0.75rem",
                                             backgroundColor: "var(--bg-page)",
-                                            borderRadius: "6px",
+                                            borderRadius: 0,
                                             border: "1px solid var(--border)",
                                         }}
                                     >
@@ -329,7 +329,7 @@ export default function PatientDetailPage({ readOnly = false }) {
                                     justifyContent: "space-between",
                                     padding: "0.75rem 1rem",
                                     backgroundColor: Number(patient.remainingFee || 0) > 0 ? "rgba(220, 38, 38, 0.08)" : "var(--primary-light)",
-                                    borderRadius: "8px",
+                                    borderRadius: 0,
                                     marginTop: "0.5rem",
                                     border: `1px solid ${Number(patient.remainingFee || 0) > 0 ? "#fca5a5" : "var(--border)"}`,
                                 }}
