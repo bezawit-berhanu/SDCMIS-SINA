@@ -134,7 +134,7 @@ export default function AppointmentsPage() {
                 <div style={{
                     padding: "10px 16px",
                     marginBottom: "1.25rem",
-                    borderRadius: "8px",
+                    borderRadius: 0,
                     fontWeight: 500,
                     fontSize: "0.875rem",
                     backgroundColor: feedbackType === "success" ? "#ecfdf5" : "#fee2e2",
@@ -197,13 +197,13 @@ export default function AppointmentsPage() {
                         </div>
 
                         {/* Filter Tabs */}
-                        <div style={{ display: "flex", gap: "4px", backgroundColor: "#f1f5f9", padding: "3px", borderRadius: "8px" }}>
+                        <div style={{ display: "flex", gap: "4px", backgroundColor: "#f1f5f9", padding: "3px", borderRadius: 0 }}>
                             <button
                                 type="button"
                                 onClick={() => { setActiveTab("upcoming"); }}
                                 style={{
                                     padding: "4px 10px",
-                                    borderRadius: "6px",
+                                    borderRadius: 0,
                                     border: "none",
                                     fontSize: "0.75rem",
                                     fontWeight: 600,
@@ -220,7 +220,7 @@ export default function AppointmentsPage() {
                                 onClick={() => { setActiveTab("all"); }}
                                 style={{
                                     padding: "4px 10px",
-                                    borderRadius: "6px",
+                                    borderRadius: 0,
                                     border: "none",
                                     fontSize: "0.75rem",
                                     fontWeight: 600,
@@ -238,7 +238,7 @@ export default function AppointmentsPage() {
                                     onClick={() => setSelectedDate(null)}
                                     style={{
                                         padding: "4px 8px",
-                                        borderRadius: "6px",
+                                        borderRadius: 0,
                                         border: "none",
                                         fontSize: "0.75rem",
                                         fontWeight: 600,
@@ -318,7 +318,7 @@ export default function AppointmentsPage() {
                                                     fontSize: "0.75rem",
                                                     fontWeight: 700,
                                                     padding: "3px 8px",
-                                                    borderRadius: "9999px",
+                                                    borderRadius: 0,
                                                     backgroundColor: apt.status === "UPCOMING" ? "#e0e7ff" : (apt.status === "MISSED" ? "#fee2e2" : "#d1fae5"),
                                                     color: apt.status === "UPCOMING" ? "#3730a3" : (apt.status === "MISSED" ? "#991b1b" : "#065f46"),
                                                     border: `1px solid ${apt.status === "UPCOMING" ? "#c7d2fe" : (apt.status === "MISSED" ? "#fca5a5" : "#a7f3d0")}`
@@ -334,7 +334,7 @@ export default function AppointmentsPage() {
                                                     onClick={() => setSelectedAppointment(apt)}
                                                     style={{
                                                         padding: "5px 10px",
-                                                        borderRadius: "6px",
+                                                        borderRadius: 0,
                                                         border: "1px solid #cbd5e1",
                                                         backgroundColor: "white",
                                                         color: "#2563eb",
@@ -368,7 +368,7 @@ export default function AppointmentsPage() {
                         padding: "1.25rem",
                         backgroundColor: "#fef2f2",
                         border: "1px solid #fecaca",
-                        borderRadius: "12px"
+                        borderRadius: 0
                     }}>
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                             <h4 style={{ margin: 0, fontSize: "0.95rem", fontWeight: 700, color: "#991b1b" }}>
@@ -405,7 +405,7 @@ export default function AppointmentsPage() {
                 }}>
                     <div className="modal-dialog" onClick={(e) => e.stopPropagation()} style={{
                         backgroundColor: "white",
-                        borderRadius: "12px",
+                        borderRadius: 0,
                         maxWidth: "500px",
                         width: "100%",
                         padding: "1.5rem",
@@ -425,7 +425,7 @@ export default function AppointmentsPage() {
                                     required
                                     value={bookForm.patientId}
                                     onChange={(e) => setBookForm({ ...bookForm, patientId: e.target.value, procedureId: "" })}
-                                    style={{ width: "100%", padding: "8px 10px", borderRadius: "6px", border: "1px solid #cbd5e1" }}
+                                    style={{ width: "100%", padding: "8px 10px", borderRadius: 0, border: "1px solid #cbd5e1" }}
                                 >
                                     {patients.map((p) => (
                                         <option key={p.id} value={p.id}>
@@ -443,7 +443,7 @@ export default function AppointmentsPage() {
                                 <select
                                     value={bookForm.procedureId}
                                     onChange={(e) => setBookForm({ ...bookForm, procedureId: e.target.value })}
-                                    style={{ width: "100%", padding: "8px 10px", borderRadius: "6px", border: "1px solid #cbd5e1" }}
+                                    style={{ width: "100%", padding: "8px 10px", borderRadius: 0, border: "1px solid #cbd5e1" }}
                                 >
                                     <option value="">General Dental Consultation / Exam</option>
                                     {selectedPatientProcedures.map((proc) => (
@@ -464,7 +464,7 @@ export default function AppointmentsPage() {
                                     required
                                     value={bookForm.appointmentDate}
                                     onChange={(e) => setBookForm({ ...bookForm, appointmentDate: e.target.value })}
-                                    style={{ width: "100%", padding: "8px 10px", borderRadius: "6px", border: "1px solid #cbd5e1" }}
+                                    style={{ width: "100%", padding: "8px 10px", borderRadius: 0, border: "1px solid #cbd5e1" }}
                                 />
                             </div>
 
@@ -478,7 +478,7 @@ export default function AppointmentsPage() {
                                     placeholder="e.g. Needs x-ray imaging prior to restoration"
                                     value={bookForm.notes}
                                     onChange={(e) => setBookForm({ ...bookForm, notes: e.target.value })}
-                                    style={{ width: "100%", padding: "8px 10px", borderRadius: "6px", border: "1px solid #cbd5e1" }}
+                                    style={{ width: "100%", padding: "8px 10px", borderRadius: 0, border: "1px solid #cbd5e1" }}
                                 />
                             </div>
 
@@ -486,14 +486,14 @@ export default function AppointmentsPage() {
                                 <button
                                     type="button"
                                     onClick={() => setShowBookModal(false)}
-                                    style={{ padding: "8px 14px", borderRadius: "6px", border: "1px solid #cbd5e1", backgroundColor: "white", cursor: "pointer", fontWeight: 600 }}
+                                    style={{ padding: "8px 14px", borderRadius: 0, border: "1px solid #cbd5e1", backgroundColor: "white", cursor: "pointer", fontWeight: 600 }}
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="submit"
                                     disabled={bookLoading}
-                                    style={{ padding: "8px 18px", borderRadius: "6px", border: "none", backgroundColor: "#2563eb", color: "white", cursor: "pointer", fontWeight: 600 }}
+                                    style={{ padding: "8px 18px", borderRadius: 0, border: "none", backgroundColor: "#2563eb", color: "white", cursor: "pointer", fontWeight: 600 }}
                                 >
                                     {bookLoading ? "Booking..." : "Confirm Booking"}
                                 </button>
