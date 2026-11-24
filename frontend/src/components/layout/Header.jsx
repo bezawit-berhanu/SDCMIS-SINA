@@ -40,7 +40,7 @@ export default function Header({ onToggleSidebar, isSidebarOpen }) {
                     <DentistNotificationDropdown userId={user.id} />
                 )}
 
-                <div className="user-badge">
+                <div className="user-badge" style={{ borderRadius: 0 }}>
                     <span className="user-badge__dot" />
                     <span>{user ? user.fullName || "Connected" : "Guest"}</span>
                 </div>
