@@ -301,13 +301,13 @@ export default function ReceptionistPage() {
                         color: "var(--primary)",
                         backgroundColor: "var(--primary-light)",
                         border: "1px solid var(--border)",
-                        borderRadius: "9999px",
+                        borderRadius: 0,
                         padding: "4px 10px",
                     }}>
                         <span style={{
                             width: "8px",
                             height: "8px",
-                            borderRadius: "50%",
+                            borderRadius: 0,
                             backgroundColor: realtimeConnected ? "#10b981" : "#f59e0b",
                             display: "inline-block",
                         }} />
@@ -323,7 +323,7 @@ export default function ReceptionistPage() {
                 <div style={{
                     padding: "10px 16px",
                     marginBottom: "1rem",
-                    borderRadius: "6px",
+                    borderRadius: 0,
                     backgroundColor: "rgba(27, 77, 46, 0.08)",
                     color: "var(--primary)",
                     border: "1px solid var(--border)",
@@ -409,7 +409,7 @@ export default function ReceptionistPage() {
                             textAlign: "center",
                             color: "var(--text-muted)",
                             backgroundColor: "var(--bg-page)",
-                            borderRadius: "var(--radius-md)",
+                            borderRadius: 0,
                             border: "1px dashed var(--border)",
                             margin: "0.5rem"
                         }}>
@@ -445,7 +445,7 @@ export default function ReceptionistPage() {
                                                 fontSize: "0.75rem",
                                                 fontWeight: 700,
                                                 padding: "3px 8px",
-                                                borderRadius: "9999px",
+                                                borderRadius: 0,
                                                 backgroundColor: item.status === "SERVING" ? "rgba(27, 77, 46, 0.15)" : item.status === "WAITING" ? "rgba(234, 179, 8, 0.12)" : "rgba(100, 116, 139, 0.1)",
                                                 color: item.status === "SERVING" ? "var(--primary)" : item.status === "WAITING" ? "#b45309" : "#475569",
                                                 border: "1px solid var(--border)"
@@ -516,7 +516,7 @@ export default function ReceptionistPage() {
                             textAlign: "center",
                             color: "var(--text-muted)",
                             backgroundColor: "var(--bg-page)",
-                            borderRadius: "var(--radius-md)",
+                            borderRadius: 0,
                             border: "1px dashed var(--border)",
                             margin: "0.5rem"
                         }}>
@@ -551,7 +551,7 @@ export default function ReceptionistPage() {
                                                 fontSize: "0.75rem",
                                                 fontWeight: 700,
                                                 padding: "3px 8px",
-                                                borderRadius: "9999px",
+                                                borderRadius: 0,
                                                 backgroundColor: "rgba(27, 77, 46, 0.1)",
                                                 color: "var(--primary)",
                                                 border: "1px solid var(--border)"
@@ -616,7 +616,7 @@ export default function ReceptionistPage() {
                                     style={{
                                         width: "100%",
                                         padding: "8px 12px",
-                                        borderRadius: "6px",
+                                        borderRadius: 0,
                                         border: "1px solid var(--border)",
                                         backgroundColor: "var(--bg-card)",
                                     }}
@@ -637,7 +637,7 @@ export default function ReceptionistPage() {
                                     style={{
                                         width: "100%",
                                         padding: "8px 12px",
-                                        borderRadius: "6px",
+                                        borderRadius: 0,
                                         border: "1px solid var(--border)",
                                         backgroundColor: "var(--bg-card)",
                                     }}
@@ -655,7 +655,7 @@ export default function ReceptionistPage() {
                                     style={{
                                         width: "100%",
                                         padding: "8px 12px",
-                                        borderRadius: "6px",
+                                        borderRadius: 0,
                                         border: "1px solid var(--border)",
                                         backgroundColor: "var(--bg-card)",
                                     }}
