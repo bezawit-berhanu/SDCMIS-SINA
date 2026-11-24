@@ -90,7 +90,7 @@ export default function DashboardPage() {
                                     alignItems: "center",
                                     padding: "0.625rem 0.75rem",
                                     backgroundColor: "var(--bg-page)",
-                                    borderRadius: "var(--radius-md)",
+                                    borderRadius: 0,
                                 }}
                             >
                                 <div>
@@ -104,7 +104,7 @@ export default function DashboardPage() {
                                         color: "var(--success)",
                                         backgroundColor: "var(--success-bg)",
                                         padding: "0.2rem 0.5rem",
-                                        borderRadius: "var(--radius-sm)",
+                                        borderRadius: 0,
                                     }}
                                 >
                                     {act.status}
