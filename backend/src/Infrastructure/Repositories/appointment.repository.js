@@ -10,49 +10,16 @@ class AppointmentRepository extends IAppointmentRepository {
         this.patientRepository = patientRepository;
         this.procedureRepository = procedureRepository;
 
-        // In-memory appointments store with realistic seed data
-        this.appointments = [
-            new Appointment({
-                appointmentId: "apt-101",
-                patientId: "pat-1001",
-                procedureId: "proc-1",
-                appointmentDate: new Date(Date.now() + 2 * 86400000), // 2 days ahead
-                status: AppointmentStatus.UPCOMING,
-                notes: "Scheduled routine examination and diagnostic consultation",
-            }),
-            new Appointment({
-                appointmentId: "apt-102",
-                patientId: "pat-1002",
-                procedureId: "proc-2",
-                appointmentDate: new Date(Date.now() - 3 * 86400000), // 3 days ago (Missed)
-                status: AppointmentStatus.MISSED,
-                notes: "Patient failed to attend scheduled restorative prep visit",
-            }),
-            new Appointment({
-                appointmentId: "apt-103",
-                patientId: "pat-1003",
-                procedureId: "proc-3",
-                appointmentDate: new Date(Date.now() + 5 * 86400000), // 5 days ahead
-                status: AppointmentStatus.UPCOMING,
-                notes: "Follow-up orthodontic bracket repositioning",
-            }),
-            new Appointment({
-                appointmentId: "apt-104",
-                patientId: "pat-1004",
-                procedureId: "proc-4",
-                appointmentDate: new Date(Date.now() - 7 * 86400000), // 7 days ago (Attended)
-                status: AppointmentStatus.ATTENDED,
-                notes: "Completed ultrasonic scaling and fluoride treatment",
-            }),
-            new Appointment({
-                appointmentId: "apt-105",
-                patientId: "pat-1001",
-                procedureId: "proc-1",
-                appointmentDate: new Date(Date.now() - 4 * 86400000), // 4 days ago (Passed upcoming -> Missed candidate)
-                status: AppointmentStatus.UPCOMING,
-                notes: "Diagnostic radiography review session",
-            }),
-        ];
+        this.appointments = [];
+    }
+
+    seedAppointment(apt) {
+        this.appointments.push(apt);
+        return apt;
+    }
+
+    clearAppointments() {
+        this.appointments = [];
     }
 
     _enrichAppointment(apt) {
