@@ -5,7 +5,7 @@ export default function PageContainer({
     children,
 }) {
     return (
-        <div className="page-container">
+        <div className="page-container" style={{ borderRadius: 0 }}>
             {(title || actions) && (
                 <div className="page-header">
                     <div>
