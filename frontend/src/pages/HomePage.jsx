@@ -18,9 +18,10 @@ export default function HomePage() {
                     style={{
                         display: "inline-block",
                         padding: "0.35rem 1rem",
-                        borderRadius: "9999px",
-                        backgroundColor: "rgba(37, 99, 235, 0.08)",
-                        color: "var(--primary)",
+                        borderRadius: 0,
+                        backgroundColor: "var(--bg-page)",
+                        border: "1px solid var(--border)",
+                        color: "var(--text-main)",
                         fontSize: "0.875rem",
                         fontWeight: 700,
                         border: "1px solid var(--border)",
