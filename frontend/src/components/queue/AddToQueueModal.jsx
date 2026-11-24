@@ -73,7 +73,7 @@ export default function AddToQueueModal({ onClose, onQueueAdded }) {
             <div
                 style={{
                     backgroundColor: "var(--bg-surface)",
-                    borderRadius: "12px",
+                    borderRadius: 0,
                     maxWidth: "480px",
                     width: "100%",
                     padding: "2rem",
@@ -109,7 +109,7 @@ export default function AddToQueueModal({ onClose, onQueueAdded }) {
                             backgroundColor: "rgba(220, 38, 38, 0.08)",
                             color: "#b91c1c",
                             border: "1px solid #fca5a5",
-                            borderRadius: "6px",
+                            borderRadius: 0,
                             marginBottom: "1rem",
                             fontSize: "0.875rem",
                             fontWeight: "500",
@@ -137,7 +137,7 @@ export default function AddToQueueModal({ onClose, onQueueAdded }) {
                             style={{
                                 width: "100%",
                                 padding: "0.65rem 0.75rem",
-                                borderRadius: "6px",
+                                borderRadius: 0,
                                 border: "1px solid var(--border)",
                                 backgroundColor: "var(--bg-card)",
                                 fontSize: "1rem",
@@ -162,7 +162,7 @@ export default function AddToQueueModal({ onClose, onQueueAdded }) {
                             style={{
                                 width: "100%",
                                 padding: "0.65rem 0.75rem",
-                                borderRadius: "6px",
+                                borderRadius: 0,
                                 border: "1px solid #cbd5e1",
                                 fontSize: "0.95rem",
                             }}
@@ -183,7 +183,7 @@ export default function AddToQueueModal({ onClose, onQueueAdded }) {
                             style={{
                                 width: "100%",
                                 padding: "0.65rem 0.75rem",
-                                borderRadius: "6px",
+                                borderRadius: 0,
                                 border: "1px solid #cbd5e1",
                                 fontSize: "0.95rem",
                                 backgroundColor: "#ffffff",
@@ -213,7 +213,7 @@ export default function AddToQueueModal({ onClose, onQueueAdded }) {
                             style={{
                                 width: "100%",
                                 padding: "0.65rem 0.75rem",
-                                borderRadius: "6px",
+                                borderRadius: 0,
                                 border: "1px solid #cbd5e1",
                                 fontSize: "0.95rem",
                                 resize: "vertical",
