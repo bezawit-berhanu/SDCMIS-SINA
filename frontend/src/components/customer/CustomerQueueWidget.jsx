@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { FiBell } from "react-icons/fi";
+import { FiBell, FiClock } from "react-icons/fi";
 import customerService from "../../services/customer.service";
 import { signalRService } from "../../services/signalr.service";
 
@@ -90,7 +90,7 @@ export default function CustomerQueueWidget({ initialQueue = null, patientId = n
                 }}
             >
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "10px", color: "var(--text-muted)" }}>
-                    <span style={{ fontSize: "1.25rem" }}>⏳</span>
+                    <FiClock style={{ fontSize: "1.25rem", color: "var(--text-muted)" }} />
                     <div>
                         <p style={{ margin: 0, fontWeight: 600, fontSize: "0.95rem", color: "var(--text-main)" }}>
                             Not Checked into Today's Clinic Queue
@@ -125,7 +125,7 @@ export default function CustomerQueueWidget({ initialQueue = null, patientId = n
                     style={{
                         padding: "8px 12px",
                         marginBottom: "12px",
-                        borderRadius: "6px",
+                        borderRadius: 0,
                         backgroundColor: "rgba(27, 77, 46, 0.1)",
                         color: "var(--primary)",
                         border: "1px solid var(--border)",
@@ -154,7 +154,7 @@ export default function CustomerQueueWidget({ initialQueue = null, patientId = n
                         fontSize: "0.8125rem",
                         fontWeight: 700,
                         padding: "4px 12px",
-                        borderRadius: "9999px",
+                        borderRadius: 0,
                         backgroundColor: isServing ? "rgba(27, 77, 46, 0.15)" : isDone ? "rgba(100, 116, 139, 0.1)" : "rgba(234, 179, 8, 0.12)",
                         color: isServing ? "var(--primary)" : isDone ? "var(--text-muted)" : "#b45309",
                         border: "1px solid var(--border)",
@@ -165,7 +165,7 @@ export default function CustomerQueueWidget({ initialQueue = null, patientId = n
             </div>
 
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "1rem", marginTop: "0.5rem" }}>
-                <div style={{ padding: "0.75rem", backgroundColor: "var(--bg-page)", borderRadius: "var(--radius-md)", border: "1px solid var(--border)" }}>
+                <div style={{ padding: "0.75rem", backgroundColor: "var(--bg-page)", borderRadius: 0, border: "1px solid var(--border)" }}>
                     <p style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: 600, textTransform: "uppercase" }}>
                         Your Queue Number
                     </p>
@@ -174,7 +174,7 @@ export default function CustomerQueueWidget({ initialQueue = null, patientId = n
                     </p>
                 </div>
 
-                <div style={{ padding: "0.75rem", backgroundColor: "var(--bg-page)", borderRadius: "var(--radius-md)", border: "1px solid var(--border)" }}>
+                <div style={{ padding: "0.75rem", backgroundColor: "var(--bg-page)", borderRadius: 0, border: "1px solid var(--border)" }}>
                     <p style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: 600, textTransform: "uppercase" }}>
                         Position
                     </p>
@@ -188,7 +188,7 @@ export default function CustomerQueueWidget({ initialQueue = null, patientId = n
                     )}
                 </div>
 
-                <div style={{ padding: "0.75rem", backgroundColor: "var(--bg-page)", borderRadius: "var(--radius-md)", border: "1px solid var(--border)" }}>
+                <div style={{ padding: "0.75rem", backgroundColor: "var(--bg-page)", borderRadius: 0, border: "1px solid var(--border)" }}>
                     <p style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: 600, textTransform: "uppercase" }}>
                         Status
                     </p>
