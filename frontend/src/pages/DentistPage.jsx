@@ -411,7 +411,7 @@ export default function DentistPage() {
                             fontWeight: 800,
                             padding: "6px 14px",
                             borderRadius: 0,
-                            backgroundColor: currentServing ? "rgba(27, 77, 46, 0.12)" : "var(--bg-surface)",
+                            backgroundColor: currentServing ? "var(--primary-light)" : "var(--bg-surface)",
                             color: currentServing ? "var(--primary)" : "var(--text-muted)",
                             border: "1px solid var(--border)",
                         }}>
@@ -431,7 +431,7 @@ export default function DentistPage() {
                         fontSize: "0.8125rem",
                         padding: "5px 12px",
                         borderRadius: 0,
-                        backgroundColor: currentServing ? "rgba(27, 77, 46, 0.1)" : "var(--bg-surface)",
+                        backgroundColor: currentServing ? "var(--primary-light)" : "var(--bg-surface)",
                         color: currentServing ? "var(--primary)" : "var(--text-muted)",
                         border: "1px solid var(--border)",
                     }}>
