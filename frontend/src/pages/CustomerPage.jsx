@@ -115,7 +115,7 @@ export default function CustomerPage() {
                         padding: "1rem 1.25rem",
                         backgroundColor: "rgba(234, 179, 8, 0.1)",
                         borderLeft: "4px solid #eab308",
-                        borderRadius: "8px",
+                        borderRadius: 0,
                         marginBottom: "1.5rem",
                         color: "#854d0e",
                     }}
@@ -146,7 +146,7 @@ export default function CustomerPage() {
                 alignItems: "center",
                 padding: "1rem",
                 backgroundColor: "var(--bg-surface)",
-                borderRadius: "var(--radius-md)",
+                borderRadius: 0,
                 border: "1px solid var(--border)",
             }}>
                 <div style={{ flex: 1, minWidth: "240px" }}>
@@ -177,27 +177,27 @@ export default function CustomerPage() {
                     <p className="card__subtitle">Your verified personal patient profile and clinic registration</p>
                 </div>
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "1rem" }}>
-                    <div style={{ padding: "0.75rem", backgroundColor: "var(--bg-page)", borderRadius: "var(--radius-md)", border: "1px solid var(--border)" }}>
+                    <div style={{ padding: "0.75rem", backgroundColor: "var(--bg-page)", borderRadius: 0, border: "1px solid var(--border)" }}>
                         <p style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: 500 }}>Patient Full Name</p>
                         <p style={{ fontSize: "1rem", fontWeight: 700, marginTop: "2px", color: "var(--text-main)" }}>{myInfo.name}</p>
                     </div>
-                    <div style={{ padding: "0.75rem", backgroundColor: "var(--bg-page)", borderRadius: "var(--radius-md)", border: "1px solid var(--border)" }}>
+                    <div style={{ padding: "0.75rem", backgroundColor: "var(--bg-page)", borderRadius: 0, border: "1px solid var(--border)" }}>
                         <p style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: 500 }}>Patient ID / Chart #</p>
                         <p style={{ fontSize: "1rem", fontWeight: 700, marginTop: "2px", color: "var(--primary)" }}>{myInfo.patientId}</p>
                     </div>
-                    <div style={{ padding: "0.75rem", backgroundColor: "var(--bg-page)", borderRadius: "var(--radius-md)", border: "1px solid var(--border)" }}>
+                    <div style={{ padding: "0.75rem", backgroundColor: "var(--bg-page)", borderRadius: 0, border: "1px solid var(--border)" }}>
                         <p style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: 500 }}>Contact Info</p>
                         <p style={{ fontSize: "1rem", fontWeight: 600, marginTop: "2px", color: "var(--text-main)" }}>{myInfo.contact}</p>
                     </div>
-                    <div style={{ padding: "0.75rem", backgroundColor: "var(--bg-page)", borderRadius: "var(--radius-md)", border: "1px solid var(--border)" }}>
+                    <div style={{ padding: "0.75rem", backgroundColor: "var(--bg-page)", borderRadius: 0, border: "1px solid var(--border)" }}>
                         <p style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: 500 }}>Assigned Dentist</p>
                         <p style={{ fontSize: "1rem", fontWeight: 600, marginTop: "2px", color: "var(--primary)" }}>{myInfo.dentist}</p>
                     </div>
-                    <div style={{ padding: "0.75rem", backgroundColor: "var(--bg-page)", borderRadius: "var(--radius-md)", border: "1px solid var(--border)" }}>
+                    <div style={{ padding: "0.75rem", backgroundColor: "var(--bg-page)", borderRadius: 0, border: "1px solid var(--border)" }}>
                         <p style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: 500 }}>Registered Branch</p>
                         <p style={{ fontSize: "1rem", fontWeight: 600, marginTop: "2px", color: "var(--text-main)" }}>{myInfo.branch}</p>
                     </div>
-                    <div style={{ padding: "0.75rem", backgroundColor: "var(--bg-page)", borderRadius: "var(--radius-md)", border: "1px solid var(--border)" }}>
+                    <div style={{ padding: "0.75rem", backgroundColor: "var(--bg-page)", borderRadius: 0, border: "1px solid var(--border)" }}>
                         <p style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: 500 }}>Record Status</p>
                         <span style={{
                             display: "inline-block",
@@ -206,7 +206,7 @@ export default function CustomerPage() {
                             color: "var(--primary)",
                             backgroundColor: "rgba(27, 77, 46, 0.1)",
                             padding: "2px 8px",
-                            borderRadius: "4px",
+                            borderRadius: 0,
                             marginTop: "4px",
                             border: "1px solid var(--border)",
                         }}>
@@ -245,7 +245,7 @@ export default function CustomerPage() {
                                     alignItems: "center",
                                     padding: "0.875rem",
                                     backgroundColor: "var(--bg-page)",
-                                    borderRadius: "var(--radius-md)",
+                                    borderRadius: 0,
                                     border: "1px solid var(--border)",
                                 }}
                             >
@@ -262,7 +262,7 @@ export default function CustomerPage() {
                                         fontSize: "0.75rem",
                                         fontWeight: 700,
                                         padding: "3px 8px",
-                                        borderRadius: "4px",
+                                        borderRadius: 0,
                                         backgroundColor: proc.status === "DONE" || proc.status === "COMPLETED" ? "rgba(27, 77, 46, 0.1)" : "rgba(234, 179, 8, 0.12)",
                                         color: proc.status === "DONE" || proc.status === "COMPLETED" ? "var(--primary)" : "#b45309",
                                         border: "1px solid var(--border)",
@@ -274,7 +274,7 @@ export default function CustomerPage() {
                         ))}
                     </div>
                 ) : (
-                    <div style={{ padding: "2rem", textAlign: "center", color: "var(--text-muted)", backgroundColor: "var(--bg-page)", borderRadius: "var(--radius-md)", border: "1px dashed var(--border)" }}>
+                    <div style={{ padding: "2rem", textAlign: "center", color: "var(--text-muted)", backgroundColor: "var(--bg-page)", borderRadius: 0, border: "1px dashed var(--border)" }}>
                         <FiClipboard style={{ fontSize: "1.75rem", display: "block", margin: "0 auto 0.5rem", color: "var(--text-light)" }} />
                         <p style={{ fontWeight: 600, margin: 0 }}>No treatment procedures logged yet</p>
                         <p style={{ fontSize: "0.8125rem", margin: "4px 0 0 0" }}>Procedures performed by your dentist will be recorded here</p>
@@ -310,7 +310,7 @@ export default function CustomerPage() {
                         style={{
                             padding: "1rem",
                             backgroundColor: "var(--bg-page)",
-                            borderRadius: "var(--radius-md)",
+                            borderRadius: 0,
                             border: "1px solid var(--border)",
                             display: "flex",
                             justifyContent: "space-between",
@@ -330,7 +330,7 @@ export default function CustomerPage() {
                                 fontSize: "0.8125rem",
                                 fontWeight: 800,
                                 padding: "4px 10px",
-                                borderRadius: "9999px",
+                                borderRadius: 0,
                                 backgroundColor: "rgba(27, 77, 46, 0.1)",
                                 color: "var(--primary)",
                                 border: "1px solid var(--border)",
@@ -340,7 +340,7 @@ export default function CustomerPage() {
                         </span>
                     </div>
                 ) : (
-                    <div style={{ padding: "1.5rem", textAlign: "center", color: "var(--text-muted)", backgroundColor: "var(--bg-page)", borderRadius: "var(--radius-md)", border: "1px dashed var(--border)" }}>
+                    <div style={{ padding: "1.5rem", textAlign: "center", color: "var(--text-muted)", backgroundColor: "var(--bg-page)", borderRadius: 0, border: "1px dashed var(--border)" }}>
                         <p style={{ fontWeight: 600, margin: 0, fontSize: "0.9rem" }}>No upcoming procedure currently planned</p>
                         <p style={{ fontSize: "0.8125rem", margin: "4px 0 0 0" }}>Your next procedure will appear here once scheduled by your dentist</p>
                     </div>
@@ -372,7 +372,7 @@ export default function CustomerPage() {
                                     style={{
                                         padding: "0.75rem",
                                         backgroundColor: "var(--bg-page)",
-                                        borderRadius: "var(--radius-md)",
+                                        borderRadius: 0,
                                         border: "1px solid var(--border)",
                                         marginBottom: "0.5rem",
                                     }}
@@ -401,7 +401,7 @@ export default function CustomerPage() {
                                     style={{
                                         padding: "0.75rem",
                                         backgroundColor: "var(--bg-page)",
-                                        borderRadius: "var(--radius-md)",
+                                        borderRadius: 0,
                                         border: "1px solid var(--border)",
                                         marginBottom: "0.5rem",
                                     }}
@@ -435,19 +435,19 @@ export default function CustomerPage() {
                     <p className="card__subtitle">Your financial standing, payment receipts, and outstanding fee</p>
                 </div>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "1rem", marginBottom: "1rem" }}>
-                    <div style={{ padding: "1rem", backgroundColor: "var(--bg-page)", borderRadius: "var(--radius-md)", border: "1px solid var(--border)" }}>
+                    <div style={{ padding: "1rem", backgroundColor: "var(--bg-page)", borderRadius: 0, border: "1px solid var(--border)" }}>
                         <p style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: 600 }}>Outstanding Balance</p>
                         <p data-testid="customer-balance-value" style={{ fontSize: "1.5rem", fontWeight: 800, color: Number(balance.remainingFee || balance.balance || 0) > 0 ? "#b91c1c" : "var(--primary)", marginTop: "4px" }}>
                             {Number(balance.remainingFee || balance.balance || 0).toFixed(2)} ETB
                         </p>
                     </div>
-                    <div style={{ padding: "1rem", backgroundColor: "var(--bg-page)", borderRadius: "var(--radius-md)", border: "1px solid var(--border)" }}>
+                    <div style={{ padding: "1rem", backgroundColor: "var(--bg-page)", borderRadius: 0, border: "1px solid var(--border)" }}>
                         <p style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: 600 }}>Total Payments Made</p>
                         <p style={{ fontSize: "1.5rem", fontWeight: 800, color: "var(--primary)", marginTop: "4px" }}>
                             {Number(balance.totalPaid || 0).toFixed(2)} ETB
                         </p>
                     </div>
-                    <div style={{ padding: "1rem", backgroundColor: "var(--bg-page)", borderRadius: "var(--radius-md)", border: "1px solid var(--border)" }}>
+                    <div style={{ padding: "1rem", backgroundColor: "var(--bg-page)", borderRadius: 0, border: "1px solid var(--border)" }}>
                         <p style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: 600 }}>Billing Status</p>
                         <p style={{ fontSize: "1.25rem", fontWeight: 700, color: Number(balance.remainingFee || 0) > 0 ? "#b45309" : "var(--primary)", marginTop: "4px" }}>
                             {Number(balance.remainingFee || 0) > 0 ? "Pending Balance" : "Paid in Full"}
