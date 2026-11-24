@@ -265,13 +265,13 @@ export default function DentistPage() {
                         color: "var(--primary)",
                         backgroundColor: "var(--primary-light)",
                         border: "1px solid var(--border)",
-                        borderRadius: "9999px",
+                        borderRadius: 0,
                         padding: "4px 10px",
                     }}>
                         <span style={{
                             width: "8px",
                             height: "8px",
-                            borderRadius: "50%",
+                            borderRadius: 0,
                             backgroundColor: realtimeConnected ? "#10b981" : "#f59e0b",
                             display: "inline-block",
                         }} />
@@ -291,7 +291,7 @@ export default function DentistPage() {
                     style={{
                         padding: "14px 18px",
                         marginBottom: "1.25rem",
-                        borderRadius: "8px",
+                        borderRadius: 0,
                         backgroundColor: "var(--bg-card)",
                         color: "var(--primary)",
                         border: "2px solid var(--border-focus)",
@@ -326,7 +326,7 @@ export default function DentistPage() {
                 <div style={{
                     padding: "10px 16px",
                     marginBottom: "1rem",
-                    borderRadius: "6px",
+                    borderRadius: 0,
                     backgroundColor: "rgba(27, 77, 46, 0.08)",
                     color: "var(--primary)",
                     border: "1px solid var(--border)",
@@ -402,7 +402,7 @@ export default function DentistPage() {
                     alignItems: "center",
                     padding: "1.25rem",
                     backgroundColor: "var(--bg-page)",
-                    borderRadius: "var(--radius-md)",
+                    borderRadius: 0,
                     border: "1px solid var(--border)",
                 }}>
                     <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
@@ -410,7 +410,7 @@ export default function DentistPage() {
                             fontSize: "1.25rem",
                             fontWeight: 800,
                             padding: "6px 14px",
-                            borderRadius: "6px",
+                            borderRadius: 0,
                             backgroundColor: currentServing ? "rgba(27, 77, 46, 0.12)" : "var(--bg-surface)",
                             color: currentServing ? "var(--primary)" : "var(--text-muted)",
                             border: "1px solid var(--border)",
@@ -430,7 +430,7 @@ export default function DentistPage() {
                         fontWeight: 700,
                         fontSize: "0.8125rem",
                         padding: "5px 12px",
-                        borderRadius: "9999px",
+                        borderRadius: 0,
                         backgroundColor: currentServing ? "rgba(27, 77, 46, 0.1)" : "var(--bg-surface)",
                         color: currentServing ? "var(--primary)" : "var(--text-muted)",
                         border: "1px solid var(--border)",
@@ -452,7 +452,7 @@ export default function DentistPage() {
                             textAlign: "center",
                             color: "var(--text-muted)",
                             backgroundColor: "var(--bg-page)",
-                            borderRadius: "var(--radius-md)",
+                            borderRadius: 0,
                             border: "1px dashed var(--border)"
                         }}>
                             <FiClipboard style={{ fontSize: "2rem", display: "block", margin: "0 auto 0.5rem", color: "var(--text-light)" }} />
@@ -470,7 +470,7 @@ export default function DentistPage() {
                                         alignItems: "center",
                                         padding: "0.75rem",
                                         backgroundColor: "var(--bg-page)",
-                                        borderRadius: "var(--radius-md)",
+                                        borderRadius: 0,
                                         border: "1px solid var(--border)",
                                     }}
                                 >
@@ -488,7 +488,7 @@ export default function DentistPage() {
                                                 color: "var(--primary)",
                                                 backgroundColor: "rgba(27, 77, 46, 0.1)",
                                                 padding: "0.25rem 0.5rem",
-                                                borderRadius: "var(--radius-sm)",
+                                                borderRadius: 0,
                                             }}
                                         >
                                             {proc.status}
@@ -568,7 +568,7 @@ export default function DentistPage() {
                             textAlign: "center",
                             color: "var(--text-muted)",
                             backgroundColor: "var(--bg-page)",
-                            borderRadius: "var(--radius-md)",
+                            borderRadius: 0,
                             border: "1px dashed var(--border)",
                             margin: "0.5rem"
                         }}>
@@ -599,7 +599,7 @@ export default function DentistPage() {
                                                 fontSize: "0.75rem",
                                                 fontWeight: 700,
                                                 padding: "3px 8px",
-                                                borderRadius: "9999px",
+                                                borderRadius: 0,
                                                 backgroundColor: "rgba(27, 77, 46, 0.1)",
                                                 color: "var(--primary)",
                                                 border: "1px solid var(--border)"
