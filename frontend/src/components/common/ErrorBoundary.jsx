@@ -51,7 +51,7 @@ export default class ErrorBoundary extends Component {
                             width: "100%",
                             backgroundColor: "#ffffff",
                             padding: "2.5rem",
-                            borderRadius: "12px",
+                            borderRadius: 0,
                             boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)",
                             textAlign: "center",
                         }}
@@ -61,7 +61,7 @@ export default class ErrorBoundary extends Component {
                                 width: "64px",
                                 height: "64px",
                                 margin: "0 auto 1.5rem",
-                                borderRadius: "50%",
+                                borderRadius: 0,
                                 backgroundColor: "#fee2e2",
                                 color: "#ef4444",
                                 display: "flex",
