@@ -125,7 +125,7 @@ export default function CreatePatientModal() {
 
     return (
         <div className="modal-backdrop" onClick={() => setIsCreateOpen(false)}>
-            <div className="modal-dialog modal-md" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-dialog modal-md" style={{ borderRadius: 0 }} onClick={(e) => e.stopPropagation()}>
                 <div className="modal-header">
                     <div>
                         <h2 className="modal-title">Register New Patient</h2>
