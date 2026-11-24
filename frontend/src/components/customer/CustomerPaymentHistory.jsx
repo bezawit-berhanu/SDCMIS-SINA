@@ -22,7 +22,7 @@ export default function CustomerPaymentHistory({ payments = [], remainingFee = 0
             </div>
 
             {payments.length === 0 ? (
-                <div style={{ padding: "1.5rem", textAlign: "center", color: "var(--text-muted)", fontSize: "0.875rem", backgroundColor: "var(--bg-page)", borderRadius: "var(--radius-md)", border: "1px dashed var(--border)", margin: "0.5rem" }}>
+                <div style={{ padding: "1.5rem", textAlign: "center", color: "var(--text-muted)", fontSize: "0.875rem", backgroundColor: "var(--bg-page)", borderRadius: 0, border: "1px dashed var(--border)", margin: "0.5rem" }}>
                     No payment receipts found for this account.
                 </div>
             ) : (
@@ -52,7 +52,7 @@ export default function CustomerPaymentHistory({ payments = [], remainingFee = 0
                                                 fontSize: "0.75rem",
                                                 fontWeight: 700,
                                                 padding: "2px 6px",
-                                                borderRadius: "4px",
+                                                borderRadius: 0,
                                                 backgroundColor: "rgba(27, 77, 46, 0.1)",
                                                 color: "var(--primary)",
                                                 border: "1px solid var(--border)",
