@@ -74,8 +74,8 @@ export default function CustomerPage() {
         contact: user?.phone || user?.email || "No contact info",
         serviceType: user?.serviceType || "General Dentistry",
         status: user?.linkedPatientId ? "ACTIVE" : "PENDING_LINK",
-        dentist: "Dr. Assigned Practitioner",
-        branch: "Sina Dental Clinic - Main",
+        dentist: "Not Assigned Yet",
+        branch: "Unassigned",
     };
 
     const treatment = dashboardData?.treatment || {
